@@ -1,21 +1,12 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { fetchFacebookPosts } from '../services/api';
 import { fetchHomePageData, fetchSocialPosts } from '../services/sanity';
 import { SocialPost, HomePageData } from '../types';
-import { BookOpen, Users, Lightbulb, ChevronRight, ExternalLink, Star, MapPin, GraduationCap, TrendingUp, Award } from 'lucide-react';
+import { BookOpen, Users, Lightbulb, ChevronRight, Star, MapPin, X, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SOCIAL_LINKS } from '../constants';
 import Wave from '../components/Wave';
-
-// Icon mapping for dynamic icons
-const iconMap: { [key: string]: React.ReactNode } = {
-  MapPin: <MapPin className="w-6 h-6 text-white" />,
-  Star: <Star className="w-6 h-6 text-white" />,
-  BookOpen: <BookOpen className="w-6 h-6 text-white" />,
-  Lightbulb: <Lightbulb className="w-10 h-10" />,
-  Users: <Users className="w-10 h-10" />,
-};
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<SocialPost[]>([]);
@@ -23,6 +14,8 @@ const Home: React.FC = () => {
   const [pageData, setPageData] = useState<HomePageData | null>(null);
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
   const [grandOpeningIndex, setGrandOpeningIndex] = useState(0);
+  const [postImageIndex, setPostImageIndex] = useState<Record<string, number>>({});
+  const [lightbox, setLightbox] = useState<null | { post: SocialPost; index: number }>(null);
   
   // Pagination State
   const [visiblePostsCount, setVisiblePostsCount] = useState(3);
@@ -74,6 +67,8 @@ const Home: React.FC = () => {
   const aboutButtonText = pageData?.aboutSection?.buttonText || 'Read More';
   const latestUpdatesTitle = pageData?.latestUpdates?.title || 'Latest Updates';
 
+  const visiblePosts = useMemo(() => posts.slice(0, 3), [posts]);
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -106,6 +101,24 @@ const Home: React.FC = () => {
     loadData();
   }, []);
 
+  // Auto slideshow for multi-image Facebook posts (normal card view)
+  useEffect(() => {
+    if (!visiblePosts || visiblePosts.length === 0) return;
+
+    const timer = setInterval(() => {
+      setPostImageIndex((prev) => {
+        const next = { ...prev };
+        for (const p of visiblePosts) {
+          const len = p.images?.length ?? 0;
+          if (len > 1) next[p.id] = ((next[p.id] ?? 0) + 1) % len;
+        }
+        return next;
+      });
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [visiblePosts]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentCarouselIndex((prev) => (prev + 1) % heroImages.length);
@@ -130,6 +143,23 @@ const Home: React.FC = () => {
 
   const prevGrandOpeningImage = () => {
     setGrandOpeningIndex((prev) => (prev - 1 + grandOpeningImages.length) % grandOpeningImages.length);
+  };
+
+  const openLightbox = (post: SocialPost, index: number) => setLightbox({ post, index });
+  const closeLightbox = () => setLightbox(null);
+
+  const nextLightbox = () => {
+    if (!lightbox) return;
+    const count = lightbox.post.images?.length || 0;
+    if (count <= 1) return;
+    setLightbox({ post: lightbox.post, index: (lightbox.index + 1) % count });
+  };
+
+  const prevLightbox = () => {
+    if (!lightbox) return;
+    const count = lightbox.post.images?.length || 0;
+    if (count <= 1) return;
+    setLightbox({ post: lightbox.post, index: (lightbox.index - 1 + count) % count });
   };
 
   // Helper to get icon component
@@ -166,7 +196,16 @@ const Home: React.FC = () => {
         
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 animate-fade-in-up">
           <h1 className="text-5xl md:text-7xl font-hand text-white mb-4 drop-shadow-lg font-bold tracking-tight">
-            {heroTitle.split(' at ').map((part, i) => i === 0 ? <>{part}<br/>at </> : part)}
+            {heroTitle.includes(' at ') ? (
+              <>
+                {heroTitle.split(' at ')[0]}
+                <br />
+                {'at '}
+                {heroTitle.split(' at ')[1]}
+              </>
+            ) : (
+              heroTitle
+            )}
           </h1>
           <p className="text-xl md:text-2xl text-school-yellow mb-10 font-display tracking-wide max-w-3xl font-medium">
             {heroSubtitle}
@@ -203,31 +242,23 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {posts.slice(0, 3).map(post => (
+              {visiblePosts.map(post => (
                 <div key={post.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col">
                   {post.images && post.images.length > 0 && (
-                    <div className="relative h-48 overflow-hidden">
-                      {post.images.length === 1 ? (
-                        <img 
-                          src={post.images[0]} 
-                          alt="Post" 
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
-                        />
-                      ) : (
-                        <div className="relative h-full">
-                          {post.images.map((img, imgIdx) => (
-                            <img 
-                              key={imgIdx}
-                              src={img} 
-                              alt={`Post image ${imgIdx + 1}`}
-                              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${imgIdx === 0 ? 'opacity-100' : 'opacity-0'}`}
-                            />
-                          ))}
-                          {post.images.length > 1 && (
-                            <div className="absolute bottom-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
-                              +{post.images.length} photos
-                            </div>
-                          )}
+                    <div
+                      className="relative h-48 overflow-hidden cursor-pointer"
+                      onClick={() => openLightbox(post, postImageIndex[post.id] ?? 0)}
+                      title="Click to view"
+                    >
+                      <img 
+                        src={post.images[postImageIndex[post.id] ?? 0] || post.images[0]} 
+                        alt="Post" 
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
+                      />
+
+                      {post.images.length > 1 && (
+                        <div className="absolute bottom-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
+                          {(postImageIndex[post.id] ?? 0) + 1} / {post.images.length}
                         </div>
                       )}
                     </div>
@@ -377,6 +408,56 @@ const Home: React.FC = () => {
           </Link>
         </div>
       </section>
+
+      {/* Facebook Post Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4"
+          onClick={closeLightbox}
+        >
+          <div
+            className="relative w-full max-w-5xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute -top-12 right-0 text-white font-bold flex items-center gap-2"
+              onClick={closeLightbox}
+            >
+              <X size={18} />
+              Close
+            </button>
+
+            <img
+              src={lightbox.post.images[lightbox.index]}
+              alt="Expanded"
+              className="w-full max-h-[80vh] object-contain rounded-lg"
+            />
+
+            {lightbox.post.images.length > 1 && (
+              <>
+                <button
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded"
+                  onClick={prevLightbox}
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded"
+                  onClick={nextLightbox}
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+
+                <div className="mt-3 text-center text-white text-sm opacity-80">
+                  {lightbox.index + 1} / {lightbox.post.images.length}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -2,24 +2,34 @@
 import { SocialPost, GalleryImage } from '../types';
 import { FALLBACK_FACEBOOK_POSTS, FALLBACK_GALLERY_IMAGES } from '../constants';
 
-const FB_ACCESS_TOKEN = 'EAAG88PhMfCsBP3pduhYqoyX6lIadrudtWOMqYFoqAHS69DTZCEZB7fk3aUTrfMQE1y6NeMrQUTYWpwoKRxL6vNNBMYbGi3OFP1mPlzNu7edgZAvAm0XlOHPJZAJO30LMJmZBZBoogkkNc2jych5kPKwUOk7y02dHhcAZAnZBE3wsCPKMWmkbGzjjQvF5iATVHdSQ0JXuJKyMjdqQjE0bKOonRkX2mZCpO78fFxgZDZD';
-const PAGE_ID = '489218120645675'; 
 const FB_GRAPH_URL = 'https://graph.facebook.com/v19.0';
+const PAGE_ID = import.meta.env.VITE_FB_PAGE_ID as string | undefined;
+const FB_ACCESS_TOKEN = import.meta.env.VITE_FB_ACCESS_TOKEN as string | undefined;
 
 export const fetchFacebookPosts = async (): Promise<SocialPost[]> => {
   try {
-    const url = `${FB_GRAPH_URL}/${PAGE_ID}/posts?fields=id,message,created_time,permalink_url,full_picture,attachments{media_type,media,subattachments}&limit=10&access_token=${FB_ACCESS_TOKEN}`;
-    console.log('Fetching Facebook posts from:', url);
+    // If not configured, fall back instead of hard failing
+    if (!PAGE_ID || !FB_ACCESS_TOKEN) {
+      console.warn('Missing VITE_FB_PAGE_ID / VITE_FB_ACCESS_TOKEN. Using fallback Facebook posts.');
+      return FALLBACK_FACEBOOK_POSTS;
+    }
+
+    // NOTE: Do not log the full URL, it contains the token.
+    const url =
+      `${FB_GRAPH_URL}/${PAGE_ID}/posts` +
+      `?fields=id,message,created_time,permalink_url,full_picture,` +
+      // Try to capture albums/carousels + single images in one request
+      `attachments{media_type,media{source,image},subattachments{media{source,image}}}` +
+      `&limit=10&access_token=${FB_ACCESS_TOKEN}`;
     
     const response = await fetch(url);
 
     if (!response.ok) {
       console.error('Facebook API error:', response.status, response.statusText);
-      throw new Error('API_FAIL');
+      throw new Error(`FB_API_${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Facebook API response:', data);
     
     if (data.error) {
       console.error('Facebook API returned error:', data.error);
@@ -27,27 +37,29 @@ export const fetchFacebookPosts = async (): Promise<SocialPost[]> => {
     }
     
     if (!data.data || data.data.length === 0) {
-      console.log('No posts returned from Facebook API, using fallback');
       return FALLBACK_FACEBOOK_POSTS;
     }
 
-    const mappedPosts = data.data.map((post: any) => {
+    const mappedPosts: SocialPost[] = data.data.map((post: any) => {
         let images: string[] = [];
 
         // 1. Check for Album (multiple images)
-        if (post.attachments?.data?.[0]?.subattachments?.data) {
-           images = post.attachments.data[0].subattachments.data.map((sub: any) => sub.media?.image?.src).filter(Boolean);
+        const subattachments = post?.attachments?.data?.[0]?.subattachments?.data;
+        if (Array.isArray(subattachments) && subattachments.length > 0) {
+           images = subattachments
+             .map((sub: any) => sub?.media?.image?.src || sub?.media?.source)
+             .filter(Boolean);
         } 
         // 2. Check for Single Media
-        else if (post.attachments?.data?.[0]?.media?.image?.src) {
-           images = [post.attachments.data[0].media.image.src];
+        else {
+          const media = post?.attachments?.data?.[0]?.media;
+          const single = media?.image?.src || media?.source;
+          if (single) images = [single];
         }
         // 3. Check for Full Picture
-        else if (post.full_picture) {
-           images = [post.full_picture];
+        if (images.length === 0 && post?.full_picture) {
+          images = [post.full_picture];
         }
-
-        console.log(`Post ${post.id}: ${images.length} images found`);
 
         return {
           id: post.id,
@@ -58,7 +70,6 @@ export const fetchFacebookPosts = async (): Promise<SocialPost[]> => {
         };
       });
 
-    console.log('Returning', mappedPosts.length, 'posts from Facebook API');
     return mappedPosts;
 
   } catch (error) {
@@ -69,6 +80,9 @@ export const fetchFacebookPosts = async (): Promise<SocialPost[]> => {
 
 export const fetchGalleryImages = async (): Promise<GalleryImage[]> => {
   try {
+    if (!PAGE_ID || !FB_ACCESS_TOKEN) {
+      return FALLBACK_GALLERY_IMAGES;
+    }
     // Similar strategy: try to fetch, but fallback aggressively if empty
     const accountRes = await fetch(
       `${FB_GRAPH_URL}/${PAGE_ID}?fields=instagram_business_account&access_token=${FB_ACCESS_TOKEN}`
