@@ -12,6 +12,9 @@
 interface Env {
   VITE_FB_PAGE_ID?: string;
   VITE_FB_ACCESS_TOKEN?: string;
+  // Optional, but recommended: the public URL of the Facebook page
+  // Example: https://www.facebook.com/p/Makko-Billi-School-100064047512878/
+  VITE_FB_PAGE_URL?: string;
 }
 
 interface FacebookPost {
@@ -88,30 +91,81 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       'attachments{media_type,media,subattachments{media}}',
     ].join(',');
 
-    const url = `${FB_GRAPH_URL}/${env.VITE_FB_PAGE_ID}/posts?fields=${fields}&limit=20&access_token=${env.VITE_FB_ACCESS_TOKEN}`;
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      let errorJson;
+    const fetchPosts = async (pageId: string) => {
+      const url = `${FB_GRAPH_URL}/${pageId}/posts?fields=${fields}&limit=20&access_token=${env.VITE_FB_ACCESS_TOKEN}`;
+      const response = await fetch(url);
+      const text = await response.text();
+      let json: any;
       try {
-        errorJson = JSON.parse(errorText);
+        json = JSON.parse(text);
       } catch {
-        errorJson = { raw: errorText };
+        json = { raw: text };
       }
-      
+      return { ok: response.ok, status: response.status, json };
+    };
+
+    const resolvePageIdFromUrl = async (pageUrl: string) => {
+      const url = `${FB_GRAPH_URL}/?id=${encodeURIComponent(pageUrl)}&fields=id,name&access_token=${env.VITE_FB_ACCESS_TOKEN}`;
+      const response = await fetch(url);
+      const text = await response.text();
+      let json: any;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        json = { raw: text };
+      }
+      return { ok: response.ok, status: response.status, json };
+    };
+
+    // 1) Try with the configured Page ID
+    let attemptPageId = env.VITE_FB_PAGE_ID as string;
+    let result = await fetchPosts(attemptPageId);
+
+    // 2) If we get "Unsupported get request" (code 100, subcode 33),
+    // try resolving the real Graph Page ID from the page URL and retry.
+    const fbErr = result?.json?.error;
+    const isUnsupportedGetRequest =
+      fbErr?.code === 100 && (fbErr?.error_subcode === 33 || fbErr?.error_subcode === 0 || fbErr?.error_subcode == null);
+
+    let resolvedPage: { id?: string; name?: string } | null = null;
+
+    if (!result.ok && isUnsupportedGetRequest && env.VITE_FB_PAGE_URL) {
+      const resolved = await resolvePageIdFromUrl(env.VITE_FB_PAGE_URL);
+      const resolvedId = resolved?.json?.id;
+      if (resolved.ok && resolvedId) {
+        resolvedPage = { id: resolvedId, name: resolved?.json?.name };
+        attemptPageId = resolvedId;
+        result = await fetchPosts(attemptPageId);
+      } else {
+        return new Response(
+          JSON.stringify({
+            error: `Facebook API HTTP error: ${result.status}`,
+            facebookError: result.json,
+            hint: 'Your VITE_FB_PAGE_ID might not be the real Graph Page ID. Set VITE_FB_PAGE_URL and redeploy.',
+            resolveAttempt: resolved.json,
+            posts: [],
+          }),
+          { status: 200, headers: corsHeaders }
+        );
+      }
+    }
+
+    if (!result.ok) {
       return new Response(
         JSON.stringify({
-          error: `Facebook API HTTP error: ${response.status}`,
-          facebookError: errorJson,
+          error: `Facebook API HTTP error: ${result.status}`,
+          facebookError: result.json,
+          attemptedPageId: attemptPageId,
+          resolvedPage,
+          hint:
+            'This usually means your token is not a valid Page Access Token for this Page, or the Page ID is wrong. Use /me/accounts in Graph API Explorer to get the correct Page ID + Page token.',
           posts: [],
         }),
         { status: 200, headers: corsHeaders }
       );
     }
 
-    const data = await response.json() as { data?: FacebookPost[]; error?: any };
+    const data = result.json as { data?: FacebookPost[]; error?: any };
 
     if (data.error) {
       return new Response(
@@ -121,8 +175,11 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             message: data.error.message,
             type: data.error.type,
             code: data.error.code,
+            error_subcode: data.error.error_subcode,
             fbtrace_id: data.error.fbtrace_id,
           },
+          attemptedPageId: attemptPageId,
+          resolvedPage,
           posts: [],
         }),
         { status: 200, headers: corsHeaders }
@@ -190,6 +247,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       JSON.stringify({ 
         success: true,
         count: validPosts.length,
+        attemptedPageId: attemptPageId,
+        resolvedPage,
         posts: validPosts 
       }),
       { status: 200, headers: corsHeaders }
