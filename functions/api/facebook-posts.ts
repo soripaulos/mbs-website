@@ -5,13 +5,13 @@
  * avoiding browser tracking protection that blocks client-side requests.
  * 
  * Environment variables required (set in Cloudflare Pages dashboard):
- * - FB_PAGE_ID: Your Facebook Page ID
- * - FB_ACCESS_TOKEN: Your Facebook Page Access Token
+ * - VITE_FB_PAGE_ID: Your Facebook Page ID
+ * - VITE_FB_ACCESS_TOKEN: Your Facebook Page Access Token
  */
 
 interface Env {
-  FB_PAGE_ID?: string;
-  FB_ACCESS_TOKEN?: string;
+  VITE_FB_PAGE_ID?: string;
+  VITE_FB_ACCESS_TOKEN?: string;
 }
 
 interface FacebookPost {
@@ -57,9 +57,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     'Content-Type': 'application/json',
   };
 
-  // Check for required environment variables
-  const hasPageId = !!env.FB_PAGE_ID;
-  const hasToken = !!env.FB_ACCESS_TOKEN;
+  // Check for required environment variables (using VITE_ prefix)
+  const hasPageId = !!env.VITE_FB_PAGE_ID;
+  const hasToken = !!env.VITE_FB_ACCESS_TOKEN;
 
   if (!hasPageId || !hasToken) {
     // Return detailed error so we know what's missing
@@ -67,10 +67,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       JSON.stringify({
         error: 'Missing environment variables',
         details: {
-          FB_PAGE_ID: hasPageId ? 'SET' : 'MISSING',
-          FB_ACCESS_TOKEN: hasToken ? 'SET' : 'MISSING',
+          VITE_FB_PAGE_ID: hasPageId ? 'SET' : 'MISSING',
+          VITE_FB_ACCESS_TOKEN: hasToken ? 'SET' : 'MISSING',
         },
-        help: 'Set FB_PAGE_ID and FB_ACCESS_TOKEN in Cloudflare Pages → Settings → Environment Variables',
+        help: 'Set VITE_FB_PAGE_ID and VITE_FB_ACCESS_TOKEN in Cloudflare Pages → Settings → Environment Variables',
         posts: [],
       }),
       { status: 200, headers: corsHeaders } // Return 200 so frontend can read the error
@@ -88,7 +88,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       'attachments{media_type,media,subattachments{media}}',
     ].join(',');
 
-    const url = `${FB_GRAPH_URL}/${env.FB_PAGE_ID}/posts?fields=${fields}&limit=20&access_token=${env.FB_ACCESS_TOKEN}`;
+    const url = `${FB_GRAPH_URL}/${env.VITE_FB_PAGE_ID}/posts?fields=${fields}&limit=20&access_token=${env.VITE_FB_ACCESS_TOKEN}`;
 
     const response = await fetch(url);
 
