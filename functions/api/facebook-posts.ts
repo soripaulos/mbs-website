@@ -10,8 +10,8 @@
  */
 
 interface Env {
-  FB_PAGE_ID: string;
-  FB_ACCESS_TOKEN: string;
+  FB_PAGE_ID?: string;
+  FB_ACCESS_TOKEN?: string;
 }
 
 interface FacebookPost {
@@ -58,14 +58,22 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   };
 
   // Check for required environment variables
-  if (!env.FB_PAGE_ID || !env.FB_ACCESS_TOKEN) {
-    console.error('[FB Proxy] Missing FB_PAGE_ID or FB_ACCESS_TOKEN');
+  const hasPageId = !!env.FB_PAGE_ID;
+  const hasToken = !!env.FB_ACCESS_TOKEN;
+
+  if (!hasPageId || !hasToken) {
+    // Return detailed error so we know what's missing
     return new Response(
       JSON.stringify({
-        error: 'Server configuration error',
+        error: 'Missing environment variables',
+        details: {
+          FB_PAGE_ID: hasPageId ? 'SET' : 'MISSING',
+          FB_ACCESS_TOKEN: hasToken ? 'SET' : 'MISSING',
+        },
+        help: 'Set FB_PAGE_ID and FB_ACCESS_TOKEN in Cloudflare Pages → Settings → Environment Variables',
         posts: [],
       }),
-      { status: 500, headers: corsHeaders }
+      { status: 200, headers: corsHeaders } // Return 200 so frontend can read the error
     );
   }
 
@@ -82,45 +90,54 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     const url = `${FB_GRAPH_URL}/${env.FB_PAGE_ID}/posts?fields=${fields}&limit=20&access_token=${env.FB_ACCESS_TOKEN}`;
 
-    console.log('[FB Proxy] Fetching from Facebook Graph API...');
     const response = await fetch(url);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[FB Proxy] Facebook API error:', response.status, errorText);
+      let errorJson;
+      try {
+        errorJson = JSON.parse(errorText);
+      } catch {
+        errorJson = { raw: errorText };
+      }
+      
       return new Response(
         JSON.stringify({
-          error: `Facebook API error: ${response.status}`,
+          error: `Facebook API HTTP error: ${response.status}`,
+          facebookError: errorJson,
           posts: [],
         }),
-        { status: 502, headers: corsHeaders }
+        { status: 200, headers: corsHeaders }
       );
     }
 
     const data = await response.json() as { data?: FacebookPost[]; error?: any };
 
     if (data.error) {
-      console.error('[FB Proxy] Facebook API returned error:', data.error);
       return new Response(
         JSON.stringify({
-          error: data.error.message || 'Facebook API error',
-          errorType: data.error.type,
-          errorCode: data.error.code,
+          error: 'Facebook API error',
+          facebookError: {
+            message: data.error.message,
+            type: data.error.type,
+            code: data.error.code,
+            fbtrace_id: data.error.fbtrace_id,
+          },
           posts: [],
         }),
-        { status: 502, headers: corsHeaders }
-      );
-    }
-
-    if (!data.data || data.data.length === 0) {
-      console.log('[FB Proxy] No posts returned from Facebook');
-      return new Response(
-        JSON.stringify({ posts: [] }),
         { status: 200, headers: corsHeaders }
       );
     }
 
-    console.log('[FB Proxy] Received', data.data.length, 'posts');
+    if (!data.data || data.data.length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          message: 'No posts found on this Facebook page',
+          posts: [] 
+        }),
+        { status: 200, headers: corsHeaders }
+      );
+    }
 
     // Map Facebook posts to our format
     const posts: SocialPost[] = data.data.map((post: FacebookPost) => {
@@ -169,20 +186,22 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     // Filter out empty posts
     const validPosts = posts.filter((p) => p.content || p.images.length > 0);
 
-    console.log('[FB Proxy] Returning', validPosts.length, 'valid posts');
-
     return new Response(
-      JSON.stringify({ posts: validPosts }),
+      JSON.stringify({ 
+        success: true,
+        count: validPosts.length,
+        posts: validPosts 
+      }),
       { status: 200, headers: corsHeaders }
     );
   } catch (error) {
-    console.error('[FB Proxy] Fetch error:', error);
     return new Response(
       JSON.stringify({
-        error: 'Failed to fetch posts',
+        error: 'Server error',
+        message: error instanceof Error ? error.message : 'Unknown error',
         posts: [],
       }),
-      { status: 500, headers: corsHeaders }
+      { status: 200, headers: corsHeaders }
     );
   }
 };
@@ -198,4 +217,3 @@ export const onRequestOptions: PagesFunction = async () => {
     },
   });
 };
-

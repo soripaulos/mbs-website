@@ -17,18 +17,30 @@ export const fetchFacebookPosts = async (): Promise<SocialPost[]> => {
     // Call our Cloudflare Pages Function
     const response = await fetch('/api/facebook-posts');
 
-    if (!response.ok) {
-      console.error('[FB] Proxy returned error:', response.status, response.statusText);
+    // Try to parse response body regardless of status
+    let data: any;
+    try {
+      data = await response.json();
+    } catch (e) {
+      console.error('[FB] Failed to parse proxy response as JSON');
       return FALLBACK_FACEBOOK_POSTS;
     }
 
-    const data = await response.json();
+    // Log the full response for debugging
+    console.log('[FB] Proxy response:', data);
 
-    // Check for error in response
+    // Check for configuration errors (missing env vars)
     if (data.error) {
       console.error('[FB] Proxy error:', data.error);
-      if (data.errorType) console.error('[FB] Error type:', data.errorType);
-      if (data.errorCode) console.error('[FB] Error code:', data.errorCode);
+      if (data.details) {
+        console.error('[FB] Environment variables:', data.details);
+      }
+      if (data.facebookError) {
+        console.error('[FB] Facebook API error:', data.facebookError);
+      }
+      if (data.help) {
+        console.info('[FB] Help:', data.help);
+      }
       return FALLBACK_FACEBOOK_POSTS;
     }
 
@@ -38,7 +50,7 @@ export const fetchFacebookPosts = async (): Promise<SocialPost[]> => {
       return FALLBACK_FACEBOOK_POSTS;
     }
 
-    console.log('[FB] Received', data.posts.length, 'posts from proxy');
+    console.log('[FB] Successfully received', data.posts.length, 'posts');
     return data.posts;
 
   } catch (error) {
