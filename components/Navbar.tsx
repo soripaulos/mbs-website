@@ -3,10 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Facebook, Youtube, Send } from 'lucide-react';
 import { SOCIAL_LINKS } from '../constants';
+import { fetchSiteSettings } from '../services/sanity';
+
+// Default logo fallback
+const DEFAULT_LOGO = 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logo, setLogo] = useState<string | null>(null);
   const location = useLocation();
 
   const isHome = location.pathname === '/';
@@ -21,6 +26,21 @@ const Navbar: React.FC = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fetch site settings for logo
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await fetchSiteSettings();
+        if (settings?.logo) {
+          setLogo(settings.logo);
+        }
+      } catch (error) {
+        console.log('Failed to load site settings');
+      }
+    };
+    loadSettings();
   }, []);
 
   const navLinks = [
@@ -76,9 +96,9 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center group">
              <img 
-                src="https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" 
+                src={logo || DEFAULT_LOGO} 
                 alt="Makko Billi Logo" 
-                className="h-12 w-12 rounded-full border-2 border-school-yellow mr-3 object-cover"
+                className="h-12 w-auto max-w-[60px] mr-3 object-contain"
              />
             <div className={`flex flex-col leading-tight ${logoTextClass}`}>
               <span className="font-display font-bold text-xl tracking-wide">MAKKO BILLI</span>

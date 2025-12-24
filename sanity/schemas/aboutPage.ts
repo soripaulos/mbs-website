@@ -12,7 +12,27 @@ export default defineType({
       fields: [
         { name: 'title', title: 'Title', type: 'string' },
         { name: 'subtitle', title: 'Subtitle', type: 'string' },
-        { name: 'image', title: 'Background Image', type: 'image', options: { hotspot: true } },
+        { 
+          name: 'images', 
+          title: 'Hero Images (Slideshow)', 
+          type: 'array', 
+          of: [{ type: 'image', options: { hotspot: true } }],
+          description: 'Add multiple images for hero slideshow. First image shows by default.',
+          validation: (Rule) => Rule.min(1).max(10),
+        },
+        {
+          name: 'overlayColor',
+          title: 'Overlay Color',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Brand Blue', value: 'bg-school-brand/80' },
+              { title: 'Dark Blue', value: 'bg-school-dark-blue/80' },
+              { title: 'Pink', value: 'bg-school-pink/80' },
+            ],
+          },
+          initialValue: 'bg-school-brand/80',
+        },
       ],
     }),
     defineField({

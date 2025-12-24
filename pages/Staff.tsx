@@ -4,7 +4,9 @@ import { fetchStaffPageData } from '../services/sanity';
 import { fetchStaffPageData as fetchFallbackStaffData } from '../services/cms';
 import { StaffPageData } from '../types';
 import { Phone, Mail } from 'lucide-react';
-import Wave from '../components/Wave';
+import HeroSlideshow from '../components/HeroSlideshow';
+
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
 
 const Staff: React.FC = () => {
   const [data, setData] = useState<StaffPageData | null>(null);
@@ -39,7 +41,7 @@ const Staff: React.FC = () => {
   // Dynamic page data with fallbacks
   const heroTitle = data.pageData?.hero?.title || 'Our Staff';
   const heroSubtitle = data.pageData?.hero?.subtitle || 'The Pillars of Our Community';
-  const heroImage = data.pageData?.hero?.backgroundImage || 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
+  const heroImages = data.pageData?.hero?.images?.length ? data.pageData.hero.images : [DEFAULT_HERO_IMAGE];
   const overlayColor = data.pageData?.hero?.overlayColor || 'bg-school-brand/80';
 
   const foundersTitle = data.pageData?.sectionTitles?.foundersTitle || 'Our Founders';
@@ -51,34 +53,13 @@ const Staff: React.FC = () => {
 
   return (
     <div className="w-full pt-20 overflow-x-hidden">
-      {/* Hero Section - Dynamic */}
-      <div className="relative h-[90vh] w-full overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <div className={`absolute inset-0 ${overlayColor} z-10`} />
-          <img 
-            src={heroImage} 
-            alt={heroTitle} 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 animate-fade-in-up">
-          <h1 className="text-5xl md:text-7xl font-hand text-white mb-4 drop-shadow-lg font-bold tracking-tight">
-            {heroTitle}
-          </h1>
-          <p className="text-xl md:text-2xl text-school-yellow mb-10 font-display tracking-wide max-w-3xl font-medium">
-            {heroSubtitle}
-          </p>
-        </div>
-
-        {/* Wave Curve */}
-        <div className="absolute bottom-0 left-0 w-full z-30 leading-none">
-          <svg className="w-full h-24 md:h-48 text-white" viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path fill="currentColor" fillOpacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,208C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-          </svg>
-        </div>
-      </div>
+      {/* Hero Section - Slideshow */}
+      <HeroSlideshow
+        images={heroImages}
+        title={heroTitle}
+        subtitle={heroSubtitle}
+        overlayColor={overlayColor}
+      />
 
       {/* Founders Section */}
       <section className="py-24 px-4 bg-white">

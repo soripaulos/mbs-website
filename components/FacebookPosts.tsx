@@ -55,7 +55,7 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
         }
         return next;
       });
-    }, 3500);
+    }, 7000);
 
     return () => clearInterval(timer);
   }, [posts]);

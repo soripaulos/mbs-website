@@ -75,7 +75,8 @@ export interface AboutPageData {
   hero: {
     title: string;
     subtitle: string;
-    image: string;
+    images: string[];
+    overlayColor?: string;
   };
   intro: {
     title: string;
@@ -110,7 +111,7 @@ export interface StaffPageData {
     hero?: {
       title: string;
       subtitle: string;
-      backgroundImage?: string;
+      images?: string[];
       overlayColor?: string;
     };
     sectionTitles?: {
@@ -176,7 +177,7 @@ export interface GalleryPageData {
   hero: {
     title: string;
     subtitle: string;
-    backgroundImage: string;
+    images: string[];
     overlayColor: string;
   };
   settings: {
@@ -191,7 +192,7 @@ export interface ContactPageData {
   hero: {
     title: string;
     subtitle: string;
-    backgroundImage: string;
+    images: string[];
     overlayColor: string;
   };
   sectionTitle: string;
@@ -210,4 +211,20 @@ export interface ContactPageData {
     submitText: string;
   };
   mapLocations: { title: string; embedUrl: string; titleColor: string }[];
+}
+
+// Site Settings Types
+export interface SiteSettings {
+  title: string;
+  description: string;
+  logo?: string;
+  logoMobile?: string;
+  favicon?: string;
+  footerLogo?: string;
+  socialLinks?: {
+    facebook?: string;
+    telegram?: string;
+    tiktok?: string;
+    youtube?: string;
+  };
 }

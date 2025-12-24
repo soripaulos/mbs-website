@@ -3,14 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
 import { fetchContactPageData } from '../services/sanity';
 import { ContactPageData } from '../types';
-import Wave from '../components/Wave';
+import HeroSlideshow from '../components/HeroSlideshow';
+
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
 
 // Fallback data
 const fallbackData: ContactPageData = {
   hero: {
     title: 'Contact Us',
     subtitle: 'Get in Touch with Us',
-    backgroundImage: 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    images: [DEFAULT_HERO_IMAGE],
     overlayColor: 'bg-school-pink/80'
   },
   sectionTitle: 'Our Address & Contact Details',
@@ -74,35 +76,18 @@ const Contact: React.FC = () => {
     loadData();
   }, []);
 
+  // Get hero images (use fallback if not available)
+  const heroImages = pageData.hero.images?.length > 0 ? pageData.hero.images : [DEFAULT_HERO_IMAGE];
+
   return (
     <div className="w-full pt-20">
-      {/* Hero - Dynamic */}
-      <div className="relative h-[90vh] w-full overflow-hidden">
-        <div className="absolute inset-0">
-          <div className={`absolute inset-0 ${pageData.hero.overlayColor} z-10`} />
-          <img 
-            src={pageData.hero.backgroundImage} 
-            alt={pageData.hero.title} 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 animate-fade-in-up">
-          <h1 className="text-5xl md:text-7xl font-hand text-white mb-4 drop-shadow-lg font-bold tracking-tight">
-            {pageData.hero.title}
-          </h1>
-          <p className="text-xl md:text-2xl text-school-yellow mb-10 font-display tracking-wide max-w-3xl font-medium">
-            {pageData.hero.subtitle}
-          </p>
-        </div>
-
-        {/* Wave Curve */}
-        <div className="absolute bottom-0 left-0 w-full z-30 leading-none">
-          <svg className="w-full h-24 md:h-48 text-white" viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path fill="currentColor" fillOpacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,208C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-          </svg>
-        </div>
-      </div>
+      {/* Hero - Dynamic Slideshow */}
+      <HeroSlideshow
+        images={heroImages}
+        title={pageData.hero.title}
+        subtitle={pageData.hero.subtitle}
+        overlayColor={pageData.hero.overlayColor}
+      />
 
       {/* Content Section */}
       <section className="py-20 px-4 bg-white">

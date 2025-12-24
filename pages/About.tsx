@@ -9,7 +9,9 @@ import {
   ChevronDown, X, MapPin
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import Wave from '../components/Wave';
+import HeroSlideshow from '../components/HeroSlideshow';
+
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
 
 const About: React.FC = () => {
   const [data, setData] = useState<AboutPageData | null>(null);
@@ -77,37 +79,20 @@ const About: React.FC = () => {
 
   const activeAcademicData = data.academics.find(a => a.id === activeAcademic);
 
+  // Get hero images
+  const heroImages = data.hero.images?.length > 0 ? data.hero.images : [DEFAULT_HERO_IMAGE];
+  const overlayColor = data.hero.overlayColor || 'bg-school-brand/80';
+
   return (
     <div className="w-full overflow-x-hidden pt-20">
       
-      {/* Hero Section - Same style as Home */}
-      <div className="relative h-[90vh] w-full overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-school-brand/80 z-10" />
-          <img 
-            src={data.hero.image} 
-            alt="About Us" 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 animate-fade-in-up">
-          <h1 className="text-5xl md:text-7xl font-hand text-white mb-4 drop-shadow-lg font-bold tracking-tight">
-            {data.hero.title}
-          </h1>
-          <p className="text-xl md:text-2xl text-school-yellow mb-10 font-display tracking-wide max-w-3xl font-medium">
-            {data.hero.subtitle}
-          </p>
-        </div>
-
-        {/* Wave Curve */}
-        <div className="absolute bottom-0 left-0 w-full z-30 leading-none">
-          <svg className="w-full h-24 md:h-48 text-white" viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path fill="currentColor" fillOpacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,208C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-          </svg>
-        </div>
-      </div>
+      {/* Hero Section - Slideshow */}
+      <HeroSlideshow
+        images={heroImages}
+        title={data.hero.title}
+        subtitle={data.hero.subtitle}
+        overlayColor={overlayColor}
+      />
 
       {/* Intro & Stats Section */}
       <section className="bg-white py-20 px-4 relative z-20">

@@ -31,10 +31,12 @@ export default defineType({
           initialValue: 'Get in Touch with Us',
         },
         {
-          name: 'backgroundImage',
-          title: 'Background Image',
-          type: 'image',
-          options: { hotspot: true },
+          name: 'images',
+          title: 'Hero Images (Slideshow)',
+          type: 'array',
+          of: [{ type: 'image', options: { hotspot: true } }],
+          description: 'Add multiple images for hero slideshow. First image shows by default.',
+          validation: (Rule) => Rule.min(1).max(10),
         },
         {
           name: 'overlayColor',

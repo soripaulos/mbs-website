@@ -82,7 +82,8 @@ export const fetchAboutPageData = async (): Promise<AboutPageData> => {
     hero{
       title,
       subtitle,
-      "image": image.asset->url
+      "images": images[].asset->url,
+      overlayColor
     },
     intro{
       title,
@@ -140,7 +141,8 @@ export const fetchAboutPageData = async (): Promise<AboutPageData> => {
     hero: {
       title: aboutData?.hero?.title || 'Nurturing Excellence',
       subtitle: aboutData?.hero?.subtitle || 'A Legacy of 15 Years in Education',
-      image: aboutData?.hero?.image || DEFAULT_HERO_IMAGE
+      images: aboutData?.hero?.images?.length > 0 ? aboutData.hero.images : [DEFAULT_HERO_IMAGE],
+      overlayColor: aboutData?.hero?.overlayColor || 'bg-school-brand/80'
     },
     intro: aboutData?.intro || {
       title: 'Welcome to Makko Billi School',
@@ -179,7 +181,7 @@ export const fetchStaffPageData = async (): Promise<StaffPageData> => {
       hero{
         title,
         subtitle,
-        "backgroundImage": backgroundImage.asset->url,
+        "images": images[].asset->url,
         overlayColor
       },
       sectionTitles
@@ -233,7 +235,7 @@ export const fetchGalleryPageData = async () => {
     hero{
       title,
       subtitle,
-      "backgroundImage": backgroundImage.asset->url,
+      "images": images[].asset->url,
       overlayColor
     },
     settings
@@ -243,7 +245,7 @@ export const fetchGalleryPageData = async () => {
     hero: {
       title: pageData?.hero?.title || 'Gallery',
       subtitle: pageData?.hero?.subtitle || 'Capturing Moments',
-      backgroundImage: pageData?.hero?.backgroundImage || DEFAULT_HERO_IMAGE,
+      images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [DEFAULT_HERO_IMAGE],
       overlayColor: pageData?.hero?.overlayColor || 'bg-school-brand/80'
     },
     settings: pageData?.settings || {
@@ -277,7 +279,7 @@ export const fetchContactPageData = async () => {
     hero{
       title,
       subtitle,
-      "backgroundImage": backgroundImage.asset->url,
+      "images": images[].asset->url,
       overlayColor
     },
     sectionTitle,
@@ -309,7 +311,7 @@ export const fetchContactPageData = async () => {
     hero: {
       title: pageData?.hero?.title || 'Contact Us',
       subtitle: pageData?.hero?.subtitle || 'Get in Touch with Us',
-      backgroundImage: pageData?.hero?.backgroundImage || DEFAULT_HERO_IMAGE,
+      images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [DEFAULT_HERO_IMAGE],
       overlayColor: pageData?.hero?.overlayColor || 'bg-school-pink/80'
     },
     sectionTitle: pageData?.sectionTitle || 'Our Address & Contact Details',
@@ -358,6 +360,9 @@ export const fetchSiteSettings = async () => {
     title,
     description,
     "logo": logo.asset->url,
+    "logoMobile": logoMobile.asset->url,
+    "favicon": favicon.asset->url,
+    "footerLogo": footerLogo.asset->url,
     socialLinks,
     facebookPageId,
     facebookAccessToken
