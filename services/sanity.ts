@@ -420,20 +420,40 @@ export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
 
 // ==================== SITE SETTINGS ====================
 export const fetchSiteSettings = async () => {
-  return await sanityClient.fetch(`*[_type == "siteSettings"][0]{
-    title,
-    description,
-    "logo": logo.asset->url,
-    "logoMobile": logoMobile.asset->url,
-    "favicon": favicon.asset->url,
-    "footerLogo": footerLogo.asset->url,
-    footerDescription,
-    footerContact,
-    copyright,
-    socialLinks,
-    facebookPageId,
-    facebookAccessToken
-  }`);
+  // Try to get the singleton first (siteSettings ID), then fallback to any siteSettings document
+  const result = await sanityClient.fetch(`coalesce(
+    *[_type == "siteSettings" && _id == "siteSettings"][0]{
+      title,
+      description,
+      "logo": logo.asset->url,
+      "logoMobile": logoMobile.asset->url,
+      "favicon": favicon.asset->url,
+      "footerLogo": footerLogo.asset->url,
+      footerDescription,
+      footerContact,
+      copyright,
+      socialLinks,
+      facebookPageId,
+      facebookAccessToken
+    },
+    *[_type == "siteSettings"][0]{
+      title,
+      description,
+      "logo": logo.asset->url,
+      "logoMobile": logoMobile.asset->url,
+      "favicon": favicon.asset->url,
+      "footerLogo": footerLogo.asset->url,
+      footerDescription,
+      footerContact,
+      copyright,
+      socialLinks,
+      facebookPageId,
+      facebookAccessToken
+    }
+  )`);
+  
+  console.log('[Sanity] Site settings loaded:', result?.logo ? 'Logo found' : 'No logo');
+  return result;
 };
 
 // ==================== CONTACT INFO (Legacy - kept for backwards compatibility) ====================
