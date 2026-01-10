@@ -20,7 +20,13 @@ export default defineType({
       name: 'icon',
       title: 'Icon Name',
       type: 'string',
-      description: 'Lucide icon name (e.g., Bus, Smartphone, Database)',
+      description: 'Lucide icon name (e.g., Bus, Smartphone, Database, Laptop). See lucide.dev for all icons.',
+    }),
+    defineField({
+      name: 'iconColor',
+      title: 'Icon Color',
+      type: 'color',
+      description: 'Color of the icon',
     }),
     defineField({
       name: 'order',

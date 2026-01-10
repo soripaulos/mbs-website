@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, X } from 'lucide-react';
 import { fetchFacebookPosts } from '../services/api';
+import { fetchSocialPosts } from '../services/sanity';
 import type { SocialPost } from '../types';
 
 type Props = {
@@ -27,8 +28,20 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
     let mounted = true;
     const run = async () => {
       try {
-        const fbPosts = await fetchFacebookPosts();
-        if (mounted) setPosts(fbPosts);
+        // Fetch both Facebook posts and manual Sanity posts
+        const [fbPosts, manualPosts] = await Promise.all([
+          fetchFacebookPosts(),
+          fetchSocialPosts(),
+        ]);
+        
+        // Combine and sort by date (newest first)
+        const allPosts = [...fbPosts, ...manualPosts].sort((a, b) => {
+          const dateA = new Date(a.date).getTime();
+          const dateB = new Date(b.date).getTime();
+          return dateB - dateA;
+        });
+        
+        if (mounted) setPosts(allPosts);
       } finally {
         if (mounted) setLoading(false);
       }

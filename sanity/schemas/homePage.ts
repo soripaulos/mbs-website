@@ -81,23 +81,15 @@ export default defineType({
           of: [{
             type: 'object',
             fields: [
-              { name: 'icon', title: 'Icon Name', type: 'string', description: 'Lucide icon name: MapPin, Star, BookOpen, etc.' },
-              { name: 'title', title: 'Title', type: 'string' },
-              { name: 'description', title: 'Description', type: 'text' },
-              { 
-                name: 'bgColor', 
-                title: 'Background Color', 
-                type: 'string', 
-                description: 'Tailwind class: bg-school-dark-blue, bg-school-yellow, bg-school-pink',
-                options: {
-                  list: [
-                    { title: 'Dark Blue', value: 'bg-school-dark-blue' },
-                    { title: 'Yellow', value: 'bg-school-yellow' },
-                    { title: 'Pink', value: 'bg-school-pink' },
-                    { title: 'Brand Blue', value: 'bg-school-brand' },
-                  ]
-                }
-              },
+          { name: 'icon', title: 'Icon Name', type: 'string', description: 'Lucide icon name (e.g., MapPin, Star, BookOpen). See lucide.dev for all icons.' },
+          { name: 'title', title: 'Title', type: 'string' },
+          { name: 'description', title: 'Description', type: 'text' },
+          { 
+            name: 'bgColor', 
+            title: 'Background Color', 
+            type: 'color',
+            description: 'Background color for this feature card',
+          },
             ],
             preview: {
               select: { title: 'title', subtitle: 'icon' },
@@ -116,33 +108,20 @@ export default defineType({
       of: [{
         type: 'object',
         fields: [
-          { name: 'icon', title: 'Icon Name', type: 'string', description: 'Lucide icon name: Lightbulb, Users, BookOpen' },
+          { name: 'icon', title: 'Icon Name', type: 'string', description: 'Lucide icon name (e.g., Lightbulb, Users, BookOpen). See lucide.dev for all icons.' },
           { name: 'title', title: 'Title', type: 'string' },
           { name: 'description', title: 'Description', type: 'text' },
           { 
             name: 'bgColor', 
             title: 'Icon Background Color', 
-            type: 'string',
-            options: {
-              list: [
-                { title: 'Blue', value: 'bg-blue-100' },
-                { title: 'Yellow', value: 'bg-yellow-100' },
-                { title: 'Pink', value: 'bg-pink-100' },
-                { title: 'Green', value: 'bg-green-100' },
-              ]
-            }
+            type: 'color',
+            description: 'Background color for the icon container',
           },
           { 
             name: 'iconColor', 
             title: 'Icon Color', 
-            type: 'string',
-            options: {
-              list: [
-                { title: 'Dark Blue', value: 'text-school-dark-blue' },
-                { title: 'Yellow', value: 'text-school-yellow' },
-                { title: 'Pink', value: 'text-school-pink' },
-              ]
-            }
+            type: 'color',
+            description: 'Color of the icon itself',
           },
         ],
         preview: {

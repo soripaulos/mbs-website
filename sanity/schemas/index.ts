@@ -13,6 +13,7 @@ import aboutPage from './aboutPage';
 import galleryPage from './galleryPage';
 import staffPage from './staffPage';
 import contactPage from './contactPage';
+import socialPost from './socialPost';
 
 export const schemaTypes = [
   // Pages
@@ -31,6 +32,7 @@ export const schemaTypes = [
   staffProfile,
   department,
   galleryImage,
+  socialPost,
   
   // Settings
   siteSettings,

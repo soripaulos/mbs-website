@@ -55,20 +55,7 @@ export default defineType({
       name: 'icon',
       title: 'Icon Name',
       type: 'string',
-      description: 'Lucide icon name',
-      options: {
-        list: [
-          { title: 'Book (Library)', value: 'Book' },
-          { title: 'Flask (Science Lab)', value: 'FlaskConical' },
-          { title: 'Monitor (IT/Computer)', value: 'Monitor' },
-          { title: 'Video (AV Room)', value: 'Video' },
-          { title: 'Trophy (Sports)', value: 'Trophy' },
-          { title: 'Palette (Art)', value: 'Palette' },
-          { title: 'Music', value: 'Music' },
-          { title: 'Star (Playground)', value: 'Star' },
-          { title: 'Stethoscope (Clinic)', value: 'Stethoscope' },
-        ],
-      },
+      description: 'Lucide icon name (e.g., Book, FlaskConical, Monitor, Video, Trophy, Palette, Music, Star, Stethoscope). See lucide.dev for all icons.',
     }),
     defineField({
       name: 'order',

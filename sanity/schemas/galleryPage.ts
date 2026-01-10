@@ -34,15 +34,8 @@ export default defineType({
         {
           name: 'overlayColor',
           title: 'Overlay Color',
-          type: 'string',
-          options: {
-            list: [
-              { title: 'Brand Blue', value: 'bg-school-brand/80' },
-              { title: 'Dark Blue', value: 'bg-school-dark-blue/80' },
-              { title: 'Pink', value: 'bg-school-pink/80' },
-            ],
-          },
-          initialValue: 'bg-school-brand/80',
+          type: 'color',
+          description: 'Semi-transparent overlay color over hero images (will be applied at 80% opacity)',
         },
       ],
     }),

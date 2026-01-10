@@ -332,13 +332,14 @@ export const fetchContactPageData = async () => {
 
 // ==================== SOCIAL POSTS ====================
 export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
-  const posts = await sanityClient.fetch(`*[_type == "socialPost"] | order(date desc)[0...10]{
+  const posts = await sanityClient.fetch(`*[_type == "socialPost"] | order(date desc)[0...50]{
     _id,
     content,
     "images": images[].asset->url,
     date,
     url,
-    platform
+    platform,
+    featured
   }`);
 
   return posts.map((post: any) => ({
@@ -350,7 +351,8 @@ export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
       day: 'numeric', 
       year: 'numeric' 
     }),
-    url: post.url
+    url: post.url || '#',
+    platform: post.platform || 'manual',
   }));
 };
 
