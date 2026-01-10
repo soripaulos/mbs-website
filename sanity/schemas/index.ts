@@ -7,13 +7,13 @@ import branch from './branch';
 import staffProfile from './staffProfile';
 import department from './department';
 import galleryImage from './galleryImage';
+import socialPost from './socialPost';
 import siteSettings from './siteSettings';
 import homePage from './homePage';
 import aboutPage from './aboutPage';
 import galleryPage from './galleryPage';
 import staffPage from './staffPage';
 import contactPage from './contactPage';
-import socialPost from './socialPost';
 
 export const schemaTypes = [
   // Pages
@@ -23,7 +23,7 @@ export const schemaTypes = [
   staffPage,
   contactPage,
   
-  // Components
+  // Content
   stat,
   facility,
   academicLevel,

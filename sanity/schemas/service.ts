@@ -20,13 +20,13 @@ export default defineType({
       name: 'icon',
       title: 'Icon Name',
       type: 'string',
-      description: 'Lucide icon name (e.g., Bus, Smartphone, Database, Laptop). See lucide.dev for all icons.',
+      description: 'Any Lucide icon name (e.g., Bus, Smartphone, Database, Laptop, BookOpen, Users, GraduationCap, etc.)',
     }),
     defineField({
       name: 'iconColor',
       title: 'Icon Color',
-      type: 'color',
-      description: 'Color of the icon',
+      type: 'string',
+      description: 'CSS color (e.g., #25376B, rgba(37, 55, 107, 1))',
     }),
     defineField({
       name: 'order',
@@ -37,7 +37,7 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
+      subtitle: 'icon',
     },
   },
 });
-

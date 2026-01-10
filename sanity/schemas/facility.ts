@@ -9,7 +9,7 @@ export default defineType({
       name: 'id',
       title: 'Facility ID',
       type: 'slug',
-      description: 'Unique identifier: lib, lab, it, av, field, art, music, playground, clinic',
+      description: 'Unique identifier (e.g., library, lab, computer-lab, sports-field)',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -41,7 +41,7 @@ export default defineType({
       name: 'colSpan',
       title: 'Column Span',
       type: 'number',
-      description: 'For grid layout (1, 2, or 3)',
+      description: 'For grid layout (1, 2, or 3 columns wide)',
       options: {
         list: [
           { title: '1 Column', value: 1 },
@@ -55,7 +55,7 @@ export default defineType({
       name: 'icon',
       title: 'Icon Name',
       type: 'string',
-      description: 'Lucide icon name (e.g., Book, FlaskConical, Monitor, Video, Trophy, Palette, Music, Star, Stethoscope). See lucide.dev for all icons.',
+      description: 'Any Lucide icon name (e.g., Book, FlaskConical, Monitor, Trophy, Palette, Music, Stethoscope, Building2, etc.)',
     }),
     defineField({
       name: 'order',
@@ -71,4 +71,3 @@ export default defineType({
     },
   },
 });
-

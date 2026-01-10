@@ -33,12 +33,18 @@ export default defineType({
           initialValue: '"Our first batch of graduates who stayed with our school since nursery"',
         },
         {
-          name: 'carouselImages',
+          name: 'images',
           title: 'Hero Carousel Images',
           type: 'array',
           of: [{ type: 'image', options: { hotspot: true } }],
-          description: 'Background images that rotate in the hero section',
-          validation: (Rule) => Rule.min(1).max(10),
+          description: 'Background images that rotate in the hero section (unlimited)',
+        },
+        {
+          name: 'overlayColor',
+          title: 'Overlay Color',
+          type: 'string',
+          description: 'CSS color value (e.g., rgba(37, 55, 107, 0.8), #25376B, or hex with alpha)',
+          initialValue: 'rgba(37, 55, 107, 0.8)',
         },
         {
           name: 'buttonText',
@@ -67,12 +73,11 @@ export default defineType({
         { name: 'subtitle', title: 'Subtitle', type: 'string', initialValue: 'Makko Billi School Dembi Dollo' },
         { name: 'description', title: 'Description', type: 'string', initialValue: 'KG and Elementary (KG-Grade 8)' },
         {
-          name: 'carouselImages',
+          name: 'images',
           title: 'Carousel Images',
           type: 'array',
           of: [{ type: 'image', options: { hotspot: true } }],
-          description: 'Images for the grand opening carousel',
-          validation: (Rule) => Rule.min(1).max(10),
+          description: 'Images for the grand opening carousel (unlimited)',
         },
         {
           name: 'features',
@@ -81,15 +86,20 @@ export default defineType({
           of: [{
             type: 'object',
             fields: [
-          { name: 'icon', title: 'Icon Name', type: 'string', description: 'Lucide icon name (e.g., MapPin, Star, BookOpen). See lucide.dev for all icons.' },
-          { name: 'title', title: 'Title', type: 'string' },
-          { name: 'description', title: 'Description', type: 'text' },
-          { 
-            name: 'bgColor', 
-            title: 'Background Color', 
-            type: 'color',
-            description: 'Background color for this feature card',
-          },
+              { 
+                name: 'icon', 
+                title: 'Icon Name', 
+                type: 'string', 
+                description: 'Any Lucide icon name (e.g., MapPin, Star, BookOpen, Users, Lightbulb, Heart, Award, GraduationCap, Building2, etc.)',
+              },
+              { name: 'title', title: 'Title', type: 'string' },
+              { name: 'description', title: 'Description', type: 'text' },
+              { 
+                name: 'bgColor', 
+                title: 'Background Color', 
+                type: 'string',
+                description: 'CSS color (e.g., rgba(37, 55, 107, 1), #25376B, rgb(255,195,75))',
+              },
             ],
             preview: {
               select: { title: 'title', subtitle: 'icon' },
@@ -108,27 +118,31 @@ export default defineType({
       of: [{
         type: 'object',
         fields: [
-          { name: 'icon', title: 'Icon Name', type: 'string', description: 'Lucide icon name (e.g., Lightbulb, Users, BookOpen). See lucide.dev for all icons.' },
+          { 
+            name: 'icon', 
+            title: 'Icon Name', 
+            type: 'string', 
+            description: 'Any Lucide icon name (e.g., Lightbulb, Users, BookOpen, Heart, Award, Target, etc.)',
+          },
           { name: 'title', title: 'Title', type: 'string' },
           { name: 'description', title: 'Description', type: 'text' },
           { 
             name: 'bgColor', 
             title: 'Icon Background Color', 
-            type: 'color',
-            description: 'Background color for the icon container',
+            type: 'string',
+            description: 'CSS color (e.g., rgba(219, 234, 254, 1), #dbeafe)',
           },
           { 
             name: 'iconColor', 
             title: 'Icon Color', 
-            type: 'color',
-            description: 'Color of the icon itself',
+            type: 'string',
+            description: 'CSS color (e.g., rgba(37, 55, 107, 1), #25376B)',
           },
         ],
         preview: {
           select: { title: 'title' },
         },
       }],
-      validation: (Rule) => Rule.length(3),
     }),
 
     // ==================== ABOUT SECTION ====================

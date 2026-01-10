@@ -4,88 +4,71 @@ export default defineType({
   name: 'socialPost',
   title: 'Social Media Post',
   type: 'document',
-  description: 'Manual posts to display alongside Facebook posts',
+  description: 'Manual posts that appear alongside Facebook posts in the Latest Updates section',
   fields: [
     defineField({
       name: 'content',
       title: 'Post Content',
       type: 'text',
-      description: 'The text content of the post',
+      description: 'The text content of your post/announcement',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'images',
-      title: 'Post Images',
+      title: 'Images',
       type: 'array',
       of: [{ type: 'image', options: { hotspot: true } }],
-      description: 'Images for this post (can add multiple)',
-      validation: (Rule) => Rule.min(1).max(10),
+      description: 'Add one or more images for this post',
     }),
     defineField({
       name: 'date',
       title: 'Post Date',
       type: 'datetime',
-      description: 'Date and time of the post',
+      description: 'When this post was created',
       validation: (Rule) => Rule.required(),
       initialValue: () => new Date().toISOString(),
     }),
     defineField({
       name: 'url',
-      title: 'External Link',
+      title: 'Link URL (optional)',
       type: 'url',
-      description: 'Optional link to external post (e.g., Facebook, Instagram)',
+      description: 'External link for "Read More" button',
     }),
     defineField({
       name: 'platform',
       title: 'Platform',
       type: 'string',
-      description: 'Source platform for this post',
       options: {
         list: [
-          { title: 'Manual', value: 'manual' },
+          { title: 'Manual/Announcement', value: 'manual' },
           { title: 'Facebook', value: 'facebook' },
           { title: 'Instagram', value: 'instagram' },
-          { title: 'Twitter/X', value: 'twitter' },
           { title: 'Other', value: 'other' },
         ],
       },
       initialValue: 'manual',
     }),
-    defineField({
-      name: 'featured',
-      title: 'Featured Post',
-      type: 'boolean',
-      description: 'Feature this post at the top',
-      initialValue: false,
-    }),
-  ],
-  orderings: [
-    {
-      title: 'Date (newest first)',
-      name: 'dateDesc',
-      by: [{ field: 'date', direction: 'desc' }],
-    },
-    {
-      title: 'Date (oldest first)',
-      name: 'dateAsc',
-      by: [{ field: 'date', direction: 'asc' }],
-    },
   ],
   preview: {
     select: {
       title: 'content',
-      date: 'date',
       media: 'images.0',
-      platform: 'platform',
+      date: 'date',
     },
-    prepare({ title, date, media, platform }) {
-      const dateStr = date ? new Date(date).toLocaleDateString() : '';
+    prepare({ title, media, date }) {
       return {
-        title: title ? title.substring(0, 60) + (title.length > 60 ? '...' : '') : 'No content',
-        subtitle: `${platform || 'manual'} • ${dateStr}`,
+        title: title ? (title.length > 50 ? title.substring(0, 50) + '...' : title) : 'Untitled Post',
+        subtitle: date ? new Date(date).toLocaleDateString() : 'No date',
         media,
       };
     },
   },
+  orderings: [
+    {
+      title: 'Date, Newest',
+      name: 'dateDesc',
+      by: [{ field: 'date', direction: 'desc' }],
+    },
+  ],
 });
 

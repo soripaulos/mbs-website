@@ -6,7 +6,8 @@ export default defineType({
   type: 'document',
   groups: [
     { name: 'general', title: 'General' },
-    { name: 'branding', title: 'Branding' },
+    { name: 'branding', title: 'Branding & Logos' },
+    { name: 'footer', title: 'Footer' },
     { name: 'social', title: 'Social Media' },
   ],
   fields: [
@@ -17,21 +18,23 @@ export default defineType({
       type: 'string',
       group: 'general',
       validation: (Rule) => Rule.required(),
+      initialValue: 'Makko Billi School',
     }),
     defineField({
       name: 'description',
       title: 'Site Description',
       type: 'text',
       group: 'general',
+      description: 'Brief description of the school for SEO',
     }),
 
     // ==================== BRANDING ====================
     defineField({
       name: 'logo',
-      title: 'Main Logo',
+      title: 'Header Logo',
       type: 'image',
       group: 'branding',
-      description: 'Primary logo displayed in header (will NOT be framed/circular)',
+      description: 'Primary logo displayed in the navigation header (not circular/framed)',
       options: {
         hotspot: true,
       },
@@ -56,15 +59,43 @@ export default defineType({
         hotspot: false,
       },
     }),
+
+    // ==================== FOOTER ====================
     defineField({
       name: 'footerLogo',
-      title: 'Footer Logo (optional)',
+      title: 'Footer Logo',
       type: 'image',
-      group: 'branding',
-      description: 'Logo for the footer section',
+      group: 'footer',
+      description: 'Logo displayed in the footer section',
       options: {
         hotspot: true,
       },
+    }),
+    defineField({
+      name: 'footerDescription',
+      title: 'Footer Description',
+      type: 'text',
+      group: 'footer',
+      description: 'Brief text shown in the footer about the school',
+      initialValue: 'Nurturing minds, building character, and fostering a love for learning since 2009.',
+    }),
+    defineField({
+      name: 'footerContact',
+      title: 'Footer Contact Info',
+      type: 'object',
+      group: 'footer',
+      fields: [
+        { name: 'phone', title: 'Phone', type: 'string', initialValue: '+251-221-120620' },
+        { name: 'email', title: 'Email', type: 'string', initialValue: 'info@makkobillischool.com' },
+        { name: 'address', title: 'Address', type: 'string', initialValue: 'Adama, Ethiopia' },
+      ],
+    }),
+    defineField({
+      name: 'copyright',
+      title: 'Copyright Text',
+      type: 'string',
+      group: 'footer',
+      initialValue: 'COPYRIGHT © 2025 MAKKO BILLI SCHOOL',
     }),
 
     // ==================== SOCIAL MEDIA ====================
@@ -85,23 +116,22 @@ export default defineType({
       title: 'Facebook Page ID',
       type: 'string',
       group: 'social',
-      description: 'For fetching Facebook posts',
+      description: 'For fetching Facebook posts (get from Graph API Explorer)',
     }),
     defineField({
       name: 'facebookAccessToken',
       title: 'Facebook Access Token',
       type: 'string',
       group: 'social',
-      description: 'For accessing Facebook Graph API',
+      description: 'Page Access Token for Facebook Graph API',
     }),
   ],
   preview: {
     prepare() {
       return {
         title: 'Site Settings',
-        subtitle: 'Branding, logos, and social links',
+        subtitle: 'Branding, logos, footer, and social links',
       };
     },
   },
 });
-

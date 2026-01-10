@@ -3,15 +3,23 @@ import React, { useEffect, useState } from 'react';
 import { fetchAboutPageData } from '../services/sanity';
 import { fetchAboutPageData as fetchFallbackAboutData } from '../services/cms';
 import { AboutPageData, Facility } from '../types';
-import { 
-  Book, FlaskConical, Monitor, Trophy, Video, CheckCircle2, Star, 
-  Palette, Music, Utensils, Stethoscope, Bus, Smartphone, Database, Laptop, 
-  ChevronDown, X, MapPin
-} from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeroSlideshow from '../components/HeroSlideshow';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
+// Dynamic icon component - supports any Lucide icon by name
+const DynamicIcon: React.FC<{ name: string; className?: string; style?: React.CSSProperties }> = ({ 
+  name, 
+  className = "w-8 h-8", 
+  style 
+}) => {
+  const IconComponent = (LucideIcons as any)[name];
+  if (IconComponent) {
+    return <IconComponent className={className} style={style} />;
+  }
+  // Fallback to Star if icon not found
+  return <LucideIcons.Star className={className} style={style} />;
+};
 
 const About: React.FC = () => {
   const [data, setData] = useState<AboutPageData | null>(null);
@@ -51,47 +59,48 @@ const About: React.FC = () => {
     );
   }
 
-  // Icon mapping for facilities
-  const getIcon = (id: string) => {
-    switch (id) {
-      case 'lib': return <Book className="w-8 h-8" />;
-      case 'lab': return <FlaskConical className="w-8 h-8" />;
-      case 'it': return <Monitor className="w-8 h-8" />;
-      case 'av': return <Video className="w-8 h-8" />;
-      case 'field': return <Trophy className="w-8 h-8" />;
-      case 'art': return <Palette className="w-8 h-8" />;
-      case 'music': return <Music className="w-8 h-8" />;
-      case 'playground': return <Star className="w-8 h-8" />;
-      case 'clinic': return <Stethoscope className="w-8 h-8" />;
-      default: return <Star className="w-8 h-8" />;
+  // Icon mapping for facilities - now supports any Lucide icon name
+  const getIcon = (iconName: string, id?: string) => {
+    // If icon name is provided from Sanity, use it
+    if (iconName && iconName !== id) {
+      return <DynamicIcon name={iconName} className="w-8 h-8" />;
     }
+    // Fallback to id-based mapping for backwards compatibility
+    const iconMap: Record<string, string> = {
+      'lib': 'Book',
+      'lab': 'FlaskConical',
+      'it': 'Monitor',
+      'av': 'Video',
+      'field': 'Trophy',
+      'art': 'Palette',
+      'music': 'Music',
+      'playground': 'Star',
+      'clinic': 'Stethoscope',
+    };
+    return <DynamicIcon name={iconMap[id || ''] || 'Star'} className="w-8 h-8" />;
   };
 
-  const getServiceIcon = (icon: string) => {
-    switch (icon) {
-      case 'bus': return <Bus size={32} className="text-school-brand" />;
-      case 'smartphone': return <Smartphone size={32} className="text-school-pink" />;
-      case 'database': return <Database size={32} className="text-school-yellow" />;
-      case 'laptop': return <Laptop size={32} className="text-green-500" />;
-      default: return <Star size={32} className="text-school-brand" />;
-    }
+  const getServiceIcon = (icon: string, color?: string) => {
+    const style = color ? { color } : undefined;
+    return <DynamicIcon name={icon || 'Star'} className="w-8 h-8" style={style} />;
   };
 
   const activeAcademicData = data.academics.find(a => a.id === activeAcademic);
 
-  // Get hero images
-  const heroImages = data.hero.images?.length > 0 ? data.hero.images : [DEFAULT_HERO_IMAGE];
-  const overlayColor = data.hero.overlayColor || 'bg-school-brand/80';
+  // Get hero images array (support both single image and array)
+  const heroImages = data.hero.images?.length > 0 
+    ? data.hero.images 
+    : (data.hero.image ? [data.hero.image] : ['https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80']);
 
   return (
     <div className="w-full overflow-x-hidden pt-20">
       
-      {/* Hero Section - Slideshow */}
+      {/* Hero Section - Using HeroSlideshow for multiple images */}
       <HeroSlideshow
         images={heroImages}
         title={data.hero.title}
         subtitle={data.hero.subtitle}
-        overlayColor={overlayColor}
+        overlayColor={data.hero.overlayColor}
       />
 
       {/* Intro & Stats Section */}

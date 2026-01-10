@@ -183,37 +183,26 @@ const Contact: React.FC = () => {
 
         {/* Maps Sections */}
         <div className="max-w-6xl mx-auto space-y-12">
-          {pageData.mapLocations.map((map, idx) => {
-            // Convert color object to CSS
-            const titleStyle = typeof map.titleColor === 'object' && map.titleColor?.hex 
-              ? { color: map.titleColor.hex }
-              : {};
-            const titleClass = typeof map.titleColor === 'string' ? map.titleColor : 'text-school-brand';
-            
-            return (
-              <div key={idx}>
-                <h3 
-                  className={`font-display font-bold text-3xl ${titleClass} mb-4 border-l-4 ${idx === 0 ? 'border-school-yellow' : 'border-school-brand'} pl-3`}
-                  style={titleStyle}
-                >
-                  {map.title}
-                </h3>
-                <div className="w-full h-96 bg-gray-200 rounded-xl overflow-hidden relative shadow-xl group border border-gray-200">
-                  <iframe 
-                    src={map.embedUrl}
-                    width="100%" 
-                    height="100%" 
-                    style={{border:0}} 
-                    allowFullScreen 
-                    loading="lazy" 
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="grayscale-0 transition duration-700"
-                    title={map.title}
-                  ></iframe>
-                </div>
+          {pageData.mapLocations.map((map, idx) => (
+            <div key={idx}>
+              <h3 className={`font-display font-bold text-3xl ${map.titleColor} mb-4 border-l-4 ${idx === 0 ? 'border-school-yellow' : 'border-school-brand'} pl-3`}>
+                {map.title}
+              </h3>
+              <div className="w-full h-96 bg-gray-200 rounded-xl overflow-hidden relative shadow-xl group border border-gray-200">
+                <iframe 
+                  src={map.embedUrl}
+                  width="100%" 
+                  height="100%" 
+                  style={{border:0}} 
+                  allowFullScreen 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="grayscale-0 transition duration-700"
+                  title={map.title}
+                ></iframe>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </section>
     </div>

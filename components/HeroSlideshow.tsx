@@ -4,7 +4,7 @@ interface HeroSlideshowProps {
   images: string[];
   title: string;
   subtitle?: string;
-  overlayColor?: string | { hex?: string; rgb?: { r: number; g: number; b: number; a?: number } };
+  overlayColor?: string;
   children?: React.ReactNode;
 }
 
@@ -12,7 +12,7 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
   images,
   title,
   subtitle,
-  overlayColor = 'bg-school-brand/80',
+  overlayColor = 'rgba(37, 55, 107, 0.8)',
   children,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -28,41 +28,19 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
     return () => clearInterval(timer);
   }, [images.length]);
 
-  // Convert color to CSS
-  const getOverlayStyle = () => {
-    if (!overlayColor) return {};
-    
-    if (typeof overlayColor === 'string') {
-      // Old format: Tailwind class or hex
-      if (overlayColor.startsWith('#')) {
-        return { backgroundColor: `${overlayColor}CC` }; // 80% opacity
-      }
-      return {}; // Let Tailwind class handle it
-    }
-    
-    // New format: Sanity color object
-    if (overlayColor.hex) {
-      return { backgroundColor: `${overlayColor.hex}CC` }; // 80% opacity
-    }
-    
-    if (overlayColor.rgb) {
-      const { r, g, b } = overlayColor.rgb;
-      return { backgroundColor: `rgba(${r}, ${g}, ${b}, 0.8)` };
-    }
-    
-    return {};
-  };
-
-  const overlayStyle = getOverlayStyle();
-  const overlayClassName = typeof overlayColor === 'string' && !overlayColor.startsWith('#') ? overlayColor : '';
+  // Check if overlayColor is a CSS value (rgba/rgb/hex) or a Tailwind class
+  const isCSSColor = overlayColor.startsWith('rgba') || 
+                     overlayColor.startsWith('rgb') || 
+                     overlayColor.startsWith('#');
 
   return (
     <div className="relative h-[90vh] w-full overflow-hidden">
       {/* Background Images with Crossfade */}
       <div className="absolute inset-0">
+        {/* Overlay - supports both CSS colors and Tailwind classes */}
         <div 
-          className={`absolute inset-0 z-10 ${overlayClassName}`}
-          style={overlayStyle}
+          className={`absolute inset-0 z-10 ${!isCSSColor ? overlayColor : ''}`}
+          style={isCSSColor ? { backgroundColor: overlayColor } : undefined}
         />
         
         {images.map((img, idx) => (
@@ -127,6 +105,3 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
 };
 
 export default HeroSlideshow;
-
-
-

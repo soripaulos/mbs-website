@@ -28,20 +28,26 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
     let mounted = true;
     const run = async () => {
       try {
-        // Fetch both Facebook posts and manual Sanity posts
-        const [fbPosts, manualPosts] = await Promise.all([
-          fetchFacebookPosts(),
-          fetchSocialPosts(),
+        // Fetch both Facebook posts and manual Sanity posts in parallel
+        const [fbPosts, sanityPosts] = await Promise.all([
+          fetchFacebookPosts().catch(() => []),
+          fetchSocialPosts().catch(() => [])
         ]);
-        
-        // Combine and sort by date (newest first)
-        const allPosts = [...fbPosts, ...manualPosts].sort((a, b) => {
-          const dateA = new Date(a.date).getTime();
-          const dateB = new Date(b.date).getTime();
-          return dateB - dateA;
-        });
-        
-        if (mounted) setPosts(allPosts);
+
+        if (mounted) {
+          // Combine posts: Sanity posts first (manual), then FB posts
+          // Filter out any duplicate content if needed
+          const combinedPosts = [...sanityPosts, ...fbPosts];
+          
+          // Sort by date (newest first)
+          combinedPosts.sort((a, b) => {
+            const dateA = new Date(a.date).getTime();
+            const dateB = new Date(b.date).getTime();
+            return dateB - dateA;
+          });
+
+          setPosts(combinedPosts);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -106,6 +112,10 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
                 <div key={i} className="bg-gray-100 h-80 rounded-xl animate-pulse"></div>
               ))}
             </div>
+          ) : posts.length === 0 ? (
+            <div className="text-center text-gray-500 py-12">
+              <p>No posts available at the moment.</p>
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -142,6 +152,13 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
                               Click to expand
                             </span>
                           </div>
+
+                          {/* Source badge */}
+                          {(post as any).source === 'sanity' && (
+                            <div className="absolute top-2 left-2 bg-school-brand/90 text-white px-2 py-1 rounded text-xs font-medium">
+                              Announcement
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -159,8 +176,8 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
                               rel="noopener noreferrer"
                               className="text-school-dark-blue hover:text-school-brand transition-colors"
                               onClick={(e) => e.stopPropagation()}
-                              aria-label="Open on Facebook"
-                              title="Open on Facebook"
+                              aria-label="Open link"
+                              title="Open link"
                             >
                               <ExternalLink size={16} />
                             </a>
@@ -240,5 +257,3 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
     </>
   );
 }
-
-

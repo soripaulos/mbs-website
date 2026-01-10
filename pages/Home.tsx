@@ -1,9 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { fetchHomePageData } from '../services/sanity';
 import { HomePageData } from '../types';
-import { BookOpen, Users, Lightbulb, ChevronRight, Star, MapPin, ChevronLeft } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { Link } from 'react-router-dom';
 import FacebookPosts from '../components/FacebookPosts';
+
+// Dynamic icon component - supports any Lucide icon by name
+const DynamicIcon: React.FC<{ name: string; className?: string; style?: React.CSSProperties }> = ({ 
+  name, 
+  className = "w-6 h-6", 
+  style 
+}) => {
+  const IconComponent = (LucideIcons as any)[name];
+  if (IconComponent) {
+    return <IconComponent className={className} style={style} />;
+  }
+  // Fallback to Star if icon not found
+  return <LucideIcons.Star className={className} style={style} />;
+};
 
 const Home: React.FC = () => {
   // Page data from Sanity
@@ -30,25 +44,31 @@ const Home: React.FC = () => {
   ];
 
   const fallbackFeatures = [
-    { icon: 'MapPin', bg: "bg-school-dark-blue", title: "Prime Location", desc: "Located in the heart of Dembi Dollo, bringing world-class education closer to the West Welega community." },
-    { icon: 'Star', bg: "bg-school-yellow", title: "Modern Infrastructure", desc: "State-of-the-art laboratories, smart classrooms, and extensive sports facilities designed for holistic development." },
-    { icon: 'BookOpen', bg: "bg-school-pink", title: "Comprehensive Curriculum", desc: "Offering KG to Grade 8 education with a focus on academic excellence, character building, and digital literacy." }
+    { icon: 'MapPin', bgColorCSS: 'rgba(37, 55, 107, 1)', title: "Prime Location", description: "Located in the heart of Dembi Dollo, bringing world-class education closer to the West Welega community." },
+    { icon: 'Star', bgColorCSS: 'rgba(249, 195, 75, 1)', title: "Modern Infrastructure", description: "State-of-the-art laboratories, smart classrooms, and extensive sports facilities designed for holistic development." },
+    { icon: 'BookOpen', bgColorCSS: 'rgba(232, 121, 149, 1)', title: "Comprehensive Curriculum", description: "Offering KG to Grade 8 education with a focus on academic excellence, character building, and digital literacy." }
   ];
 
   const fallbackPillars = [
-    { icon: 'Lightbulb', bg: "bg-blue-100", iconColor: "text-school-dark-blue", title: "Quality Education", desc: "Nurturing curious minds with rigorous academics, innovative teaching, and a passion for lifelong learning." },
-    { icon: 'Users', bg: "bg-yellow-100", iconColor: "text-school-yellow", title: "Character Building", desc: "Instilling values, empathy, and integrity to shape compassionate and responsible global citizens." },
-    { icon: 'BookOpen', bg: "bg-pink-100", iconColor: "text-school-pink", title: "Skill Development", desc: "Equipping students with practical skills, critical thinking, and adaptability for a dynamic world." }
+    { icon: 'Lightbulb', bgColorCSS: 'rgba(219, 234, 254, 1)', iconColorCSS: 'rgba(37, 55, 107, 1)', title: "Quality Education", description: "Nurturing curious minds with rigorous academics, innovative teaching, and a passion for lifelong learning." },
+    { icon: 'Users', bgColorCSS: 'rgba(254, 249, 195, 1)', iconColorCSS: 'rgba(249, 195, 75, 1)', title: "Character Building", description: "Instilling values, empathy, and integrity to shape compassionate and responsible global citizens." },
+    { icon: 'BookOpen', bgColorCSS: 'rgba(252, 231, 243, 1)', iconColorCSS: 'rgba(232, 121, 149, 1)', title: "Skill Development", description: "Equipping students with practical skills, critical thinking, and adaptability for a dynamic world." }
   ];
 
   // ============ DERIVED DATA ============
-  const heroImages = pageData?.hero?.carouselImages?.length ? pageData.hero.carouselImages : fallbackHeroImages;
+  // Support both old 'carouselImages' and new 'images' field names
+  const heroImages = pageData?.hero?.images?.length 
+    ? pageData.hero.images 
+    : (pageData?.hero?.carouselImages?.length ? pageData.hero.carouselImages : fallbackHeroImages);
+  const heroOverlayColor = pageData?.hero?.overlayColorCSS || 'rgba(37, 55, 107, 0.8)';
   const heroTitle = pageData?.hero?.title || '15 Years of Fellowship at Makko Billi';
   const heroSubtitle = pageData?.hero?.subtitle || '"Our first batch of graduates who stayed with our school since nursery"';
   const heroButtonText = pageData?.hero?.buttonText || 'Discover Our Story';
   const heroButtonLink = pageData?.hero?.buttonLink || '/about';
 
-  const grandOpeningImages = pageData?.grandOpening?.carouselImages?.length ? pageData.grandOpening.carouselImages : fallbackGrandOpeningImages;
+  const grandOpeningImages = pageData?.grandOpening?.images?.length 
+    ? pageData.grandOpening.images 
+    : (pageData?.grandOpening?.carouselImages?.length ? pageData.grandOpening.carouselImages : fallbackGrandOpeningImages);
   const grandOpeningBadge = pageData?.grandOpening?.badge || 'New Campus';
   const grandOpeningTitle = pageData?.grandOpening?.title || 'Grand Opening';
   const grandOpeningSubtitle = pageData?.grandOpening?.subtitle || 'Makko Billi School Dembi Dollo';
@@ -101,18 +121,6 @@ const Home: React.FC = () => {
     setGrandOpeningIndex((prev) => (prev - 1 + grandOpeningImages.length) % grandOpeningImages.length);
   };
 
-  // ============ ICON HELPER ============
-  const getIcon = (iconName: string, className?: string) => {
-    switch (iconName) {
-      case 'MapPin': return <MapPin className={className || "w-6 h-6 text-white"} />;
-      case 'Star': return <Star className={className || "w-6 h-6 text-white"} />;
-      case 'BookOpen': return <BookOpen className={className || "w-6 h-6 text-white"} />;
-      case 'Lightbulb': return <Lightbulb className={className || "w-10 h-10"} />;
-      case 'Users': return <Users className={className || "w-10 h-10"} />;
-      default: return <Star className={className || "w-6 h-6 text-white"} />;
-    }
-  };
-
   // ============ RENDER ============
   return (
     <div className="w-full overflow-x-hidden bg-white">
@@ -125,7 +133,10 @@ const Home: React.FC = () => {
               index === currentCarouselIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <div className="absolute inset-0 bg-school-dark-blue/80 z-10" />
+            <div 
+              className="absolute inset-0 z-10" 
+              style={{ backgroundColor: heroOverlayColor }}
+            />
             <img
               src={img}
               alt="School Campus"
@@ -158,6 +169,22 @@ const Home: React.FC = () => {
             {heroButtonText}
           </Link>
         </div>
+
+        {/* Image indicators */}
+        {heroImages.length > 1 && (
+          <div className="absolute bottom-28 md:bottom-56 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+            {heroImages.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentCarouselIndex(idx)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  idx === currentCarouselIndex ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/70'
+                }`}
+                aria-label={`Go to image ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Wave Curve */}
         <div className="absolute bottom-0 left-0 w-full z-30 leading-none">
@@ -215,13 +242,13 @@ const Home: React.FC = () => {
                     onClick={prevGrandOpeningImage}
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <ChevronLeft className="w-6 h-6 text-school-dark-blue" />
+                    <LucideIcons.ChevronLeft className="w-6 h-6 text-school-dark-blue" />
                   </button>
                   <button
                     onClick={nextGrandOpeningImage}
                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <ChevronRight className="w-6 h-6 text-school-dark-blue" />
+                    <LucideIcons.ChevronRight className="w-6 h-6 text-school-dark-blue" />
                   </button>
 
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -244,9 +271,10 @@ const Home: React.FC = () => {
               {grandOpeningFeatures.map((item: any, idx: number) => (
                 <div key={idx} className="flex gap-4">
                   <div
-                    className={`w-12 h-12 rounded-lg ${item.bgColor || item.bg} flex items-center justify-center flex-shrink-0 shadow-md`}
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md"
+                    style={{ backgroundColor: item.bgColorCSS || item.bgColor || '#25376B' }}
                   >
-                    {getIcon(item.icon)}
+                    <DynamicIcon name={item.icon} className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h4 className="text-lg font-bold text-school-dark-blue mb-1">{item.title}</h4>
@@ -265,9 +293,14 @@ const Home: React.FC = () => {
           {pillars.map((item: any, idx: number) => (
             <div key={idx} className="flex flex-col items-center group">
               <div
-                className={`w-24 h-24 rounded-full ${item.bgColor || item.bg} flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-300`}
+                className="w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-300"
+                style={{ backgroundColor: item.bgColorCSS || item.bgColor || '#dbeafe' }}
               >
-                <span className={item.iconColor}>{getIcon(item.icon, `w-10 h-10 ${item.iconColor}`)}</span>
+                <DynamicIcon 
+                  name={item.icon} 
+                  className="w-10 h-10" 
+                  style={{ color: item.iconColorCSS || item.iconColor || '#25376B' }}
+                />
               </div>
               <h3 className="text-lg font-bold text-school-brand mb-3">{item.title}</h3>
               <p className="text-xs text-gray-500 leading-relaxed max-w-xs">{item.description || item.desc}</p>

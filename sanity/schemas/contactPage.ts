@@ -35,14 +35,14 @@ export default defineType({
           title: 'Hero Images (Slideshow)',
           type: 'array',
           of: [{ type: 'image', options: { hotspot: true } }],
-          description: 'Add multiple images for hero slideshow. First image shows by default.',
-          validation: (Rule) => Rule.min(1).max(10),
+          description: 'Add multiple images for hero slideshow (unlimited). First image shows by default.',
         },
         {
           name: 'overlayColor',
           title: 'Overlay Color',
-          type: 'color',
-          description: 'Semi-transparent overlay color over hero images (will be applied at 80% opacity)',
+          type: 'string',
+          description: 'CSS color value (e.g., rgba(232, 121, 149, 0.8), #E8799580)',
+          initialValue: 'rgba(232, 121, 149, 0.8)',
         },
       ],
     }),
@@ -68,6 +68,7 @@ export default defineType({
           title: 'Main Phone Numbers',
           type: 'array',
           of: [{ type: 'string' }],
+          description: 'Primary contact numbers',
         },
         {
           name: 'departmentPhones',
@@ -150,12 +151,12 @@ export default defineType({
         type: 'object',
         fields: [
           { name: 'title', title: 'Location Title', type: 'string' },
-          { name: 'embedUrl', title: 'Google Maps Embed URL', type: 'url', description: 'Get embed URL from Google Maps' },
+          { name: 'embedUrl', title: 'Google Maps Embed URL', type: 'url', description: 'Get embed URL from Google Maps → Share → Embed a map → Copy src URL' },
           { 
             name: 'titleColor', 
             title: 'Title Color', 
-            type: 'color',
-            description: 'Color for the location title text',
+            type: 'string',
+            description: 'CSS color (e.g., #25376B, rgba(37, 55, 107, 1))',
           },
         ],
         preview: {
@@ -173,6 +174,3 @@ export default defineType({
     },
   },
 });
-
-
-

@@ -19,6 +19,22 @@ const DEFAULT_DEPARTMENT_IMAGE = 'https://images.unsplash.com/photo-152417823236
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
 const DEFAULT_FACILITY_IMAGE = 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
 
+// Helper function to get color value (now just a passthrough since colors are stored as CSS strings)
+const getColor = (color: any, defaultColor: string = 'rgba(37, 55, 107, 0.8)'): string => {
+  if (!color) return defaultColor;
+  if (typeof color === 'string') return color;
+  // Handle legacy color objects if any
+  if (color.hex) {
+    const alpha = color.alpha ?? 0.8;
+    const hex = color.hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  return defaultColor;
+};
+
 // ==================== HOME PAGE ====================
 export const fetchHomePageData = async () => {
   const query = `*[_type == "homePage"][0]{
@@ -27,14 +43,15 @@ export const fetchHomePageData = async () => {
       subtitle,
       buttonText,
       buttonLink,
-      "carouselImages": carouselImages[].asset->url
+      "images": coalesce(images[].asset->url, carouselImages[].asset->url),
+      overlayColor
     },
     grandOpening{
       badge,
       title,
       subtitle,
       description,
-      "carouselImages": carouselImages[].asset->url,
+      "images": coalesce(images[].asset->url, carouselImages[].asset->url),
       features[]{
         icon,
         title,
@@ -65,8 +82,24 @@ export const fetchHomePageData = async () => {
   
   const data = await sanityClient.fetch(query);
   
-  // Add fallback for images
+  // Process colors
   if (data) {
+    if (data.hero?.overlayColor) {
+      data.hero.overlayColorCSS = getColor(data.hero.overlayColor, 'rgba(37, 55, 107, 0.8)');
+    }
+    if (data.grandOpening?.features) {
+      data.grandOpening.features = data.grandOpening.features.map((f: any) => ({
+        ...f,
+        bgColorCSS: getColor(f.bgColor, 'rgba(37, 55, 107, 1)')
+      }));
+    }
+    if (data.pillars) {
+      data.pillars = data.pillars.map((p: any) => ({
+        ...p,
+        bgColorCSS: getColor(p.bgColor, 'rgba(219, 234, 254, 1)'),
+        iconColorCSS: getColor(p.iconColor, 'rgba(37, 55, 107, 1)')
+      }));
+    }
     if (data.aboutSection && !data.aboutSection.backgroundImage) {
       data.aboutSection.backgroundImage = DEFAULT_HERO_IMAGE;
     }
@@ -129,7 +162,7 @@ export const fetchAboutPageData = async (): Promise<AboutPageData> => {
       "gallery": gallery[].asset->url
     }`),
     sanityClient.fetch(`*[_type == "service"] | order(order asc){
-      _id, title, description, icon
+      _id, title, description, icon, iconColor
     }`),
     sanityClient.fetch(`*[_type == "branch"] | order(order asc){
       _id, name, location, description, features[],
@@ -142,7 +175,7 @@ export const fetchAboutPageData = async (): Promise<AboutPageData> => {
       title: aboutData?.hero?.title || 'Nurturing Excellence',
       subtitle: aboutData?.hero?.subtitle || 'A Legacy of 15 Years in Education',
       images: aboutData?.hero?.images?.length > 0 ? aboutData.hero.images : [DEFAULT_HERO_IMAGE],
-      overlayColor: aboutData?.hero?.overlayColor || 'bg-school-brand/80'
+      overlayColor: getColor(aboutData?.hero?.overlayColor, 'rgba(37, 55, 107, 0.8)')
     },
     intro: aboutData?.intro || {
       title: 'Welcome to Makko Billi School',
@@ -165,7 +198,11 @@ export const fetchAboutPageData = async (): Promise<AboutPageData> => {
         image: a.director?.image || DEFAULT_PERSON_IMAGE
       }
     })),
-    services: services.map((s: any) => ({ id: s._id, ...s })),
+    services: services.map((s: any) => ({ 
+      id: s._id, 
+      ...s,
+      iconColorCSS: getColor(s.iconColor, 'rgba(37, 55, 107, 1)')
+    })),
     branches: branches.map((b: any) => ({ 
       id: b._id, 
       ...b,
@@ -204,8 +241,17 @@ export const fetchStaffPageData = async (): Promise<StaffPageData> => {
     }`)
   ]);
 
+  // Process hero overlay color
+  const heroOverlayColor = getColor(pageData?.hero?.overlayColor, 'rgba(37, 55, 107, 0.8)');
+
   return {
-    pageData: pageData || null,
+    pageData: pageData ? {
+      ...pageData,
+      hero: {
+        ...pageData.hero,
+        overlayColor: heroOverlayColor
+      }
+    } : null,
     founders: founders.map((s: any) => ({ 
       id: s._id, 
       ...s, 
@@ -246,7 +292,7 @@ export const fetchGalleryPageData = async () => {
       title: pageData?.hero?.title || 'Gallery',
       subtitle: pageData?.hero?.subtitle || 'Capturing Moments',
       images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [DEFAULT_HERO_IMAGE],
-      overlayColor: pageData?.hero?.overlayColor || 'bg-school-brand/80'
+      overlayColor: getColor(pageData?.hero?.overlayColor, 'rgba(37, 55, 107, 0.8)')
     },
     settings: pageData?.settings || {
       showCategories: true,
@@ -312,7 +358,7 @@ export const fetchContactPageData = async () => {
       title: pageData?.hero?.title || 'Contact Us',
       subtitle: pageData?.hero?.subtitle || 'Get in Touch with Us',
       images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [DEFAULT_HERO_IMAGE],
-      overlayColor: pageData?.hero?.overlayColor || 'bg-school-pink/80'
+      overlayColor: getColor(pageData?.hero?.overlayColor, 'rgba(232, 121, 149, 0.8)')
     },
     sectionTitle: pageData?.sectionTitle || 'Our Address & Contact Details',
     phones: pageData?.phones || { mainPhones: [], departmentPhones: [] },
@@ -326,20 +372,22 @@ export const fetchContactPageData = async () => {
       messageLabel: 'Your Message*',
       submitText: 'Send Message'
     },
-    mapLocations: pageData?.mapLocations || []
+    mapLocations: (pageData?.mapLocations || []).map((loc: any) => ({
+      ...loc,
+      titleColorCSS: getColor(loc.titleColor, 'rgba(37, 55, 107, 1)')
+    }))
   };
 };
 
-// ==================== SOCIAL POSTS ====================
+// ==================== SOCIAL POSTS (Manual Sanity Posts) ====================
 export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
-  const posts = await sanityClient.fetch(`*[_type == "socialPost"] | order(date desc)[0...50]{
+  const posts = await sanityClient.fetch(`*[_type == "socialPost"] | order(date desc)[0...10]{
     _id,
     content,
     "images": images[].asset->url,
     date,
     url,
-    platform,
-    featured
+    platform
   }`);
 
   return posts.map((post: any) => ({
@@ -351,8 +399,8 @@ export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
       day: 'numeric', 
       year: 'numeric' 
     }),
-    url: post.url || '#',
-    platform: post.platform || 'manual',
+    url: post.url,
+    source: 'sanity' // Mark as manual post from Sanity
   }));
 };
 
@@ -365,13 +413,16 @@ export const fetchSiteSettings = async () => {
     "logoMobile": logoMobile.asset->url,
     "favicon": favicon.asset->url,
     "footerLogo": footerLogo.asset->url,
+    footerDescription,
+    footerContact,
+    copyright,
     socialLinks,
     facebookPageId,
     facebookAccessToken
   }`);
 };
 
-// ==================== CONTACT INFO (Legacy) ====================
+// ==================== CONTACT INFO (Legacy - kept for backwards compatibility) ====================
 export const fetchContactInfo = async () => {
   return await sanityClient.fetch(`*[_type == "contactInfo"][0]{
     mainPhones[],

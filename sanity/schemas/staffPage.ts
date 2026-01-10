@@ -4,12 +4,17 @@ export default defineType({
   name: 'staffPage',
   title: 'Staff Page',
   type: 'document',
+  groups: [
+    { name: 'hero', title: 'Hero Section' },
+    { name: 'sections', title: 'Section Titles' },
+  ],
   fields: [
     // ==================== HERO SECTION ====================
     defineField({
       name: 'hero',
       title: 'Hero Section',
       type: 'object',
+      group: 'hero',
       fields: [
         {
           name: 'title',
@@ -28,14 +33,14 @@ export default defineType({
           title: 'Hero Images (Slideshow)',
           type: 'array',
           of: [{ type: 'image', options: { hotspot: true } }],
-          description: 'Add multiple images for hero slideshow. First image shows by default.',
-          validation: (Rule) => Rule.min(1).max(10),
+          description: 'Add multiple images for hero slideshow (unlimited). First image shows by default.',
         },
         {
           name: 'overlayColor',
           title: 'Overlay Color',
-          type: 'color',
-          description: 'Semi-transparent overlay color over hero images (will be applied at 80% opacity)',
+          type: 'string',
+          description: 'CSS color value (e.g., rgba(37, 55, 107, 0.8), #25376B80)',
+          initialValue: 'rgba(37, 55, 107, 0.8)',
         },
       ],
     }),
@@ -45,6 +50,7 @@ export default defineType({
       name: 'sectionTitles',
       title: 'Section Titles',
       type: 'object',
+      group: 'sections',
       fields: [
         { name: 'foundersTitle', title: 'Founders Section Title', type: 'string', initialValue: 'Our Founders' },
         { name: 'directorsTitle', title: 'Directors Section Title', type: 'string', initialValue: 'Our Directors' },
@@ -64,6 +70,3 @@ export default defineType({
     },
   },
 });
-
-
-
