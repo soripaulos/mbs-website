@@ -306,7 +306,6 @@ export const fetchGalleryPageData = async () => {
       title: pageData?.hero?.title || 'Gallery',
       subtitle: pageData?.hero?.subtitle || 'Capturing Moments',
       images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [],
-      images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [],
       overlayColor: getColor(pageData?.hero?.overlayColor, 'rgba(37, 55, 107, 0.8)')
     },
     settings: pageData?.settings || {

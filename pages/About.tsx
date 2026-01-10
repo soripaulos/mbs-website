@@ -4,6 +4,7 @@ import { fetchAboutPageData } from '../services/sanity';
 import { fetchAboutPageData as fetchFallbackAboutData } from '../services/cms';
 import { AboutPageData, Facility } from '../types';
 import * as LucideIcons from 'lucide-react';
+import { ChevronDown, CheckCircle2, MapPin, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeroSlideshow from '../components/HeroSlideshow';
 
