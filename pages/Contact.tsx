@@ -5,15 +5,13 @@ import { fetchContactPageData } from '../services/sanity';
 import { ContactPageData } from '../types';
 import HeroSlideshow from '../components/HeroSlideshow';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
-
 // Fallback data
 const fallbackData: ContactPageData = {
   hero: {
     title: 'Contact Us',
     subtitle: 'Get in Touch with Us',
-    images: [DEFAULT_HERO_IMAGE],
-    overlayColor: 'bg-school-pink/80'
+    images: [],
+    overlayColor: 'rgba(232, 121, 149, 0.8)'
   },
   sectionTitle: 'Our Address & Contact Details',
   phones: {
@@ -76,8 +74,7 @@ const Contact: React.FC = () => {
     loadData();
   }, []);
 
-  // Get hero images (use fallback if not available)
-  const heroImages = pageData.hero.images?.length > 0 ? pageData.hero.images : [DEFAULT_HERO_IMAGE];
+  const heroImages = pageData.hero.images || [];
 
   return (
     <div className="w-full pt-20">

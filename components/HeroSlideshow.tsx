@@ -17,16 +17,17 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const hasImages = images && images.length > 0;
   // Auto-rotate images if there are multiple
   useEffect(() => {
-    if (images.length <= 1) return;
+    if (!hasImages || images.length <= 1) return;
 
     const timer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
     }, 5000); // 5 seconds per image
 
     return () => clearInterval(timer);
-  }, [images.length]);
+  }, [images.length, hasImages]);
 
   // Check if overlayColor is a CSS value (rgba/rgb/hex) or a Tailwind class
   const isCSSColor = overlayColor.startsWith('rgba') || 
@@ -34,7 +35,7 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
                      overlayColor.startsWith('#');
 
   return (
-    <div className="relative h-[90vh] w-full overflow-hidden">
+    <div className="relative h-[90vh] w-full overflow-hidden" style={!hasImages && isCSSColor ? { backgroundColor: overlayColor } : undefined}>
       {/* Background Images with Crossfade */}
       <div className="absolute inset-0">
         {/* Overlay - supports both CSS colors and Tailwind classes */}
@@ -43,7 +44,7 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
           style={isCSSColor ? { backgroundColor: overlayColor } : undefined}
         />
         
-        {images.map((img, idx) => (
+        {hasImages && images.map((img, idx) => (
           <img
             key={idx}
             src={img}
@@ -69,7 +70,7 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       </div>
 
       {/* Image Indicators (only show if multiple images) */}
-      {images.length > 1 && (
+      {hasImages && images.length > 1 && (
         <div className="absolute bottom-28 md:bottom-56 left-1/2 -translate-x-1/2 z-30 flex gap-2">
           {images.map((_, idx) => (
             <button

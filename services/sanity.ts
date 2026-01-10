@@ -19,11 +19,25 @@ const DEFAULT_DEPARTMENT_IMAGE = 'https://images.unsplash.com/photo-152417823236
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
 const DEFAULT_FACILITY_IMAGE = 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
 
-// Helper function to get color value (now just a passthrough since colors are stored as CSS strings)
+// Map tailwind-like tokens to real CSS colors so that old values still work
+const colorTokenMap: Record<string, string> = {
+  'bg-school-brand/80': 'rgba(37, 55, 107, 0.8)',
+  'bg-school-brand': 'rgb(37, 55, 107)',
+  'bg-school-dark-blue/80': 'rgba(28, 43, 96, 0.8)',
+  'bg-school-dark-blue': 'rgb(28, 43, 96)',
+  'bg-school-pink/80': 'rgba(232, 121, 149, 0.8)',
+  'bg-school-pink': 'rgb(232, 121, 149)',
+  'bg-school-yellow/80': 'rgba(249, 195, 75, 0.8)',
+  'bg-school-yellow': 'rgb(249, 195, 75)',
+};
+
+// Helper: normalize any color value (CSS string, legacy tailwind token, or legacy Sanity color object)
 const getColor = (color: any, defaultColor: string = 'rgba(37, 55, 107, 0.8)'): string => {
   if (!color) return defaultColor;
-  if (typeof color === 'string') return color;
-  // Handle legacy color objects if any
+  if (typeof color === 'string') {
+    if (colorTokenMap[color]) return colorTokenMap[color];
+    return color;
+  }
   if (color.hex) {
     const alpha = color.alpha ?? 0.8;
     const hex = color.hex.replace('#', '');
@@ -174,7 +188,7 @@ export const fetchAboutPageData = async (): Promise<AboutPageData> => {
     hero: {
       title: aboutData?.hero?.title || 'Nurturing Excellence',
       subtitle: aboutData?.hero?.subtitle || 'A Legacy of 15 Years in Education',
-      images: aboutData?.hero?.images?.length > 0 ? aboutData.hero.images : [DEFAULT_HERO_IMAGE],
+      images: aboutData?.hero?.images?.length > 0 ? aboutData.hero.images : [],
       overlayColor: getColor(aboutData?.hero?.overlayColor, 'rgba(37, 55, 107, 0.8)')
     },
     intro: aboutData?.intro || {
@@ -291,7 +305,8 @@ export const fetchGalleryPageData = async () => {
     hero: {
       title: pageData?.hero?.title || 'Gallery',
       subtitle: pageData?.hero?.subtitle || 'Capturing Moments',
-      images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [DEFAULT_HERO_IMAGE],
+      images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [],
+      images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [],
       overlayColor: getColor(pageData?.hero?.overlayColor, 'rgba(37, 55, 107, 0.8)')
     },
     settings: pageData?.settings || {
@@ -357,7 +372,7 @@ export const fetchContactPageData = async () => {
     hero: {
       title: pageData?.hero?.title || 'Contact Us',
       subtitle: pageData?.hero?.subtitle || 'Get in Touch with Us',
-      images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [DEFAULT_HERO_IMAGE],
+      images: pageData?.hero?.images?.length > 0 ? pageData.hero.images : [],
       overlayColor: getColor(pageData?.hero?.overlayColor, 'rgba(232, 121, 149, 0.8)')
     },
     sectionTitle: pageData?.sectionTitle || 'Our Address & Contact Details',

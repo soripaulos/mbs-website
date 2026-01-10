@@ -29,57 +29,26 @@ const Home: React.FC = () => {
   // Grand Opening carousel
   const [grandOpeningIndex, setGrandOpeningIndex] = useState(0);
 
-  // ============ FALLBACK DATA ============
-  const fallbackHeroImages = [
-    "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1427504742925-087e6b2dd71e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-  ];
-
-  const fallbackGrandOpeningImages = [
-    "https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
-  ];
-
-  const fallbackFeatures = [
-    { icon: 'MapPin', bgColorCSS: 'rgba(37, 55, 107, 1)', title: "Prime Location", description: "Located in the heart of Dembi Dollo, bringing world-class education closer to the West Welega community." },
-    { icon: 'Star', bgColorCSS: 'rgba(249, 195, 75, 1)', title: "Modern Infrastructure", description: "State-of-the-art laboratories, smart classrooms, and extensive sports facilities designed for holistic development." },
-    { icon: 'BookOpen', bgColorCSS: 'rgba(232, 121, 149, 1)', title: "Comprehensive Curriculum", description: "Offering KG to Grade 8 education with a focus on academic excellence, character building, and digital literacy." }
-  ];
-
-  const fallbackPillars = [
-    { icon: 'Lightbulb', bgColorCSS: 'rgba(219, 234, 254, 1)', iconColorCSS: 'rgba(37, 55, 107, 1)', title: "Quality Education", description: "Nurturing curious minds with rigorous academics, innovative teaching, and a passion for lifelong learning." },
-    { icon: 'Users', bgColorCSS: 'rgba(254, 249, 195, 1)', iconColorCSS: 'rgba(249, 195, 75, 1)', title: "Character Building", description: "Instilling values, empathy, and integrity to shape compassionate and responsible global citizens." },
-    { icon: 'BookOpen', bgColorCSS: 'rgba(252, 231, 243, 1)', iconColorCSS: 'rgba(232, 121, 149, 1)', title: "Skill Development", description: "Equipping students with practical skills, critical thinking, and adaptability for a dynamic world." }
-  ];
-
   // ============ DERIVED DATA ============
-  // Support both old 'carouselImages' and new 'images' field names
-  const heroImages = pageData?.hero?.images?.length 
-    ? pageData.hero.images 
-    : (pageData?.hero?.carouselImages?.length ? pageData.hero.carouselImages : fallbackHeroImages);
+  const heroImages = pageData?.hero?.images || [];
   const heroOverlayColor = pageData?.hero?.overlayColorCSS || 'rgba(37, 55, 107, 0.8)';
-  const heroTitle = pageData?.hero?.title || '15 Years of Fellowship at Makko Billi';
-  const heroSubtitle = pageData?.hero?.subtitle || '"Our first batch of graduates who stayed with our school since nursery"';
-  const heroButtonText = pageData?.hero?.buttonText || 'Discover Our Story';
+  const heroTitle = pageData?.hero?.title || '';
+  const heroSubtitle = pageData?.hero?.subtitle || '';
+  const heroButtonText = pageData?.hero?.buttonText || '';
   const heroButtonLink = pageData?.hero?.buttonLink || '/about';
 
-  const grandOpeningImages = pageData?.grandOpening?.images?.length 
-    ? pageData.grandOpening.images 
-    : (pageData?.grandOpening?.carouselImages?.length ? pageData.grandOpening.carouselImages : fallbackGrandOpeningImages);
-  const grandOpeningBadge = pageData?.grandOpening?.badge || 'New Campus';
-  const grandOpeningTitle = pageData?.grandOpening?.title || 'Grand Opening';
-  const grandOpeningSubtitle = pageData?.grandOpening?.subtitle || 'Makko Billi School Dembi Dollo';
-  const grandOpeningDescription = pageData?.grandOpening?.description || 'KG and Elementary (KG-Grade 8)';
-  const grandOpeningFeatures = pageData?.grandOpening?.features?.length ? pageData.grandOpening.features : fallbackFeatures;
+  const grandOpeningImages = pageData?.grandOpening?.images || [];
+  const grandOpeningBadge = pageData?.grandOpening?.badge || '';
+  const grandOpeningTitle = pageData?.grandOpening?.title || '';
+  const grandOpeningSubtitle = pageData?.grandOpening?.subtitle || '';
+  const grandOpeningDescription = pageData?.grandOpening?.description || '';
+  const grandOpeningFeatures = pageData?.grandOpening?.features || [];
 
-  const pillars = pageData?.pillars?.length ? pageData.pillars : fallbackPillars;
-  const aboutTitle = pageData?.aboutSection?.title || 'A Little About Us';
-  const aboutContent = pageData?.aboutSection?.content || 'Makko Billi School, a private institution founded in July 2009 in Adama, Ethiopia, takes its name from a visionary leader of the Macha Oromos during the 16th century. The school boasts exceptional facilities, including modern classrooms, a fully equipped library, and advanced laboratories.';
-  const aboutBgImage = pageData?.aboutSection?.backgroundImage || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80';
-  const aboutButtonText = pageData?.aboutSection?.buttonText || 'Read More';
+  const pillars = pageData?.pillars || [];
+  const aboutTitle = pageData?.aboutSection?.title || '';
+  const aboutContent = pageData?.aboutSection?.content || '';
+  const aboutBgImage = pageData?.aboutSection?.backgroundImage || '';
+  const aboutButtonText = pageData?.aboutSection?.buttonText || '';
   const latestUpdatesTitle = pageData?.latestUpdates?.title || 'Latest Updates';
 
   // ============ DATA LOADING ============
@@ -146,28 +115,34 @@ const Home: React.FC = () => {
         ))}
 
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 animate-fade-in-up">
-          <h1 className="text-5xl md:text-7xl font-hand text-white mb-4 drop-shadow-lg font-bold tracking-tight">
-            {heroTitle.includes(' at ') ? (
-              <>
-                {heroTitle.split(' at ')[0]}
-                <br />
-                {'at '}
-                {heroTitle.split(' at ')[1]}
-              </>
-            ) : (
-              heroTitle
-            )}
-          </h1>
-          <p className="text-xl md:text-2xl text-school-yellow mb-10 font-display tracking-wide max-w-3xl font-medium">
-            {heroSubtitle}
-          </p>
+          {heroTitle && (
+            <h1 className="text-5xl md:text-7xl font-hand text-white mb-4 drop-shadow-lg font-bold tracking-tight">
+              {heroTitle.includes(' at ') ? (
+                <>
+                  {heroTitle.split(' at ')[0]}
+                  <br />
+                  {'at '}
+                  {heroTitle.split(' at ')[1]}
+                </>
+              ) : (
+                heroTitle
+              )}
+            </h1>
+          )}
+          {heroSubtitle && (
+            <p className="text-xl md:text-2xl text-school-yellow mb-10 font-display tracking-wide max-w-3xl font-medium">
+              {heroSubtitle}
+            </p>
+          )}
 
-          <Link
-            to={heroButtonLink}
-            className="bg-school-yellow text-school-dark-blue px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition-all transform hover:scale-105 shadow-lg"
-          >
-            {heroButtonText}
-          </Link>
+          {heroButtonText && (
+            <Link
+              to={heroButtonLink}
+              className="bg-school-yellow text-school-dark-blue px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition-all transform hover:scale-105 shadow-lg"
+            >
+              {heroButtonText}
+            </Link>
+          )}
         </div>
 
         {/* Image indicators */}
@@ -312,10 +287,14 @@ const Home: React.FC = () => {
       {/* ========== ABOUT SNIPPET SECTION ========== */}
       <section
         className="py-24 px-4 bg-school-dark-blue text-white relative overflow-hidden bg-fixed bg-center bg-cover"
-        style={{
-          backgroundImage: `linear-gradient(rgba(37, 55, 107, 0.85), rgba(37, 55, 107, 0.85)), url('${aboutBgImage}')`,
-          backgroundAttachment: 'fixed',
-        }}
+        style={
+          aboutBgImage
+            ? {
+                backgroundImage: `linear-gradient(rgba(37, 55, 107, 0.85), rgba(37, 55, 107, 0.85)), url('${aboutBgImage}')`,
+                backgroundAttachment: 'fixed',
+              }
+            : { backgroundColor: 'rgba(37,55,107,0.85)' }
+        }
       >
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
         <div className="max-w-3xl mx-auto text-center relative z-10">

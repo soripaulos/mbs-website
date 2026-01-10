@@ -5,8 +5,6 @@ import { fetchGalleryPageData, fetchGalleryImages as fetchSanityGalleryImages } 
 import { GalleryImage, GalleryPageData } from '../types';
 import HeroSlideshow from '../components/HeroSlideshow';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1427504742925-087e6b2dd71e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
-
 const Gallery: React.FC = () => {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,8 +50,8 @@ const Gallery: React.FC = () => {
   // Dynamic values with fallbacks
   const heroTitle = pageData?.hero?.title || 'Gallery';
   const heroSubtitle = pageData?.hero?.subtitle || 'Capturing Moments';
-  const heroImages = pageData?.hero?.images?.length ? pageData.hero.images : [DEFAULT_HERO_IMAGE];
-  const overlayColor = pageData?.hero?.overlayColor || 'bg-school-brand/80';
+  const heroImages = pageData?.hero?.images || [];
+  const overlayColor = pageData?.hero?.overlayColor || 'rgba(37, 55, 107, 0.8)';
   const loadMoreText = pageData?.settings?.loadMoreText || 'Load more';
 
   return (

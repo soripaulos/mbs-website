@@ -36,6 +36,25 @@ const Navbar: React.FC = () => {
         if (settings?.logo) {
           setLogo(settings.logo);
         }
+        // Update socials if provided
+        if (settings?.socialLinks) {
+          SOCIAL_LINKS.facebook = settings.socialLinks.facebook || SOCIAL_LINKS.facebook;
+          SOCIAL_LINKS.telegram = settings.socialLinks.telegram || SOCIAL_LINKS.telegram;
+          SOCIAL_LINKS.youtube = settings.socialLinks.youtube || SOCIAL_LINKS.youtube;
+          SOCIAL_LINKS.tiktok = settings.socialLinks.tiktok || SOCIAL_LINKS.tiktok;
+        }
+        // Update favicon if provided
+        if (settings?.favicon) {
+          const existing = document.querySelector("link[rel='icon']") as HTMLLinkElement | null;
+          if (existing) {
+            existing.href = settings.favicon;
+          } else {
+            const link = document.createElement('link');
+            link.rel = 'icon';
+            link.href = settings.favicon;
+            document.head.appendChild(link);
+          }
+        }
       } catch (error) {
         console.log('Failed to load site settings');
       }

@@ -90,7 +90,7 @@ const About: React.FC = () => {
   // Get hero images array (support both single image and array)
   const heroImages = data.hero.images?.length > 0 
     ? data.hero.images 
-    : (data.hero.image ? [data.hero.image] : ['https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80']);
+    : (data.hero.image ? [data.hero.image] : []);
 
   return (
     <div className="w-full overflow-x-hidden pt-20">

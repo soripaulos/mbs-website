@@ -6,8 +6,6 @@ import { StaffPageData } from '../types';
 import { Phone, Mail } from 'lucide-react';
 import HeroSlideshow from '../components/HeroSlideshow';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
-
 const Staff: React.FC = () => {
   const [data, setData] = useState<StaffPageData | null>(null);
 
@@ -41,8 +39,8 @@ const Staff: React.FC = () => {
   // Dynamic page data with fallbacks
   const heroTitle = data.pageData?.hero?.title || 'Our Staff';
   const heroSubtitle = data.pageData?.hero?.subtitle || 'The Pillars of Our Community';
-  const heroImages = data.pageData?.hero?.images?.length ? data.pageData.hero.images : [DEFAULT_HERO_IMAGE];
-  const overlayColor = data.pageData?.hero?.overlayColor || 'bg-school-brand/80';
+  const heroImages = data.pageData?.hero?.images || [];
+  const overlayColor = data.pageData?.hero?.overlayColor || 'rgba(37, 55, 107, 0.8)';
 
   const foundersTitle = data.pageData?.sectionTitles?.foundersTitle || 'Our Founders';
   const directorsTitle = data.pageData?.sectionTitles?.directorsTitle || 'Our Directors';
