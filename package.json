@@ -11,14 +11,14 @@
     "sanity:deploy": "sanity deploy"
   },
   "dependencies": {
-    "@sanity/client": "^7.13.0",
-    "@sanity/image-url": "^1.2.0",
-    "@sanity/vision": "^4.17.0",
+    "@sanity/client": "^7.14.0",
+    "@sanity/image-url": "^2.0.2",
+    "@sanity/vision": "^5.2.0",
     "lucide-react": "^0.554.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
-    "sanity": "^4.17.0",
+    "sanity": "^5.2.0",
     "styled-components": "^6.1.19"
   },
   "devDependencies": {
