@@ -51,7 +51,10 @@ const getColor = (color: any, defaultColor: string = 'rgba(37, 55, 107, 0.8)'): 
 
 // ==================== HOME PAGE ====================
 export const fetchHomePageData = async () => {
-  const query = `*[_type == "homePage"][0]{
+  const query = `coalesce(
+    *[_type == "homePage" && _id == "homePage"][0],
+    *[_type == "homePage"][0]
+  ){
     hero{
       title,
       subtitle,
@@ -124,8 +127,11 @@ export const fetchHomePageData = async () => {
 
 // ==================== ABOUT PAGE ====================
 export const fetchAboutPageData = async (): Promise<AboutPageData> => {
-  // Fetch the about page structure
-  const aboutQuery = `*[_type == "aboutPage"][0]{
+  // Fetch the about page structure - prefer singleton document
+  const aboutQuery = `coalesce(
+    *[_type == "aboutPage" && _id == "aboutPage"][0],
+    *[_type == "aboutPage"][0]
+  ){
     hero{
       title,
       subtitle,
@@ -228,7 +234,10 @@ export const fetchAboutPageData = async (): Promise<AboutPageData> => {
 // ==================== STAFF PAGE ====================
 export const fetchStaffPageData = async (): Promise<StaffPageData> => {
   const [pageData, founders, directors, viceDirectors, departments] = await Promise.all([
-    sanityClient.fetch(`*[_type == "staffPage"][0]{
+    sanityClient.fetch(`coalesce(
+      *[_type == "staffPage" && _id == "staffPage"][0],
+      *[_type == "staffPage"][0]
+    ){
       hero{
         title,
         subtitle,
@@ -291,7 +300,10 @@ export const fetchStaffPageData = async (): Promise<StaffPageData> => {
 
 // ==================== GALLERY PAGE ====================
 export const fetchGalleryPageData = async () => {
-  const pageData = await sanityClient.fetch(`*[_type == "galleryPage"][0]{
+  const pageData = await sanityClient.fetch(`coalesce(
+    *[_type == "galleryPage" && _id == "galleryPage"][0],
+    *[_type == "galleryPage"][0]
+  ){
     hero{
       title,
       subtitle,
@@ -335,7 +347,10 @@ export const fetchGalleryImages = async (): Promise<GalleryImage[]> => {
 
 // ==================== CONTACT PAGE ====================
 export const fetchContactPageData = async () => {
-  const pageData = await sanityClient.fetch(`*[_type == "contactPage"][0]{
+  const pageData = await sanityClient.fetch(`coalesce(
+    *[_type == "contactPage" && _id == "contactPage"][0],
+    *[_type == "contactPage"][0]
+  ){
     hero{
       title,
       subtitle,

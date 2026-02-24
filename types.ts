@@ -134,32 +134,34 @@ export interface HomePageData {
   hero?: {
     title: string;
     subtitle: string;
-    images?: string[];
-    carouselImages?: string[];
-    overlayColorCSS?: string;
+    images: string[];
     buttonText: string;
     buttonLink: string;
+    overlayColor?: string;
+    overlayColorCSS?: string;
   };
   grandOpening?: {
     badge: string;
     title: string;
     subtitle: string;
     description: string;
-    images?: string[];
-    carouselImages?: string[];
+    images: string[];
     features: {
       icon: string;
       title: string;
       description: string;
-      bgColor: string;
+      bgColor?: string;
+      bgColorCSS?: string;
     }[];
   };
   pillars?: {
     icon: string;
     title: string;
     description: string;
-    bgColor: string;
-    iconColor: string;
+    bgColor?: string;
+    bgColorCSS?: string;
+    iconColor?: string;
+    iconColorCSS?: string;
   }[];
   aboutSection?: {
     title: string;

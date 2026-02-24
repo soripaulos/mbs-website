@@ -57,7 +57,7 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       </div>
 
       {/* Content */}
-      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 animate-fade-in-up">
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 pb-20 md:pb-48 animate-fade-in-up">
         <h1 className="text-5xl md:text-7xl font-hand text-white mb-4 drop-shadow-lg font-bold tracking-tight">
           {title}
         </h1>
@@ -69,9 +69,9 @@ const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
         {children}
       </div>
 
-      {/* Image Indicators (only show if multiple images) */}
+      {/* Image Indicators - positioned above wave, below content */}
       {hasImages && images.length > 1 && (
-        <div className="absolute bottom-28 md:bottom-56 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+        <div className="absolute bottom-28 md:bottom-56 left-1/2 -translate-x-1/2 z-20 flex gap-2">
           {images.map((_, idx) => (
             <button
               key={idx}

@@ -32,11 +32,10 @@ const Home: React.FC = () => {
   // ============ DERIVED DATA ============
   const heroImages = pageData?.hero?.images || [];
   const heroOverlayColor = pageData?.hero?.overlayColorCSS || 'rgba(37, 55, 107, 0.8)';
-  const heroTitle = pageData?.hero?.title || 'Welcome to Makko Billi School';
-  const heroSubtitle = pageData?.hero?.subtitle || 'Access the new student portal on web and Android—grades, assignments, and more in one place.';
-  const heroButtonText = pageData?.hero?.buttonText || 'Go to the Portal';
-  const heroButtonLink = pageData?.hero?.buttonLink || 'https://portal.makkobillischool.com';
-  const isExternalHeroLink = heroButtonLink.startsWith('http://') || heroButtonLink.startsWith('https://');
+  const heroTitle = pageData?.hero?.title || '';
+  const heroSubtitle = pageData?.hero?.subtitle || '';
+  const heroButtonText = pageData?.hero?.buttonText || '';
+  const heroButtonLink = pageData?.hero?.buttonLink || '/about';
 
   const grandOpeningImages = pageData?.grandOpening?.images || [];
   const grandOpeningBadge = pageData?.grandOpening?.badge || '';
@@ -115,7 +114,7 @@ const Home: React.FC = () => {
           </div>
         ))}
 
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 pb-24 animate-fade-in-up">
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 pb-20 md:pb-48 animate-fade-in-up">
           {heroTitle && (
             <h1 className="text-5xl md:text-7xl font-hand text-white mb-4 drop-shadow-lg font-bold tracking-tight">
               {heroTitle.includes(' at ') ? (
@@ -137,29 +136,18 @@ const Home: React.FC = () => {
           )}
 
           {heroButtonText && (
-            isExternalHeroLink ? (
-              <a
-                href={heroButtonLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-school-yellow text-school-dark-blue px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition-all transform hover:scale-105 shadow-lg inline-block"
-              >
-                {heroButtonText}
-              </a>
-            ) : (
-              <Link
-                to={heroButtonLink}
-                className="bg-school-yellow text-school-dark-blue px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition-all transform hover:scale-105 shadow-lg"
-              >
-                {heroButtonText}
-              </Link>
-            )
+            <Link
+              to={heroButtonLink}
+              className="bg-school-yellow text-school-dark-blue px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition-all transform hover:scale-105 shadow-lg"
+            >
+              {heroButtonText}
+            </Link>
           )}
         </div>
 
-        {/* Image indicators - placed at bottom to avoid overlapping the CTA button */}
+        {/* Image indicators - positioned above wave */}
         {heroImages.length > 1 && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+          <div className="absolute bottom-28 md:bottom-56 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             {heroImages.map((_, idx) => (
               <button
                 key={idx}
