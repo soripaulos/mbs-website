@@ -134,7 +134,9 @@ export interface HomePageData {
   hero?: {
     title: string;
     subtitle: string;
-    carouselImages: string[];
+    images?: string[];
+    carouselImages?: string[];
+    overlayColorCSS?: string;
     buttonText: string;
     buttonLink: string;
   };
@@ -143,7 +145,8 @@ export interface HomePageData {
     title: string;
     subtitle: string;
     description: string;
-    carouselImages: string[];
+    images?: string[];
+    carouselImages?: string[];
     features: {
       icon: string;
       title: string;
