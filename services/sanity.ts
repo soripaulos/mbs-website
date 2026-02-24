@@ -1,4 +1,4 @@
-import { sanityClient, getImageUrl } from '../sanity/client';
+import { sanityClient } from '../sanity/client';
 import type { 
   AboutPageData, 
   StaffPageData, 
@@ -452,7 +452,6 @@ export const fetchSiteSettings = async () => {
     }
   )`);
   
-  console.log('[Sanity] Site settings loaded:', result?.logo ? 'Logo found' : 'No logo');
   return result;
 };
 

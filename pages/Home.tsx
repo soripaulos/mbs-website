@@ -205,6 +205,7 @@ const Home: React.FC = () => {
                       key={idx}
                       src={img}
                       alt={`Campus ${idx + 1}`}
+                      loading="lazy"
                       className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
                         idx === grandOpeningIndex ? 'opacity-100' : 'opacity-0'
                       }`}
@@ -296,7 +297,7 @@ const Home: React.FC = () => {
             : { backgroundColor: 'rgba(37,55,107,0.85)' }
         }
       >
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+        <div className="absolute inset-0 opacity-10"></div>
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <h2 className="text-4xl font-display font-bold mb-6">{aboutTitle}</h2>
           <p className="text-gray-300 text-sm leading-loose mb-10">{aboutContent}</p>

@@ -81,7 +81,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   }
 
   try {
-    const FB_GRAPH_URL = 'https://graph.facebook.com/v19.0';
+    const FB_GRAPH_URL = 'https://graph.facebook.com/v21.0';
     const fields = [
       'id',
       'message',
@@ -125,9 +125,23 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     // try resolving the real Graph Page ID from the page URL and retry.
     const fbErr = result?.json?.error;
     const isUnsupportedGetRequest =
-      fbErr?.code === 100 && (fbErr?.error_subcode === 33 || fbErr?.error_subcode === 0 || fbErr?.error_subcode == null);
+      fbErr && fbErr.code === 100 && (fbErr.error_subcode === 33 || fbErr.error_subcode === 0 || fbErr.error_subcode == null);
+    const isTokenError =
+      fbErr && (fbErr.code === 190 || fbErr.code === 102);
 
     let resolvedPage: { id?: string; name?: string } | null = null;
+
+    if (!result.ok && isTokenError) {
+      return new Response(
+        JSON.stringify({
+          error: `Facebook token error (code ${fbErr.code})`,
+          facebookError: result.json,
+          hint: 'Your access token is invalid or expired. Generate a new Page Access Token in Graph API Explorer → /me/accounts.',
+          posts: [],
+        }),
+        { status: 200, headers: corsHeaders }
+      );
+    }
 
     if (!result.ok && isUnsupportedGetRequest && env.VITE_FB_PAGE_URL) {
       const resolved = await resolvePageIdFromUrl(env.VITE_FB_PAGE_URL);

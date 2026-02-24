@@ -98,6 +98,8 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
     setLightbox({ post: lightbox.post, imageIndex: (lightbox.imageIndex - 1 + count) % count });
   };
 
+  if (!loading && posts.length === 0) return null;
+
   return (
     <>
       <section className="py-20 px-4 bg-white">
@@ -111,10 +113,6 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
               {[1, 2, 3].map((i) => (
                 <div key={i} className="bg-gray-100 h-80 rounded-xl animate-pulse"></div>
               ))}
-            </div>
-          ) : posts.length === 0 ? (
-            <div className="text-center text-gray-500 py-12">
-              <p>No posts available at the moment.</p>
             </div>
           ) : (
             <>
@@ -138,6 +136,7 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
                           <img
                             src={post.images[currentImageIdx] || post.images[0]}
                             alt="Post"
+                            loading="lazy"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
 
@@ -153,7 +152,6 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
                             </span>
                           </div>
 
-                          {/* Source badge */}
                           {(post as any).source === 'sanity' && (
                             <div className="absolute top-2 left-2 bg-school-brand/90 text-white px-2 py-1 rounded text-xs font-medium">
                               Announcement
@@ -164,7 +162,7 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
 
                       <div className="p-5 flex flex-col flex-grow">
                         <p className="text-gray-700 text-sm mb-4 line-clamp-4 flex-grow leading-relaxed">
-                          {post.content || 'Check out our latest update!'}
+                          {post.content}
                         </p>
 
                         <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
@@ -189,18 +187,16 @@ export default function FacebookPosts({ title = 'Latest Updates', initialCount =
                 })}
               </div>
 
-              <div className="text-center mt-12">
-                {hasMorePosts ? (
+              {hasMorePosts && (
+                <div className="text-center mt-12">
                   <button
                     onClick={handleLoadMore}
                     className="inline-block px-8 py-3 border-2 border-school-dark-blue text-school-dark-blue rounded-full font-bold hover:bg-school-dark-blue hover:text-white transition-colors text-sm"
                   >
                     See More ({posts.length - visibleCount} more)
                   </button>
-                ) : (
-                  posts.length > initialCount && <p className="text-gray-400 text-sm">You&apos;ve seen all posts!</p>
-                )}
-              </div>
+                </div>
+              )}
             </>
           )}
         </div>

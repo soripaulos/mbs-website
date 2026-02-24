@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { fetchGalleryImages } from '../services/api';
 import { fetchGalleryPageData, fetchGalleryImages as fetchSanityGalleryImages } from '../services/sanity';
 import { GalleryImage, GalleryPageData } from '../types';
 import HeroSlideshow from '../components/HeroSlideshow';
@@ -20,26 +19,11 @@ const Gallery: React.FC = () => {
         console.log('Failed to load gallery page data from Sanity');
       }
 
-      // Load gallery images
       try {
-        // Try Sanity first
         const sanityImages = await fetchSanityGalleryImages();
-        if (sanityImages && sanityImages.length > 0) {
-          setImages(sanityImages);
-        } else {
-          // Fallback to Facebook/Instagram API
-          const apiImages = await fetchGalleryImages();
-          setImages(apiImages);
-        }
+        setImages(sanityImages || []);
       } catch (error) {
-        console.error("Failed to load gallery images", error);
-        // Try API as fallback
-        try {
-          const apiImages = await fetchGalleryImages();
-          setImages(apiImages);
-        } catch (e) {
-          console.error("API fallback also failed", e);
-        }
+        console.warn("Failed to load gallery images", error);
       } finally {
         setLoading(false);
       }
@@ -83,7 +67,7 @@ const Gallery: React.FC = () => {
                     className="w-full object-cover transform group-hover:scale-110 transition duration-700 ease-in-out"
                     loading="lazy"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
+                      (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-school-brand/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-6">

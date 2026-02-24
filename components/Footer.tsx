@@ -21,8 +21,6 @@ interface SiteSettings {
   };
 }
 
-const DEFAULT_LOGO = 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80';
-
 const Footer: React.FC = () => {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
 
@@ -38,8 +36,7 @@ const Footer: React.FC = () => {
     loadSettings();
   }, []);
 
-  // Use settings or fallback to static values
-  const footerLogo = settings?.footerLogo || DEFAULT_LOGO;
+  const footerLogo = settings?.footerLogo || null;
   const footerDescription = settings?.footerDescription || 'Nurturing minds, building character, and fostering a love for learning since 2009.';
   const copyright = settings?.copyright || 'COPYRIGHT © 2025 MAKKO BILLI SCHOOL';
   const phone = settings?.footerContact?.phone || '+251-221-120620';
@@ -60,11 +57,13 @@ const Footer: React.FC = () => {
           {/* Column 1: Logo & About */}
           <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center mb-4">
-              <img 
-                src={footerLogo} 
-                alt="Makko Billi Logo" 
-                className="h-12 w-auto max-w-[60px] mr-3 object-contain"
-              />
+              {footerLogo && (
+                <img 
+                  src={footerLogo} 
+                  alt="Makko Billi Logo" 
+                  className="h-12 w-auto max-w-[60px] mr-3 object-contain"
+                />
+              )}
               <div className="flex flex-col leading-tight">
                 <span className="font-display font-bold text-2xl text-white">MAKKO BILLI</span>
                 <span className="font-display text-sm tracking-widest text-white/90">SCHOOL</span>
