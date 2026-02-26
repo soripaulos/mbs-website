@@ -9,6 +9,7 @@ export default defineType({
     { name: 'grandOpening', title: 'Grand Opening' },
     { name: 'pillars', title: 'Three Pillars' },
     { name: 'about', title: 'About Section' },
+    { name: 'studentPortalApp', title: 'Student Portal App' },
   ],
   fields: [
     // ==================== HERO SECTION ====================
@@ -159,6 +160,62 @@ export default defineType({
         { name: 'buttonText', title: 'Button Text', type: 'string', initialValue: 'Read More' },
         { name: 'buttonLink', title: 'Button Link', type: 'string', initialValue: '/about' },
       ],
+    }),
+
+    // ==================== STUDENT PORTAL APP SECTION ====================
+    defineField({
+      name: 'studentPortalApp',
+      title: 'Student Portal App Section',
+      type: 'object',
+      group: 'studentPortalApp',
+      fields: [
+        { name: 'badge', title: 'Badge Text', type: 'string', initialValue: 'NEW' },
+        { name: 'title', title: 'Title', type: 'string', initialValue: 'Makko Billi Student Portal App' },
+        { name: 'subtitle', title: 'Subtitle', type: 'string', initialValue: 'Stay Connected, Stay Informed' },
+        { 
+          name: 'description', 
+          title: 'Description', 
+          type: 'text', 
+          initialValue: 'Access everything you need for your child\'s education right from your smartphone. Track attendance, view grades, communicate with teachers, and stay updated with school announcements.' 
+        },
+        {
+          name: 'appImage',
+          title: 'App Image',
+          type: 'image',
+          options: { hotspot: true }
+        },
+        {
+          name: 'features',
+          title: 'Features',
+          type: 'array',
+          of: [{
+            type: 'object',
+            fields: [
+              { 
+                name: 'icon', 
+                title: 'Icon Name', 
+                type: 'string', 
+                description: 'Lucide icon name (e.g., Calendar, GraduationCap, MessageCircle, Bell)' 
+              },
+              { name: 'title', title: 'Title', type: 'string' },
+              { name: 'description', title: 'Description', type: 'string' },
+            ],
+            preview: {
+              select: { title: 'title', subtitle: 'description' },
+            }
+          }]
+        },
+        {
+          name: 'downloadLinks',
+          title: 'Download Links',
+          type: 'object',
+          fields: [
+            { name: 'appStore', title: 'App Store URL', type: 'url' },
+            { name: 'playStore', title: 'Play Store URL', type: 'url' },
+            { name: 'webPortal', title: 'Web Portal URL', type: 'url' }
+          ]
+        }
+      ]
     }),
 
     // ==================== LATEST UPDATES SECTION ====================
