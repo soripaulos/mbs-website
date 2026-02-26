@@ -45,6 +45,7 @@ const Home: React.FC = () => {
   const grandOpeningFeatures = pageData?.grandOpening?.features || [];
 
   const pillars = pageData?.pillars || [];
+  const studentPortal = pageData?.studentPortalApp;
   const aboutTitle = pageData?.aboutSection?.title || '';
   const aboutContent = pageData?.aboutSection?.content || '';
   const aboutBgImage = pageData?.aboutSection?.backgroundImage || '';
@@ -284,6 +285,96 @@ const Home: React.FC = () => {
           ))}
         </div>
       </section>
+
+      {/* ========== STUDENT PORTAL APP SECTION ========== */}
+      {studentPortal && (studentPortal.title || studentPortal.features?.length) && (
+        <section className="py-24 px-4 bg-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              {studentPortal.badge && (
+                <span className="inline-block bg-school-brand text-white px-4 py-1 rounded-full text-xs font-bold tracking-wider mb-4 uppercase">
+                  {studentPortal.badge}
+                </span>
+              )}
+              {studentPortal.title && (
+                <h2 className="text-4xl md:text-5xl font-hand text-school-dark-blue font-bold mb-2">{studentPortal.title}</h2>
+              )}
+              {studentPortal.subtitle && (
+                <p className="text-xl font-display text-school-brand font-medium">{studentPortal.subtitle}</p>
+              )}
+            </div>
+
+            <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+              {studentPortal.appImage && (
+                <div className="flex-1 flex justify-center">
+                  <img
+                    src={studentPortal.appImage}
+                    alt="Student Portal App"
+                    className="max-h-[400px] w-auto object-contain drop-shadow-2xl"
+                  />
+                </div>
+              )}
+              <div className="flex-1 space-y-6">
+                {studentPortal.description && (
+                  <p className="text-gray-600 leading-relaxed">{studentPortal.description}</p>
+                )}
+                {studentPortal.features && studentPortal.features.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {studentPortal.features.map((feature: any, idx: number) => (
+                      <div key={idx} className="flex gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                        <div className="w-10 h-10 rounded-lg bg-school-brand/10 flex items-center justify-center flex-shrink-0">
+                          <DynamicIcon name={feature.icon} className="w-5 h-5 text-school-brand" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-school-dark-blue">{feature.title}</h4>
+                          {feature.description && <p className="text-sm text-gray-600">{feature.description}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {studentPortal.downloadLinks && (studentPortal.downloadLinks.appStore || studentPortal.downloadLinks.playStore || studentPortal.downloadLinks.webPortal) && (
+                  <div className="flex flex-wrap gap-3 pt-4">
+                    {studentPortal.downloadLinks.appStore && (
+                      <a
+                        href={studentPortal.downloadLinks.appStore}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 bg-black text-white px-5 py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
+                      >
+                        <LucideIcons.Apple className="w-5 h-5" />
+                        App Store
+                      </a>
+                    )}
+                    {studentPortal.downloadLinks.playStore && (
+                      <a
+                        href={studentPortal.downloadLinks.playStore}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 bg-school-brand text-white px-5 py-3 rounded-lg font-semibold hover:bg-school-dark-blue transition"
+                      >
+                        <LucideIcons.Smartphone className="w-5 h-5" />
+                        Play Store
+                      </a>
+                    )}
+                    {studentPortal.downloadLinks.webPortal && (
+                      <a
+                        href={studentPortal.downloadLinks.webPortal}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 border-2 border-school-brand text-school-brand px-5 py-3 rounded-lg font-semibold hover:bg-school-brand hover:text-white transition"
+                      >
+                        <LucideIcons.Globe className="w-5 h-5" />
+                        Web Portal
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ========== ABOUT SNIPPET SECTION ========== */}
       <section

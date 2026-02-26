@@ -170,6 +170,15 @@ export interface HomePageData {
     buttonText: string;
     buttonLink: string;
   };
+  studentPortalApp?: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    description: string;
+    appImage?: string;
+    features: { icon: string; title: string; description: string }[];
+    downloadLinks?: { appStore?: string; playStore?: string; webPortal?: string };
+  };
   latestUpdates?: {
     title: string;
     showCount: number;

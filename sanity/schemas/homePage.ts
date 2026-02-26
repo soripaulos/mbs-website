@@ -9,7 +9,7 @@ export default defineType({
     { name: 'grandOpening', title: 'Grand Opening' },
     { name: 'pillars', title: 'Three Pillars' },
     { name: 'about', title: 'About Section' },
-    { name: 'studentPortalApp', title: 'Student Portal App' },
+    { name: 'studentPortalApp', title: 'Student Portal App Section' },
   ],
   fields: [
     // ==================== HERO SECTION ====================
@@ -24,14 +24,14 @@ export default defineType({
           title: 'Main Title',
           type: 'string',
           description: 'The main headline text',
-          initialValue: 'Welcome to Makko Billi School',
+          initialValue: '15 Years of Fellowship at Makko Billi',
         },
         {
           name: 'subtitle',
           title: 'Subtitle',
           type: 'string',
-          description: 'Text below the main title (e.g. portal announcement)',
-          initialValue: 'Access the new student portal on web and Android—grades, assignments, and more in one place.',
+          description: 'Text below the main title',
+          initialValue: '"Our first batch of graduates who stayed with our school since nursery"',
         },
         {
           name: 'images',
@@ -51,14 +51,13 @@ export default defineType({
           name: 'buttonText',
           title: 'Button Text',
           type: 'string',
-          initialValue: 'Go to the Portal',
+          initialValue: 'Discover Our Story',
         },
         {
           name: 'buttonLink',
           title: 'Button Link',
           type: 'string',
-          description: 'Use https://portal.makkobillischool.com for the student portal',
-          initialValue: 'https://portal.makkobillischool.com',
+          initialValue: '/about',
         },
       ],
     }),
@@ -172,38 +171,40 @@ export default defineType({
         { name: 'badge', title: 'Badge Text', type: 'string', initialValue: 'NEW' },
         { name: 'title', title: 'Title', type: 'string', initialValue: 'Makko Billi Student Portal App' },
         { name: 'subtitle', title: 'Subtitle', type: 'string', initialValue: 'Stay Connected, Stay Informed' },
-        { 
-          name: 'description', 
-          title: 'Description', 
-          type: 'text', 
-          initialValue: 'Access everything you need for your child\'s education right from your smartphone. Track attendance, view grades, communicate with teachers, and stay updated with school announcements.' 
+        {
+          name: 'description',
+          title: 'Description',
+          type: 'text',
+          initialValue: "Access everything you need for your child's education right from your smartphone. Track attendance, view grades, communicate with teachers, and stay updated with school announcements.",
         },
         {
           name: 'appImage',
           title: 'App Image',
           type: 'image',
-          options: { hotspot: true }
+          options: { hotspot: true },
         },
         {
           name: 'features',
           title: 'Features',
           type: 'array',
-          of: [{
-            type: 'object',
-            fields: [
-              { 
-                name: 'icon', 
-                title: 'Icon Name', 
-                type: 'string', 
-                description: 'Lucide icon name (e.g., Calendar, GraduationCap, MessageCircle, Bell)' 
+          of: [
+            {
+              type: 'object',
+              fields: [
+                {
+                  name: 'icon',
+                  title: 'Icon Name',
+                  type: 'string',
+                  description: 'Lucide icon name (e.g., Calendar, GraduationCap, MessageCircle, Bell)',
+                },
+                { name: 'title', title: 'Title', type: 'string' },
+                { name: 'description', title: 'Description', type: 'string' },
+              ],
+              preview: {
+                select: { title: 'title', subtitle: 'description' },
               },
-              { name: 'title', title: 'Title', type: 'string' },
-              { name: 'description', title: 'Description', type: 'string' },
-            ],
-            preview: {
-              select: { title: 'title', subtitle: 'description' },
-            }
-          }]
+            },
+          ],
         },
         {
           name: 'downloadLinks',
@@ -212,10 +213,10 @@ export default defineType({
           fields: [
             { name: 'appStore', title: 'App Store URL', type: 'url' },
             { name: 'playStore', title: 'Play Store URL', type: 'url' },
-            { name: 'webPortal', title: 'Web Portal URL', type: 'url' }
-          ]
-        }
-      ]
+            { name: 'webPortal', title: 'Web Portal URL', type: 'url' },
+          ],
+        },
+      ],
     }),
 
     // ==================== LATEST UPDATES SECTION ====================
