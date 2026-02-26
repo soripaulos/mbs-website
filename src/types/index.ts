@@ -21,6 +21,7 @@ export interface SiteSettings {
   };
   facebookPageId?: string;
   facebookAccessToken?: string;
+  studentPortalUrl?: string;
 }
 
 // Hero Section

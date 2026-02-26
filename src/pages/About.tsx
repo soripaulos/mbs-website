@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Check, ChevronLeft, ChevronRight, X, Lightbulb, Heart, Palette, Calculator, BookOpen, Users, Globe } from 'lucide-react';
+import { MapPin, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import DynamicIcon from '@/components/DynamicIcon';
 import {
@@ -150,83 +150,6 @@ function IntroSection({ intro }: { intro: typeof aboutPageData.intro }) {
   );
 }
 
-// Feature Icon Component - Unique and Customizable
-function FeatureIcon({ icon, color }: { icon: string; color: string }) {
-  const iconMap: Record<string, React.ReactNode> = {
-    'Play-based learning': <Lightbulb size={16} />,
-    'Social development': <Heart size={16} />,
-    'Basic numeracy & literacy': <Calculator size={16} />,
-    'Creative arts': <Palette size={16} />,
-    'Core curriculum': <BookOpen size={16} />,
-    'Critical thinking': <Lightbulb size={16} />,
-    'Character education': <Heart size={16} />,
-    'Extracurricular activities': <Users size={16} />,
-    'Advanced subjects': <BookOpen size={16} />,
-    'College preparation': <Globe size={16} />,
-    'Leadership programs': <Users size={16} />,
-    'Career guidance': <Lightbulb size={16} />,
-  };
-
-  return (
-    <div
-      className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-      style={{ backgroundColor: color }}
-    >
-      <span className="text-white">{iconMap[icon] || <Check size={14} />}</span>
-    </div>
-  );
-}
-
-// Image Slider Component
-function ImageSlider({ images }: { images: string[] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  if (images.length <= 1) {
-    return images.length === 1 ? (
-      <img src={images[0]} alt="Gallery" className="w-full h-full object-cover rounded-2xl" />
-    ) : null;
-  }
-
-  const nextImage = () => setCurrentIndex((prev) => (prev + 1) % images.length);
-  const prevImage = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-
-  return (
-    <div className="relative w-full h-full rounded-2xl overflow-hidden">
-      {images.map((image, index) => (
-        <img
-          key={index}
-          src={image}
-          alt={`Slide ${index + 1}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${index === currentIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-            }`}
-        />
-      ))}
-      <button
-        onClick={prevImage}
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-school-brand hover:bg-white transition-colors"
-      >
-        <ChevronLeft size={18} />
-      </button>
-      <button
-        onClick={nextImage}
-        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-school-brand hover:bg-white transition-colors"
-      >
-        <ChevronRight size={18} />
-      </button>
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all ${index === currentIndex ? 'bg-school-yellow w-4' : 'bg-white/70'
-              }`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // Academics Section - Moved above Facilities with Image Slider
 function AcademicsSection() {
   const academicsRef = useRef<HTMLDivElement>(null);
@@ -261,13 +184,6 @@ function AcademicsSection() {
   if (!academicLevels || academicLevels.length === 0) return null;
 
   const activeData = academicLevels.find(l => l.id === activeLevel) || academicLevels[0];
-
-  // Feature colors for each level
-  const featureColors: Record<string, string> = {
-    kg: '#f179aa',
-    primary: '#2d4289',
-    secondary: '#fed250'
-  };
 
   const renderActiveContent = () => {
     if (!activeData) return null;
