@@ -175,7 +175,7 @@ function FoundersSection({ founders, sectionTitle }: { founders: StaffProfile[];
       {/* Main Founder + Co-Founders Layout */}
       <div className="flex flex-col md:flex-row justify-center items-end gap-8 md:gap-12">
         {/* Main Founder - with hover slide-up effect */}
-        <div className="w-full md:w-1/3 order-1 relative z-10">
+        <div className="w-full md:w-1/3 relative z-10">
           <AnimatedSection delay={100}>
             <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[3/4] transform md:scale-105 md:hover:scale-110 transition duration-500 border-4 border-school-yellow group">
               <img
@@ -224,7 +224,7 @@ function FoundersSection({ founders, sectionTitle }: { founders: StaffProfile[];
 
         {/* Co-Founders */}
         {coFounders.map((coFounder, index) => (
-          <div key={coFounder.id} className={`w-full md:w-1/3 order-${index + 2}`}>
+          <div key={coFounder.id} className="w-full md:w-1/3">
             <AnimatedSection delay={200 + index * 100}>
               <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[3/4] group">
                 <img
@@ -360,36 +360,36 @@ export default function Staff() {
   return (
     <div className="min-h-screen">
       <HeroSlideshow
-        images={staffPage.hero.images}
-        title={staffPage.hero.title}
-        subtitle={staffPage.hero.subtitle}
-        overlayColor={staffPage.hero.overlayColor}
+        images={staffPage?.hero?.images}
+        title={staffPage?.hero?.title}
+        subtitle={staffPage?.hero?.subtitle}
+        overlayColor={staffPage?.hero?.overlayColor}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Founders */}
         <FoundersSection
           founders={founders}
-          sectionTitle={staffPage.sectionTitles.foundersTitle}
+          sectionTitle={staffPage?.sectionTitles?.foundersTitle}
         />
 
         {/* Directors */}
         <DirectorsSection
           directors={directors}
-          title={staffPage.sectionTitles.directorsTitle}
-          subtitle={staffPage.sectionTitles.directorsSubtitle}
+          title={staffPage?.sectionTitles?.directorsTitle}
+          subtitle={staffPage?.sectionTitles?.directorsSubtitle}
         />
 
         {/* Vice Directors */}
         <ViceDirectorsSection
           viceDirectors={viceDirectors}
-          title={staffPage.sectionTitles.viceDirectorsTitle}
-          subtitle={staffPage.sectionTitles.viceDirectorsSubtitle}
+          title={staffPage?.sectionTitles?.viceDirectorsTitle}
+          subtitle={staffPage?.sectionTitles?.viceDirectorsSubtitle}
         />
       </div>
 
       {/* Departments */}
-      <DepartmentsSection departments={departments} departmentsTitle={staffPage.sectionTitles.departmentsTitle} />
+      <DepartmentsSection departments={departments} departmentsTitle={staffPage?.sectionTitles?.departmentsTitle} />
     </div>
   );
 }

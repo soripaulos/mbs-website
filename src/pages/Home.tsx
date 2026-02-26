@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, ArrowRight, Apple, PlayCircle, Globe, Calend
 import HeroSlideshow from '@/components/HeroSlideshow';
 import DynamicIcon from '@/components/DynamicIcon';
 import { homePageData as mockHomePageData, socialPostsData } from '@/data/mockData';
-import { useSanityData } from '@/hooks/useSanityData';
+import { useSanityData, useSanityArrayData } from '@/hooks/useSanityData';
 import { fetchHomePageData, fetchStudentPortalApp, fetchSocialPosts } from '@/services/sanity';
 import { useCallback } from 'react';
 
@@ -171,7 +171,9 @@ function StudentPortalAppSection() {
                 Play Store
               </a>
               <a
-                href={studentPortalApp.downloadLinks.webPortal}
+                href={studentPortalApp.downloadLinks?.webPortal && studentPortalApp.downloadLinks.webPortal !== '#' ? studentPortalApp.downloadLinks.webPortal : 'https://portal.makkobillischool.com'}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 px-5 py-3 bg-school-yellow text-school-brand rounded-xl font-semibold hover:bg-white transition-colors"
               >
                 <Globe size={20} />
@@ -187,7 +189,7 @@ function StudentPortalAppSection() {
               <div className="absolute inset-0 bg-school-yellow/20 rounded-full blur-3xl transform scale-110" />
               <div className="relative bg-white rounded-3xl p-4 shadow-2xl">
                 <img
-                  src={studentPortalApp.appImage}
+                  src="https://cdn.sanity.io/images/yqwhfc1k/production/8508996403a729ae03430e7460e4a899b40d2c11-1181x768.png"
                   alt="Student Portal App"
                   className="w-full rounded-2xl"
                 />
@@ -218,32 +220,37 @@ function StudentPortalAppSection() {
 }
 
 // Latest Updates Section
-function LatestUpdates({ latestUpdates }: { latestUpdates: typeof mockHomePageData.latestUpdates }) {
+function LatestUpdates({ latestUpdates }: { latestUpdates?: typeof mockHomePageData.latestUpdates }) {
   const [visibleCount, setVisibleCount] = useState(3);
   const postsFetcher = useCallback(() => fetchSocialPosts(), []);
-  const { data: posts } = useSanityData(postsFetcher, socialPostsData);
+  const { data: posts, loading: postsLoading } = useSanityArrayData(postsFetcher, socialPostsData);
 
-  if (posts?.length === 0) return null;
+  const sectionTitle = latestUpdates?.title || 'Latest Posts';
+  const buttonText = latestUpdates?.buttonText || 'Load More';
+
+  if (!postsLoading && (!posts || posts.length === 0)) return null;
+  if (postsLoading && (!posts || posts.length === 0)) return null;
 
   return (
     <section className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatedSection className="text-center mb-12">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-4">
-            {latestUpdates.title}
+            {sectionTitle}
           </h2>
           <div className="w-20 h-1 bg-school-yellow mx-auto rounded-full" />
         </AnimatedSection>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.slice(0, visibleCount).map((post, index) => (
-            <AnimatedSection key={post.id} delay={index * 150}>
+          {posts.slice(0, visibleCount).map((post: any, index: number) => (
+            <AnimatedSection key={post.id || index} delay={index * 150}>
               <div className="bg-white rounded-xl shadow-lg overflow-hidden card-hover border border-gray-100">
-                {post.images.length > 0 && (
+                {post.images && post.images.length > 0 && (
                   <div className="aspect-video overflow-hidden">
                     <img
                       src={post.images[0]}
                       alt="Post"
+                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -253,9 +260,11 @@ function LatestUpdates({ latestUpdates }: { latestUpdates: typeof mockHomePageDa
                     <span className="px-3 py-1 bg-school-brand/10 text-school-brand text-xs font-semibold rounded-full">
                       {post.platform === 'manual' ? 'Announcement' : post.platform}
                     </span>
-                    <span className="text-gray-400 text-xs">
-                      {new Date(post.date).toLocaleDateString()}
-                    </span>
+                    {post.date && (
+                      <span className="text-gray-400 text-xs">
+                        {new Date(post.date).toLocaleDateString()}
+                      </span>
+                    )}
                   </div>
                   <p className="text-gray-600 text-sm line-clamp-3">{post.content}</p>
                 </div>
@@ -270,7 +279,7 @@ function LatestUpdates({ latestUpdates }: { latestUpdates: typeof mockHomePageDa
               onClick={() => setVisibleCount(prev => prev + 3)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-school-brand text-white rounded-full font-semibold hover:bg-school-dark-blue transition-colors"
             >
-              {latestUpdates.buttonText}
+              {buttonText}
               <ArrowRight size={18} />
             </button>
           </div>
@@ -376,25 +385,25 @@ function GrandOpening({ grandOpening }: { grandOpening: typeof mockHomePageData.
             </div>
           </AnimatedSection>
 
-          {/* Features - Improved Cards */}
-          <div className="space-y-5">
+          {/* Features - Clean inline layout */}
+          <div className="space-y-6">
             {grandOpening.features.map((feature, index) => (
               <AnimatedSection key={index} delay={250 + index * 120}>
-                <div
-                  className="group relative flex gap-5 p-6 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
-                  style={{ backgroundColor: feature.bgColor }}
-                >
-                  {/* Decorative Shape */}
-                  <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/30 rounded-full transition-transform group-hover:scale-150" />
-
-                  <div className="relative w-14 h-14 bg-school-brand rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform">
-                    <DynamicIcon name={feature.icon} size={26} className="text-white" />
+                <div className="group flex gap-4 items-start py-3">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                    style={{ backgroundColor: feature.bgColor }}
+                  >
+                    <DynamicIcon name={feature.icon} size={24} className="text-white" />
                   </div>
-                  <div className="relative">
-                    <h3 className="font-display font-bold text-xl text-school-brand mb-2 group-hover:text-school-dark-blue transition-colors">
+                  <div>
+                    <h3
+                      className="font-display font-bold text-lg mb-1 transition-colors"
+                      style={{ color: feature.bgColor }}
+                    >
                       {feature.title}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
                   </div>
                 </div>
               </AnimatedSection>
@@ -488,12 +497,12 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <HeroSlideshow
-        images={homePageData.hero.images}
-        title={homePageData.hero.title}
-        subtitle={homePageData.hero.subtitle}
-        overlayColor={homePageData.hero.overlayColor}
+        images={homePageData?.hero?.images}
+        title={homePageData?.hero?.title}
+        subtitle={homePageData?.hero?.subtitle}
+        overlayColor={homePageData?.hero?.overlayColor}
       >
-        {homePageData.hero.buttonText && homePageData.hero.buttonLink && (
+        {homePageData?.hero?.buttonText && homePageData?.hero?.buttonLink && (
           <Link
             to={homePageData.hero.buttonLink}
             className="inline-flex items-center gap-2 px-8 py-4 bg-school-yellow text-school-brand rounded-full font-bold text-lg hover:bg-white transition-colors shadow-lg"
@@ -504,20 +513,26 @@ export default function Home() {
         )}
       </HeroSlideshow>
 
-      {/* Latest Updates */}
-      <LatestUpdates latestUpdates={homePageData.latestUpdates} />
+      {/* Latest Updates / Social Posts */}
+      <LatestUpdates latestUpdates={homePageData?.latestUpdates} />
 
       {/* Student Portal App Section - NEW */}
       <StudentPortalAppSection />
 
       {/* Grand Opening Section */}
-      <GrandOpening grandOpening={homePageData.grandOpening} />
+      {homePageData?.grandOpening && (
+        <GrandOpening grandOpening={homePageData.grandOpening} />
+      )}
 
       {/* Three Pillars Section */}
-      <ThreePillars pillars={homePageData.pillars} />
+      {homePageData?.pillars && homePageData.pillars.length > 0 && (
+        <ThreePillars pillars={homePageData.pillars} />
+      )}
 
       {/* About Snippet Section */}
-      <AboutSnippet aboutSection={homePageData.aboutSection} />
+      {homePageData?.aboutSection && (
+        <AboutSnippet aboutSection={homePageData.aboutSection} />
+      )}
     </div>
   );
 }

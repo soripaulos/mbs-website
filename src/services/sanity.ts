@@ -22,10 +22,10 @@ export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
   const query = `*[_type == "siteSettings"] | order(_updatedAt desc)[0] {
     title,
     description,
-    "logo": logo.asset->url,
-    "logoMobile": logoMobile.asset->url,
+    "logo": logo.asset->url + "?w=200&q=80&auto=format",
+    "logoMobile": logoMobile.asset->url + "?w=120&q=80&auto=format",
     "favicon": favicon.asset->url,
-    "footerLogo": footerLogo.asset->url,
+    "footerLogo": footerLogo.asset->url + "?w=150&q=80&auto=format",
     footerDescription,
     footerContact,
     copyright,
@@ -49,22 +49,32 @@ export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
 };
 
 // Helper: append optimization parameters to Sanity image URLs
-function optimizeImageUrl(url: string | undefined | null) {
+// Sanity CDN supports: w (width), h (height), q (quality), auto=format (webp/avif), fit, crop
+function optimizeImageUrl(url: string | undefined | null, width = 1920, quality = 80): string | undefined | null {
   if (!url) return url;
   if (url.includes('cdn.sanity.io')) {
     const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}auto=format&w=1920&q=80`;
+    return `${url}${separator}auto=format&w=${width}&q=${quality}&fit=max`;
   }
   return url;
+}
+
+// Optimize an array of image URLs
+function optimizeImageUrls(
+  urls: (string | undefined | null)[] | undefined | null,
+  width = 1920,
+  quality = 80
+): string[] {
+  if (!urls) return [];
+  return urls.filter(Boolean).map(u => optimizeImageUrl(u, width, quality)) as string[];
 }
 
 // Helper: ensure hero images is always an array (Sanity returns null if no images uploaded)
 function ensureHeroImages(hero: any): any {
   if (!hero) return { images: [], title: '', subtitle: '', overlayColor: '' };
-  const rawImages = hero.images && hero.images.length > 0 ? hero.images : [];
   return {
     ...hero,
-    images: rawImages.map(optimizeImageUrl),
+    images: optimizeImageUrls(hero.images, 1920, 80),
   };
 }
 
@@ -111,6 +121,7 @@ export const fetchContactPageData = async (): Promise<ContactInfo | null> => {
 
   try {
     const result = await sanityClient.fetch(query);
+    if (!result) return null;
     result.hero = ensureHeroImages(result.hero);
     return result;
   } catch (error) {

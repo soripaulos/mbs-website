@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { MapPin, Check, ChevronLeft, ChevronRight, X, Lightbulb, Heart, Palette, Calculator, BookOpen, Users, Globe } from 'lucide-react';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import DynamicIcon from '@/components/DynamicIcon';
@@ -228,6 +229,7 @@ function ImageSlider({ images }: { images: string[] }) {
 
 // Academics Section - Moved above Facilities with Image Slider
 function AcademicsSection() {
+  const academicsRef = useRef<HTMLDivElement>(null);
   const fetcher = useCallback(() => fetchAcademicLevels(), []);
   const { data: academicLevels } = useSanityData(fetcher, academicLevelsData);
   const [activeLevel, setActiveLevel] = useState<string>(academicLevels[0]?.id || '');
@@ -237,6 +239,24 @@ function AcademicsSection() {
       setActiveLevel(academicLevels[0].id);
     }
   }, [academicLevels, activeLevel]);
+
+  // Scroll to expanded content when active level changes
+  const handleLevelClick = (id: string) => {
+    setActiveLevel(id);
+
+    // Use a small timeout to allow React to render the expanded view and transitions to start
+    setTimeout(() => {
+      const element = document.getElementById('active-pathway-content');
+      if (element) {
+        const offset = 100; // Account for fixed header
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({
+          top: elementPosition - offset,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+  };
 
   if (!academicLevels || academicLevels.length === 0) return null;
 
@@ -249,8 +269,121 @@ function AcademicsSection() {
     secondary: '#fed250'
   };
 
+  const renderActiveContent = () => {
+    if (!activeData) return null;
+    return (
+      <div id="active-pathway-content" className="bg-white rounded-[2rem] shadow-sm p-6 md:p-10 border border-gray-100 scroll-mt-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+
+          {/* Left: Description & Director */}
+          <AnimatedSection delay={200}>
+            <div className="space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="w-1.5 h-8 bg-school-yellow rounded-full"></div>
+                <h3 className="font-display text-3xl font-bold text-school-brand">
+                  {activeData.level} Overview
+                </h3>
+              </div>
+              <p className="text-gray-600 leading-relaxed text-lg">{activeData.extendedDescription}</p>
+
+              {activeData.director && (
+                <div className="bg-[#f4f7fb] rounded-2xl p-6">
+                  <p className="text-[10px] font-bold text-school-pink uppercase tracking-widest mb-3">{activeData.director.role}</p>
+                  <div className="flex items-start gap-4">
+                    {activeData.director.image && (
+                      <img
+                        src={activeData.director.image}
+                        alt={activeData.director.name}
+                        className="w-16 h-16 rounded-full object-cover shadow-sm bg-white"
+                        loading="lazy"
+                      />
+                    )}
+                    <div>
+                      <p className="font-bold text-school-brand text-lg">{activeData.director.name}</p>
+                      {activeData.director.message && (
+                        <p className="text-sm text-gray-500 mt-2 italic flex">
+                          <span className="text-2xl leading-none text-gray-300 mr-1 opacity-50 font-serif">"</span>
+                          {activeData.director.message}
+                          <span className="text-2xl leading-none text-gray-300 ml-1 opacity-50 font-serif">"</span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <div className="flex flex-wrap gap-3">
+                  {activeData.features.map((feature: string, idx: number) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-sm text-gray-700 border border-gray-200"
+                    >
+                      <div className="w-4 h-4 rounded-full border border-school-brand flex items-center justify-center">
+                        <svg className="w-2.5 h-2.5 text-school-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
+
+          {/* Right: Uniform Bento Gallery */}
+          <AnimatedSection delay={300}>
+            <div className="space-y-4">
+              <h4 className="font-display font-bold text-school-brand text-xl lg:hidden mb-4">Life in {activeData.level}</h4>
+              <h4 className="font-display font-bold text-school-brand text-xl hidden lg:block mb-6">Life in {activeData.level}</h4>
+
+              {(() => {
+                const allImages = activeData.gallery?.length > 0
+                  ? activeData.gallery
+                  : activeData.mainImage ? [activeData.mainImage] : [];
+
+                if (allImages.length === 0) return null;
+
+                return (
+                  <div className="grid grid-cols-2 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[140px]">
+                    {/* Map up to 5 images into standard 1x1 grid slots */}
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`rounded-2xl overflow-hidden shadow-sm bg-gray-100 ${!allImages[i] ? 'hidden md:block opacity-50' : ''}`}
+                      >
+                        {allImages[i] ? (
+                          <img src={allImages[i]} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-300">
+                            <span className="text-4xl text-gray-200 tracking-widest leading-none">...</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* 6th Slot: Explore tile */}
+                    <Link
+                      to="/gallery"
+                      className="rounded-2xl bg-[#2d3a77] flex flex-col items-center justify-center text-white hover:bg-school-brand transition-colors shadow-sm"
+                    >
+                      <span className="font-display font-bold text-xl mb-1">Explore</span>
+                      <span className="text-white/80 text-sm">See full gallery</span>
+                    </Link>
+                  </div>
+                );
+              })()}
+            </div>
+          </AnimatedSection>
+
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <section className="py-16 md:py-24 bg-gray-50">
+    <section ref={academicsRef} className="py-16 md:py-24 bg-gray-50 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatedSection className="text-center mb-12">
           <span className="inline-block px-4 py-1 bg-school-pink/20 text-school-pink text-sm font-bold rounded-full mb-4">
@@ -264,81 +397,57 @@ function AcademicsSection() {
           </p>
         </AnimatedSection>
 
-        {/* Level Tabs */}
-        <AnimatedSection delay={150} className="mb-8">
-          <div className="flex flex-wrap justify-center gap-3">
-            {academicLevels.map((level) => (
-              <button
-                key={level.id}
-                onClick={() => setActiveLevel(level.id)}
-                className={`px-6 py-3 rounded-full font-bold text-sm transition-all ${activeLevel === level.id
-                  ? 'bg-school-brand text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
-                  }`}
-              >
-                {level.level}
-              </button>
-            ))}
+        {/* Level Cards */}
+        <AnimatedSection delay={150} className="mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {academicLevels.map((level) => {
+              const isActive = activeLevel === level.id;
+              return (
+                <div key={level.id} className="relative flex flex-col">
+                  {/* Card Header */}
+                  <div
+                    onClick={() => handleLevelClick(level.id)}
+                    className={`relative cursor-pointer rounded-2xl overflow-hidden bg-white shadow-sm transition-all duration-300 transform md:hover:-translate-y-1 ${isActive ? 'ring-2 ring-school-yellow ring-offset-2' : 'border border-gray-100 hover:shadow-md'
+                      }`}
+                  >
+                    {/* Top Image */}
+                    <div className="h-48 w-full overflow-hidden">
+                      <img
+                        src={level.mainImage || 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=800&q=80'}
+                        alt={level.level}
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      />
+                    </div>
+
+                    {/* Chevron over edge for active state */}
+                    {isActive && (
+                      <div className="absolute left-1/2 -ml-4 top-44 w-8 h-8 bg-school-yellow rounded-full flex items-center justify-center text-white shadow-md z-10 transition-transform">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                      </div>
+                    )}
+
+                    {/* Bottom Content */}
+                    <div className="p-6 text-center">
+                      <h3 className="font-display font-bold text-xl text-school-brand mb-2">{level.level}</h3>
+                      <p className="text-gray-500 text-sm line-clamp-2">{level.description}</p>
+                    </div>
+                  </div>
+
+                  {/* Mobile expanded view injected right under the card */}
+                  <div className={`md:hidden transition-all duration-500 ease-in-out overflow-hidden ${isActive ? 'max-h-[3000px] opacity-100 mt-6 mb-8' : 'max-h-0 opacity-0'}`}>
+                    {isActive && renderActiveContent()}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </AnimatedSection>
 
-        {/* Active Level Content */}
-        {activeData && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <AnimatedSection delay={200}>
-              <div className="aspect-video rounded-2xl overflow-hidden shadow-lg">
-                <ImageSlider images={activeData.gallery?.length > 0 ? activeData.gallery : ((activeData as any).image ? [(activeData as any).image] : (activeData.mainImage ? [activeData.mainImage] : []))} />
-              </div>
-            </AnimatedSection>
+        {/* Desktop Active Level Content container (hidden on mobile) */}
+        <div className="hidden md:block max-w-6xl mx-auto">
+          {renderActiveContent()}
+        </div>
 
-            <AnimatedSection delay={300}>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-display text-2xl font-bold text-school-brand mb-2">
-                    {activeData.level} Overview
-                  </h3>
-                  <p className="text-gray-600">{activeData.extendedDescription}</p>
-                </div>
-
-                {activeData.director && (
-                  <div className="bg-school-brand/5 rounded-xl p-4 border-l-4 border-school-brand">
-                    <div className="flex items-center gap-4">
-                      {activeData.director.image && (
-                        <img
-                          src={activeData.director.image}
-                          alt={activeData.director.name}
-                          className="w-14 h-14 rounded-full object-cover border-2 border-school-yellow"
-                        />
-                      )}
-                      <div>
-                        <p className="font-bold text-school-brand">{activeData.director.name}</p>
-                        <p className="text-sm text-gray-500">{activeData.director.role}</p>
-                        {activeData.director.message && (
-                          <p className="text-sm text-gray-600 mt-1 italic">"{activeData.director.message}"</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <h4 className="font-bold text-school-brand mb-3">Key Features</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {activeData.features.map((feature, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-white rounded-full text-sm shadow-sm"
-                      >
-                        <FeatureIcon icon={feature} color={featureColors[activeData.id] || '#2d4289'} />
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </AnimatedSection>
-          </div>
-        )}
       </div>
     </section>
   );
@@ -641,12 +750,12 @@ export default function About() {
   return (
     <div className="min-h-screen">
       <HeroSlideshow
-        images={pageData.hero.images}
-        title={pageData.hero.title}
-        subtitle={pageData.hero.subtitle}
-        overlayColor={pageData.hero.overlayColor}
+        images={pageData?.hero?.images}
+        title={pageData?.hero?.title}
+        subtitle={pageData?.hero?.subtitle}
+        overlayColor={pageData?.hero?.overlayColor}
       />
-      <IntroSection intro={pageData.intro} />
+      {pageData?.intro && <IntroSection intro={pageData.intro} />}
       <StatsSection />
       {/* Learning Pathways moved above Facilities */}
       <AcademicsSection />

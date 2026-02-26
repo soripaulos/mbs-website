@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface HeroSlideshowProps {
-  images: string[];
-  title: string;
+  images?: string[];
+  title?: string;
   subtitle?: string;
   overlayColor?: string;
   children?: React.ReactNode;
@@ -24,7 +24,7 @@ export default function HeroSlideshow({
   autoPlay = true,
   autoPlayInterval = 5000,
 }: HeroSlideshowProps) {
-  const safeImages = images || [];
+  const safeImages = (images || []).filter(Boolean);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -36,11 +36,13 @@ export default function HeroSlideshow({
   }, [currentIndex, isTransitioning]);
 
   const goToPrevious = useCallback(() => {
+    if (safeImages.length === 0) return;
     const newIndex = currentIndex === 0 ? safeImages.length - 1 : currentIndex - 1;
     goToSlide(newIndex);
   }, [currentIndex, safeImages.length, goToSlide]);
 
   const goToNext = useCallback(() => {
+    if (safeImages.length === 0) return;
     const newIndex = currentIndex === safeImages.length - 1 ? 0 : currentIndex + 1;
     goToSlide(newIndex);
   }, [currentIndex, safeImages.length, goToSlide]);
@@ -55,8 +57,6 @@ export default function HeroSlideshow({
     return () => clearInterval(interval);
   }, [autoPlay, autoPlayInterval, safeImages.length, goToNext]);
 
-  if (safeImages.length === 0) return null;
-
   return (
     <div className="relative w-full h-screen min-h-[600px] overflow-hidden">
       {/* Background Images */}
@@ -70,6 +70,9 @@ export default function HeroSlideshow({
             src={image}
             alt={`Slide ${index + 1}`}
             className="w-full h-full object-cover"
+            loading={index === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+            fetchPriority={index === 0 ? 'high' : 'low'}
           />
         </div>
       ))}
@@ -82,9 +85,11 @@ export default function HeroSlideshow({
 
       {/* Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pb-20">
-        <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white mb-4 md:mb-6 max-w-4xl leading-tight drop-shadow-lg">
-          {title}
-        </h1>
+        {title && (
+          <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white mb-4 md:mb-6 max-w-4xl leading-tight drop-shadow-lg">
+            {title}
+          </h1>
+        )}
         {subtitle && (
           <p className="text-school-yellow text-lg md:text-xl lg:text-2xl max-w-2xl mb-8 font-semibold drop-shadow-md">
             {subtitle}

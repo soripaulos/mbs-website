@@ -145,7 +145,7 @@ export default function Gallery() {
   const { data: galleryImages } = useSanityArrayData(fetchGalleryImages, mockGalleryImages);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [visibleCount, setVisibleCount] = useState(galleryPage.settings.imagesPerPage);
+  const [visibleCount, setVisibleCount] = useState(galleryPage?.settings?.imagesPerPage || 12);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const categories = ['all', 'campus', 'events', 'classroom', 'sports', 'arts', 'science', 'other'];
@@ -179,17 +179,17 @@ export default function Gallery() {
   return (
     <div className="min-h-screen">
       <HeroSlideshow
-        images={galleryPage.hero.images}
-        title={galleryPage.hero.title}
-        subtitle={galleryPage.hero.subtitle}
-        overlayColor={galleryPage.hero.overlayColor}
+        images={galleryPage?.hero?.images}
+        title={galleryPage?.hero?.title}
+        subtitle={galleryPage?.hero?.subtitle}
+        overlayColor={galleryPage?.hero?.overlayColor}
       />
 
       {/* Gallery Content */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Category Filter */}
-          {galleryPage.settings.showCategories && (
+          {galleryPage?.settings?.showCategories && (
             <AnimatedSection className="mb-10">
               <div className="flex flex-wrap justify-center gap-2">
                 {categories.map((category) => (
@@ -197,7 +197,7 @@ export default function Gallery() {
                     key={category}
                     onClick={() => {
                       setSelectedCategory(category);
-                      setVisibleCount(galleryPage.settings.imagesPerPage);
+                      setVisibleCount(galleryPage?.settings?.imagesPerPage || 12);
                     }}
                     className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-all ${selectedCategory === category
                       ? 'bg-school-brand text-white shadow-lg'
@@ -244,10 +244,10 @@ export default function Gallery() {
           {visibleCount < filteredImages.length && (
             <AnimatedSection className="text-center mt-10">
               <button
-                onClick={() => setVisibleCount(prev => prev + galleryPage.settings.imagesPerPage)}
+                onClick={() => setVisibleCount(prev => prev + (galleryPage?.settings?.imagesPerPage || 12))}
                 className="px-8 py-3 bg-school-brand text-white rounded-full font-semibold hover:bg-school-dark-blue transition-colors"
               >
-                {galleryPage.settings.loadMoreText}
+                {galleryPage?.settings?.loadMoreText || 'Load More'}
               </button>
             </AnimatedSection>
           )}

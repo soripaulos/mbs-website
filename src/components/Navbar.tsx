@@ -42,18 +42,28 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <>
-              <img
-                src={siteSettings.logoMobile || siteSettings.logo}
-                alt={siteSettings.title || 'Logo'}
-                className="h-10 w-auto object-contain md:hidden"
-              />
-              <img
-                src={siteSettings.logo}
-                alt={siteSettings.title || 'Logo'}
-                className="hidden md:block h-12 w-auto object-contain"
-              />
-            </>
+            {siteSettings.logo && (
+              <>
+                <img
+                  src={siteSettings.logoMobile || siteSettings.logo}
+                  alt={siteSettings.title || 'Logo'}
+                  className="h-10 w-auto object-contain md:hidden"
+                  loading="eager"
+                  fetchPriority="high"
+                  width={40}
+                  height={40}
+                />
+                <img
+                  src={siteSettings.logo}
+                  alt={siteSettings.title || 'Logo'}
+                  className="hidden md:block h-12 w-auto object-contain"
+                  loading="eager"
+                  fetchPriority="high"
+                  width={48}
+                  height={48}
+                />
+              </>
+            )}
             <div className="flex flex-col">
               <span className={`font-display font-bold text-sm md:text-lg leading-tight transition-colors ${isTransparent ? 'text-white' : 'text-school-brand'
                 }`}>
@@ -86,9 +96,9 @@ export default function Navbar() {
 
           {/* Social Icons */}
           <div className="hidden lg:flex items-center gap-3">
-            {siteSettings.socialLinks.facebook && (
+            {siteSettings.socialLinks?.facebook && (
               <a
-                href={siteSettings.socialLinks.facebook}
+                href={siteSettings.socialLinks?.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`transition-colors hover:text-school-yellow ${isTransparent ? 'text-white' : 'text-school-brand'
@@ -97,9 +107,9 @@ export default function Navbar() {
                 <Facebook size={18} />
               </a>
             )}
-            {siteSettings.socialLinks.telegram && (
+            {siteSettings.socialLinks?.telegram && (
               <a
-                href={siteSettings.socialLinks.telegram}
+                href={siteSettings.socialLinks?.telegram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`transition-colors hover:text-school-yellow ${isTransparent ? 'text-white' : 'text-school-brand'
@@ -108,9 +118,9 @@ export default function Navbar() {
                 <Send size={18} />
               </a>
             )}
-            {siteSettings.socialLinks.youtube && (
+            {siteSettings.socialLinks?.youtube && (
               <a
-                href={siteSettings.socialLinks.youtube}
+                href={siteSettings.socialLinks?.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`transition-colors hover:text-school-yellow ${isTransparent ? 'text-white' : 'text-school-brand'
@@ -119,9 +129,9 @@ export default function Navbar() {
                 <Youtube size={18} />
               </a>
             )}
-            {siteSettings.socialLinks.tiktok && (
+            {siteSettings.socialLinks?.tiktok && (
               <a
-                href={siteSettings.socialLinks.tiktok}
+                href={siteSettings.socialLinks?.tiktok}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`transition-colors hover:text-school-yellow ${isTransparent ? 'text-white' : 'text-school-brand'
@@ -165,9 +175,9 @@ export default function Navbar() {
             </Link>
           ))}
           <div className="flex items-center gap-4 pt-4 px-4 border-t border-gray-100">
-            {siteSettings.socialLinks.facebook && (
+            {siteSettings.socialLinks?.facebook && (
               <a
-                href={siteSettings.socialLinks.facebook}
+                href={siteSettings.socialLinks?.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-school-brand hover:text-school-yellow transition-colors"
@@ -175,9 +185,9 @@ export default function Navbar() {
                 <Facebook size={20} />
               </a>
             )}
-            {siteSettings.socialLinks.telegram && (
+            {siteSettings.socialLinks?.telegram && (
               <a
-                href={siteSettings.socialLinks.telegram}
+                href={siteSettings.socialLinks?.telegram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-school-brand hover:text-school-yellow transition-colors"
@@ -185,9 +195,9 @@ export default function Navbar() {
                 <Send size={20} />
               </a>
             )}
-            {siteSettings.socialLinks.youtube && (
+            {siteSettings.socialLinks?.youtube && (
               <a
-                href={siteSettings.socialLinks.youtube}
+                href={siteSettings.socialLinks?.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-school-brand hover:text-school-yellow transition-colors"
@@ -195,9 +205,9 @@ export default function Navbar() {
                 <Youtube size={20} />
               </a>
             )}
-            {siteSettings.socialLinks.tiktok && (
+            {siteSettings.socialLinks?.tiktok && (
               <a
-                href={siteSettings.socialLinks.tiktok}
+                href={siteSettings.socialLinks?.tiktok}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-school-brand hover:text-school-yellow transition-colors"

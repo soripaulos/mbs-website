@@ -56,7 +56,9 @@ function AnimatedSection({
 
 // Contact Info Cards
 function ContactInfoCards({ contactData }: { contactData: typeof mockContactData }) {
-  const { phones, emails, addresses } = contactData;
+  const phones = contactData?.phones;
+  const emails = contactData?.emails;
+  const addresses = contactData?.addresses;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -70,7 +72,7 @@ function ContactInfoCards({ contactData }: { contactData: typeof mockContactData
             Phone Numbers
           </h3>
           <div className="space-y-2">
-            {phones.mainPhones.map((phone, idx) => (
+            {(phones?.mainPhones || []).map((phone: string, idx: number) => (
               <a
                 key={idx}
                 href={`tel:${phone}`}
@@ -80,16 +82,18 @@ function ContactInfoCards({ contactData }: { contactData: typeof mockContactData
               </a>
             ))}
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            {phones.departmentPhones.map((dept, idx) => (
-              <div key={idx} className="text-sm text-gray-600 mb-1">
-                <span className="font-medium">{dept.department}:</span>{' '}
-                <a href={`tel:${dept.phone}`} className="text-school-pink hover:underline">
-                  {dept.phone}
-                </a>
-              </div>
-            ))}
-          </div>
+          {phones?.departmentPhones && phones.departmentPhones.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              {phones.departmentPhones.map((dept: any, idx: number) => (
+                <div key={idx} className="text-sm text-gray-600 mb-1">
+                  <span className="font-medium">{dept.department}:</span>{' '}
+                  <a href={`tel:${dept.phone}`} className="text-school-pink hover:underline">
+                    {dept.phone}
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </AnimatedSection>
 
@@ -103,7 +107,7 @@ function ContactInfoCards({ contactData }: { contactData: typeof mockContactData
             Email
           </h3>
           <div className="space-y-2">
-            {emails.map((email, idx) => (
+            {(emails || []).map((email: any, idx: number) => (
               <div key={idx} className="text-sm">
                 <span className="text-gray-500">{email.department}</span>
                 <a
@@ -128,7 +132,7 @@ function ContactInfoCards({ contactData }: { contactData: typeof mockContactData
             Address
           </h3>
           <div className="space-y-3">
-            {addresses.map((addr, idx) => (
+            {(addresses || []).map((addr: any, idx: number) => (
               <div key={idx} className="text-sm">
                 <p className="font-medium text-school-pink">{addr.name}</p>
                 <p className="text-gray-600">{addr.address}</p>
@@ -144,7 +148,7 @@ function ContactInfoCards({ contactData }: { contactData: typeof mockContactData
 
 // Contact Form
 function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
-  const { form } = contactData;
+  const form = contactData?.form;
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -158,15 +162,17 @@ function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const { name, email, subject, message } = formData;
+    const body = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
+    const mailtoUrl = `mailto:info@makkobillischool.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
 
     setIsSubmitting(false);
     setSubmitted(true);
     setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
-  if (!form.enabled) return null;
+  if (form && !form.enabled) return null;
 
   if (submitted) {
     return (
@@ -196,7 +202,7 @@ function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {form.nameLabel}
+              {form?.nameLabel || 'Name'}
             </label>
             <input
               type="text"
@@ -209,7 +215,7 @@ function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {form.emailLabel}
+              {form?.emailLabel || 'Email'}
             </label>
             <input
               type="email"
@@ -223,7 +229,7 @@ function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
         </div>
         <div className="mt-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            {form.subjectLabel}
+            {form?.subjectLabel || 'Subject'}
           </label>
           <input
             type="text"
@@ -236,7 +242,7 @@ function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
         </div>
         <div className="mt-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            {form.messageLabel}
+            {form?.messageLabel || 'Message'}
           </label>
           <textarea
             required
@@ -259,7 +265,7 @@ function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
             </>
           ) : (
             <>
-              {form.submitText}
+              {form?.submitText || 'Send Message'}
               <Send size={18} />
             </>
           )}
@@ -271,13 +277,15 @@ function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
 
 // Map Section
 function MapSection({ contactData }: { contactData: typeof mockContactData }) {
-  const { mapLocations } = contactData;
+  const mapLocations = contactData?.mapLocations;
+
+  if (!mapLocations || mapLocations.length === 0) return null;
 
   return (
     <section className="py-16 md:py-24 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-12">
-          {mapLocations.map((location, index) => (
+          {mapLocations.map((location: any, index: number) => (
             <AnimatedSection key={index} delay={index * 150}>
               <div>
                 <h3
@@ -319,10 +327,10 @@ export default function Contact() {
   return (
     <div className="min-h-screen">
       <HeroSlideshow
-        images={contactData.hero.images}
-        title={contactData.hero.title}
-        subtitle={contactData.hero.subtitle}
-        overlayColor={contactData.hero.overlayColor}
+        images={contactData?.hero?.images}
+        title={contactData?.hero?.title}
+        subtitle={contactData?.hero?.subtitle}
+        overlayColor={contactData?.hero?.overlayColor}
       />
 
       {/* Contact Info Section */}

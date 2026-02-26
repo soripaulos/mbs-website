@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Facebook, Send, Youtube, Music2, Heart } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, Send, Youtube, Music2, Heart, Globe } from 'lucide-react';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
 import { fetchSiteSettings } from '@/services/sanity';
@@ -33,9 +33,9 @@ export default function Footer() {
               {siteSettings.footerDescription || siteSettings.description}
             </p>
             <div className="flex items-center gap-3 pt-2">
-              {siteSettings.socialLinks.facebook && (
+              {siteSettings.socialLinks?.facebook && (
                 <a
-                  href={siteSettings.socialLinks.facebook}
+                  href={siteSettings.socialLinks?.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-school-yellow hover:text-school-brand transition-all"
@@ -43,9 +43,9 @@ export default function Footer() {
                   <Facebook size={16} />
                 </a>
               )}
-              {siteSettings.socialLinks.telegram && (
+              {siteSettings.socialLinks?.telegram && (
                 <a
-                  href={siteSettings.socialLinks.telegram}
+                  href={siteSettings.socialLinks?.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-school-yellow hover:text-school-brand transition-all"
@@ -53,9 +53,9 @@ export default function Footer() {
                   <Send size={16} />
                 </a>
               )}
-              {siteSettings.socialLinks.tiktok && (
+              {siteSettings.socialLinks?.tiktok && (
                 <a
-                  href={siteSettings.socialLinks.tiktok}
+                  href={siteSettings.socialLinks?.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-school-yellow hover:text-school-brand transition-all"
@@ -63,9 +63,9 @@ export default function Footer() {
                   <Music2 size={16} />
                 </a>
               )}
-              {siteSettings.socialLinks.youtube && (
+              {siteSettings.socialLinks?.youtube && (
                 <a
-                  href={siteSettings.socialLinks.youtube}
+                  href={siteSettings.socialLinks?.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-school-yellow hover:text-school-brand transition-all"
@@ -148,27 +148,23 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Newsletter */}
+          {/* Student Portal */}
           <div className="space-y-5">
             <h3 className="font-display font-bold text-lg text-school-yellow">
-              Stay Updated
+              Student Portal
             </h3>
             <p className="text-white/70 text-sm">
-              Subscribe to our newsletter for the latest news and updates.
+              Access grades, attendance, and school updates from anywhere.
             </p>
-            <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 px-4 py-2.5 bg-white/10 rounded-lg text-sm text-white placeholder:text-white/40 border border-white/10 focus:border-school-yellow focus:outline-none transition-colors"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2.5 bg-school-yellow text-school-brand rounded-lg font-semibold text-sm hover:bg-white transition-colors"
-              >
-                Subscribe
-              </button>
-            </form>
+            <a
+              href={siteSettings.studentPortalUrl && siteSettings.studentPortalUrl !== '#' ? siteSettings.studentPortalUrl : 'https://portal.makkobillischool.com'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-school-yellow text-school-brand rounded-lg font-semibold text-sm hover:bg-white transition-colors"
+            >
+              <Globe size={16} />
+              Open Portal
+            </a>
           </div>
         </div>
       </div>
