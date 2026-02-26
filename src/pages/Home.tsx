@@ -134,7 +134,7 @@ function StudentPortalAppSection() {
 
             {/* Features */}
             <div className="grid grid-cols-2 gap-4 mb-8">
-              {studentPortalApp.features.map((feature, index) => (
+              {studentPortalApp.features.map((feature: any, index: number) => (
                 <div
                   key={index}
                   className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer ${activeFeature === index

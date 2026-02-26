@@ -287,7 +287,7 @@ function AcademicsSection() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <AnimatedSection delay={200}>
               <div className="aspect-video rounded-2xl overflow-hidden shadow-lg">
-                <ImageSlider images={activeData.gallery?.length > 0 ? activeData.gallery : (activeData.image ? [activeData.image] : (activeData.mainImage ? [activeData.mainImage] : []))} />
+                <ImageSlider images={activeData.gallery?.length > 0 ? activeData.gallery : ((activeData as any).image ? [(activeData as any).image] : (activeData.mainImage ? [activeData.mainImage] : []))} />
               </div>
             </AnimatedSection>
 
