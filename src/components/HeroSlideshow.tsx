@@ -58,7 +58,7 @@ export default function HeroSlideshow({
   }, [autoPlay, autoPlayInterval, safeImages.length, goToNext]);
 
   return (
-    <div className="relative w-full overflow-hidden aspect-[16/9] max-h-screen">
+    <div className="relative w-full overflow-hidden aspect-[21/9] max-h-screen">
       {/* Background Images */}
       {safeImages.map((image, index) => (
         <div
