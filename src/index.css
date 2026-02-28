@@ -148,6 +148,15 @@
   background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.5) 100%);
 }
 
+/* Hero typography - 20% smaller, fluid responsive sizing */
+.hero-title {
+  font-size: clamp(1.8rem, 5vw + 1.5rem, 3.6rem);
+}
+
+.hero-subtitle {
+  font-size: clamp(0.9rem, 2vw + 0.8rem, 1.2rem);
+}
+
 /* Card hover effects */
 .card-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;

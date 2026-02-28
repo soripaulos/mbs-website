@@ -86,12 +86,12 @@ export default function HeroSlideshow({
       {/* Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pb-20">
         {title && (
-          <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white mb-4 md:mb-6 max-w-4xl leading-tight drop-shadow-lg">
+          <h1 className="hero-title font-display font-bold text-white mb-4 md:mb-6 max-w-4xl leading-tight drop-shadow-lg">
             {title}
           </h1>
         )}
         {subtitle && (
-          <p className="text-school-yellow text-lg md:text-xl lg:text-2xl max-w-2xl mb-8 font-semibold drop-shadow-md">
+          <p className="hero-subtitle text-school-yellow max-w-2xl mb-8 font-semibold drop-shadow-md">
             {subtitle}
           </p>
         )}
