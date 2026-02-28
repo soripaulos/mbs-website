@@ -480,7 +480,7 @@ function FacilitiesSection() {
               >
                 <div className={`${facility.colSpan === 2 ? 'aspect-[2/1]' : 'aspect-square'}`}>
                   <img
-                    src={facility.mainImage}
+                    src={facility.mainImage || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect fill="%23e5e7eb" width="400" height="400"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="20" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E'}
                     alt={facility.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
@@ -595,7 +595,7 @@ function BranchesSection() {
                 <div className={index % 2 === 1 ? 'lg:order-2' : ''}>
                   <div className="rounded-2xl overflow-hidden shadow-lg">
                     <img
-                      src={branch.image}
+                      src={branch.image || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450"%3E%3Crect fill="%23e5e7eb" width="800" height="450"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="24" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E'}
                       alt={branch.name}
                       className="w-full aspect-video object-cover"
                     />
