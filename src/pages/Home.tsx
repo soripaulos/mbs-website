@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowRight, Apple, PlayCircle, Globe, Calendar, Bell } from 'lucide-react';
+import { toast } from 'sonner';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import DynamicIcon from '@/components/DynamicIcon';
 import { homePageData as mockHomePageData, socialPostsData } from '@/data/mockData';
@@ -156,20 +157,22 @@ function StudentPortalAppSection() {
 
             {/* Download Buttons */}
             <div className="flex flex-wrap gap-3">
-              <a
-                href={studentPortalApp.downloadLinks.appStore}
-                className="flex items-center gap-2 px-5 py-3 bg-white text-school-brand rounded-xl font-semibold hover:bg-school-yellow transition-colors"
+              <button
+                type="button"
+                onClick={() => toast.info('Coming Soon', { description: 'The App Store version will be available soon.' })}
+                className="flex items-center gap-2 px-5 py-3 bg-white text-school-brand rounded-xl font-semibold hover:bg-school-yellow transition-colors cursor-pointer"
               >
                 <Apple size={20} />
                 App Store
-              </a>
-              <a
-                href={studentPortalApp.downloadLinks.playStore}
-                className="flex items-center gap-2 px-5 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors border border-white/30"
+              </button>
+              <button
+                type="button"
+                onClick={() => toast.info('Coming Soon', { description: 'The Play Store version will be available soon.' })}
+                className="flex items-center gap-2 px-5 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors border border-white/30 cursor-pointer"
               >
                 <PlayCircle size={20} />
                 Play Store
-              </a>
+              </button>
               <a
                 href={studentPortalApp.downloadLinks?.webPortal && studentPortalApp.downloadLinks.webPortal !== '#' ? studentPortalApp.downloadLinks.webPortal : 'https://portal.makkobillischool.com'}
                 target="_blank"
