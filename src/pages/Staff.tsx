@@ -63,7 +63,7 @@ function DirectorCard({ profile, accentColor = 'brand' }: { profile: StaffProfil
     <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group relative h-[400px]">
       {/* Full Image */}
       <img
-        src={profile.image || 'https://via.placeholder.com/400x500?text=No+Image'}
+        src={profile.image || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"%3E%3Crect fill="%23e5e7eb" width="400" height="500"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="24" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E'}
         alt={profile.name}
         className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
       />
@@ -113,7 +113,7 @@ function ViceDirectorCard({ profile }: { profile: StaffProfile }) {
     <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group relative h-[350px]">
       {/* Full Image */}
       <img
-        src={profile.image || 'https://via.placeholder.com/400x500?text=No+Image'}
+        src={profile.image || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"%3E%3Crect fill="%23e5e7eb" width="400" height="500"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="24" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E'}
         alt={profile.name}
         className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
       />
@@ -179,7 +179,7 @@ function FoundersSection({ founders, sectionTitle }: { founders: StaffProfile[];
           <AnimatedSection delay={100}>
             <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[3/4] transform md:scale-105 md:hover:scale-110 transition duration-500 border-4 border-school-yellow group">
               <img
-                src={mainFounder.image || 'https://via.placeholder.com/400x500?text=No+Image'}
+                src={mainFounder.image || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"%3E%3Crect fill="%23e5e7eb" width="400" height="500"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="24" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E'}
                 alt={mainFounder.name}
                 className="w-full h-full object-cover"
               />
@@ -228,7 +228,7 @@ function FoundersSection({ founders, sectionTitle }: { founders: StaffProfile[];
             <AnimatedSection delay={200 + index * 100}>
               <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[3/4] group">
                 <img
-                  src={coFounder.image || 'https://via.placeholder.com/400x500?text=No+Image'}
+                  src={coFounder.image || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"%3E%3Crect fill="%23e5e7eb" width="400" height="500"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="24" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E'}
                   alt={coFounder.name}
                   className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
                 />
