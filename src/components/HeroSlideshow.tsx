@@ -58,7 +58,7 @@ export default function HeroSlideshow({
   }, [autoPlay, autoPlayInterval, safeImages.length, goToNext]);
 
   return (
-    <div className="relative w-full h-screen min-h-[600px] overflow-hidden">
+    <div className="relative w-full overflow-hidden aspect-[21/9] max-h-screen">
       {/* Background Images */}
       {safeImages.map((image, index) => (
         <div
@@ -84,7 +84,7 @@ export default function HeroSlideshow({
       />
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pb-20">
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pb-12 md:pb-20">
         {title && (
           <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white mb-4 md:mb-6 max-w-4xl leading-tight drop-shadow-lg">
             {title}
@@ -120,7 +120,7 @@ export default function HeroSlideshow({
 
       {/* Dots */}
       {showDots && safeImages.length > 1 && (
-        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        <div className="absolute bottom-14 md:bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2">
           {safeImages.map((_, index) => (
             <button
               key={index}
@@ -138,7 +138,7 @@ export default function HeroSlideshow({
       {/* Wave SVG */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
         <svg
-          className="relative block w-full h-16 md:h-24"
+          className="relative block w-full h-10 md:h-24"
           viewBox="0 0 1200 120"
           preserveAspectRatio="none"
         >
