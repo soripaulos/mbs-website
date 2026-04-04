@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Phone, Mail, MapPin, Heart, Globe, Users, ChevronLeft, ChevronRight, X, BookOpen, Lightbulb, Map } from 'lucide-react';
+import { Phone, Mail, MapPin, Heart, Users, ChevronLeft, ChevronRight, X, BookOpen, Lightbulb, Map } from 'lucide-react';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import { dembiDolloPageData as mockData } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
