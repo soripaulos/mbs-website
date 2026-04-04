@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Facebook, Send, Youtube, Music2 } from 'lucide-react';
+import { Menu, X, Facebook, Send, Youtube, Music2, ChevronDown } from 'lucide-react';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
 import { fetchSiteSettings } from '@/services/sanity';
@@ -13,10 +13,16 @@ const navLinks = [
   { path: '/contact', label: 'CONTACT' },
 ];
 
+const branchLinks = [
+  { path: '/dembi-dollo', label: 'Dembi Dollo' },
+];
+
 export default function Navbar() {
   const { data: siteSettings } = useSanityData(fetchSiteSettings, mockSiteSettings);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isBranchesOpen, setIsBranchesOpen] = useState(false);
+  const [isMobileBranchesOpen, setIsMobileBranchesOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === '/';
 
@@ -92,6 +98,48 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+
+            {/* Branches Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setIsBranchesOpen(true)}
+              onMouseLeave={() => setIsBranchesOpen(false)}
+            >
+              <button
+                className={`flex items-center gap-1 text-sm font-semibold tracking-wide transition-colors hover:text-school-yellow ${
+                  branchLinks.some(b => location.pathname === b.path)
+                    ? 'text-school-yellow'
+                    : isTransparent
+                      ? 'text-white'
+                      : 'text-school-brand'
+                }`}
+              >
+                BRANCHES
+                <ChevronDown size={14} className={`transition-transform duration-200 ${isBranchesOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <div
+                className={`absolute top-full left-1/2 -translate-x-1/2 pt-2 transition-all duration-200 ${
+                  isBranchesOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-1'
+                }`}
+              >
+                <div className="bg-white rounded-xl shadow-xl border border-gray-100 py-2 min-w-[180px] overflow-hidden">
+                  {branchLinks.map((branch) => (
+                    <Link
+                      key={branch.path}
+                      to={branch.path}
+                      className={`block px-4 py-2.5 text-sm font-semibold transition-colors ${
+                        location.pathname === branch.path
+                          ? 'bg-school-brand/10 text-school-brand'
+                          : 'text-gray-700 hover:bg-school-brand/5 hover:text-school-brand'
+                      }`}
+                    >
+                      {branch.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Social Icons */}
@@ -174,6 +222,37 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          {/* Mobile Branches */}
+          <div>
+            <button
+              onClick={() => setIsMobileBranchesOpen(!isMobileBranchesOpen)}
+              className={`flex items-center justify-between w-full py-2 px-4 text-sm font-semibold rounded-lg transition-colors ${
+                branchLinks.some(b => location.pathname === b.path)
+                  ? 'bg-school-brand text-white'
+                  : 'text-school-brand hover:bg-school-brand/10'
+              }`}
+            >
+              BRANCHES
+              <ChevronDown size={14} className={`transition-transform duration-200 ${isMobileBranchesOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <div className={`overflow-hidden transition-all duration-300 ${isMobileBranchesOpen ? 'max-h-40' : 'max-h-0'}`}>
+              {branchLinks.map((branch) => (
+                <Link
+                  key={branch.path}
+                  to={branch.path}
+                  onClick={() => { setIsMobileMenuOpen(false); setIsMobileBranchesOpen(false); }}
+                  className={`block py-2 px-8 text-sm font-medium rounded-lg transition-colors ${
+                    location.pathname === branch.path
+                      ? 'text-school-yellow font-semibold'
+                      : 'text-gray-600 hover:text-school-brand hover:bg-school-brand/5'
+                  }`}
+                >
+                  {branch.label}
+                </Link>
+              ))}
+            </div>
+          </div>
           <div className="flex items-center gap-4 pt-4 px-4 border-t border-gray-100">
             {siteSettings.socialLinks?.facebook && (
               <a

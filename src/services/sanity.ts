@@ -15,6 +15,7 @@ import type {
   Service,
   Branch,
   SocialPost,
+  DembiDolloPage,
 } from '../types';
 
 // Fetch Site Settings (logo, social links, description, footer)
@@ -471,3 +472,95 @@ export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
     return [];
   }
 };
+
+// Fetch Dembi Dollo Page Data
+export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> => {
+  const query = `*[_type == "dembiDolloPage"] | order(_updatedAt desc)[0] {
+    "hero": {
+      "images": hero.images[].asset->url,
+      "title": hero.title,
+      "subtitle": hero.subtitle,
+      "overlayColor": hero.overlayColor
+    },
+    compoundSection {
+      title,
+      description,
+      "images": images[] {
+        "image": asset->url,
+        caption
+      }
+    },
+    classroomsSection {
+      title,
+      description,
+      "images": images[] {
+        "image": asset->url,
+        caption
+      }
+    },
+    activitiesSection {
+      title,
+      description,
+      "images": images[] {
+        "image": asset->url,
+        caption
+      }
+    },
+    story {
+      sectionTitle,
+      ideaTitle,
+      ideaContent,
+      "ideaImage": ideaImage.asset->url,
+      locationTitle,
+      locationContent,
+      "locationImage": locationImage.asset->url
+    },
+    communitySupport {
+      sectionTitle,
+      sectionDescription,
+      "initiatives": initiatives[] {
+        title,
+        description,
+        "images": images[] {
+          "image": asset->url,
+          caption
+        }
+      }
+    },
+    staff {
+      sectionTitle,
+      sectionSubtitle,
+      "members": members[] {
+        name,
+        role,
+        "image": image.asset->url,
+        phones,
+        email,
+        bio
+      }
+    },
+    contact {
+      sectionTitle,
+      sectionDescription,
+      phone,
+      email,
+      address,
+      mapEmbedUrl,
+      ctaTitle,
+      ctaDescription,
+      ctaButtonText,
+      ctaButtonLink
+    }
+  }`;
+
+  try {
+    const result = await sanityClient.fetch(query);
+    if (!result) return null;
+    result.hero = ensureHeroImages(result.hero);
+    return result;
+  } catch (error) {
+    console.error('[Sanity] Error fetching Dembi Dollo page data:', error);
+    return null;
+  }
+};
+

@@ -262,6 +262,79 @@ export interface AboutPage {
   branches: string[];
 }
 
+// Dembi Dollo Gallery Item
+export interface DembiDolloGalleryItem {
+  image: string;
+  caption?: string;
+}
+
+// Dembi Dollo Staff Member (inline)
+export interface DembiDolloStaff {
+  name: string;
+  role?: string;
+  image?: string;
+  phones?: string[];
+  email?: string;
+  bio?: string;
+}
+
+export interface CommunityInitiative {
+  title: string;
+  description: string;
+  images: DembiDolloGalleryItem[];
+}
+
+// Dembi Dollo Page
+export interface DembiDolloPage {
+  hero: HeroSection;
+  compoundSection: {
+    title: string;
+    description: string;
+    images: DembiDolloGalleryItem[];
+  };
+  classroomsSection: {
+    title: string;
+    description: string;
+    images: DembiDolloGalleryItem[];
+  };
+  activitiesSection: {
+    title: string;
+    description: string;
+    images: DembiDolloGalleryItem[];
+  };
+  story: {
+    sectionTitle: string;
+    ideaTitle: string;
+    ideaContent: string;
+    ideaImage?: string;
+    locationTitle: string;
+    locationContent: string;
+    locationImage?: string;
+  };
+  communitySupport: {
+    sectionTitle: string;
+    sectionDescription: string;
+    initiatives: CommunityInitiative[];
+  };
+  staff: {
+    sectionTitle: string;
+    sectionSubtitle: string;
+    members: DembiDolloStaff[];
+  };
+  contact: {
+    sectionTitle: string;
+    sectionDescription: string;
+    phone: string;
+    email?: string;
+    address?: string;
+    mapEmbedUrl: string;
+    ctaTitle: string;
+    ctaDescription: string;
+    ctaButtonText: string;
+    ctaButtonLink?: string;
+  };
+}
+
 // Home Page
 export interface HomePage {
   hero: HeroSection;

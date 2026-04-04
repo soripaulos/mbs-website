@@ -8,6 +8,7 @@ import About from '@/pages/About';
 import Staff from '@/pages/Staff';
 import Gallery from '@/pages/Gallery';
 import Contact from '@/pages/Contact';
+import DembiDollo from '@/pages/DembiDollo';
 import { useSanityData } from '@/hooks/useSanityData';
 import { fetchSiteSettings } from '@/services/sanity';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
@@ -58,6 +59,7 @@ function App() {
             <Route path="/staff" element={<Staff />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/dembi-dollo" element={<DembiDollo />} />
           </Routes>
         </main>
         <Footer />
