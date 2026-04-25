@@ -25,7 +25,7 @@ export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
     description,
     "logo": logo.asset->url + "?w=200&q=80&auto=format",
     "logoMobile": logoMobile.asset->url + "?w=120&q=80&auto=format",
-    "favicon": favicon.asset->url,
+    "favicon": favicon.asset->url + "?w=64&h=64&q=80&auto=format",
     "footerLogo": footerLogo.asset->url + "?w=150&q=80&auto=format",
     footerDescription,
     footerContact,
@@ -70,20 +70,18 @@ function optimizeImageUrls(
   return urls.filter(Boolean).map(u => optimizeImageUrl(u, width, quality)) as string[];
 }
 
-// Helper: ensure hero images is always an array (Sanity returns null if no images uploaded)
+// Hero images are already optimized in GROQ queries with ?w=1600&q=80&auto=format
+// No additional client-side optimization needed (would cause duplicate params)
 function ensureHeroImages(hero: any): any {
   if (!hero) return { images: [], title: '', subtitle: '', overlayColor: '' };
-  return {
-    ...hero,
-    images: optimizeImageUrls(hero.images, 1920, 80),
-  };
+  return hero;
 }
 
 // Fetch Contact Page Data
 export const fetchContactPageData = async (): Promise<ContactInfo | null> => {
   const query = `*[_type == "contactPage"] | order(_updatedAt desc)[0] {
     "hero": {
-      "images": hero.images[].asset->url,
+      "images": hero.images[].asset->url + "?w=1600&q=80&auto=format",
       "title": hero.title,
       "subtitle": hero.subtitle,
       "overlayColor": hero.overlayColor
@@ -135,7 +133,7 @@ export const fetchContactPageData = async (): Promise<ContactInfo | null> => {
 export const fetchStaffPageData = async (): Promise<StaffPage | null> => {
   const query = `*[_type == "staffPage"] | order(_updatedAt desc)[0] {
     "hero": {
-      "images": hero.images[].asset->url,
+      "images": hero.images[].asset->url + "?w=1600&q=80&auto=format",
       "title": hero.title,
       "subtitle": hero.subtitle,
       "overlayColor": hero.overlayColor
@@ -164,7 +162,7 @@ export const fetchStaffPageData = async (): Promise<StaffPage | null> => {
 export const fetchGalleryPageData = async (): Promise<GalleryPage | null> => {
   const query = `*[_type == "galleryPage"] | order(_updatedAt desc)[0] {
     "hero": {
-      "images": hero.images[].asset->url,
+      "images": hero.images[].asset->url + "?w=1600&q=80&auto=format",
       "title": hero.title,
       "subtitle": hero.subtitle,
       "overlayColor": hero.overlayColor
@@ -190,7 +188,7 @@ export const fetchGalleryPageData = async (): Promise<GalleryPage | null> => {
 export const fetchGalleryImages = async (): Promise<GalleryImage[]> => {
   const query = `*[_type == "galleryImage"] | order(order asc) {
     "id": _id,
-    "image": image.asset->url,
+    "image": image.asset->url + "?w=800&q=80&auto=format",
     caption,
     category,
     date,
@@ -212,7 +210,7 @@ export const fetchStaffProfiles = async (): Promise<StaffProfile[]> => {
     name,
     role,
     category,
-    "image": image.asset->url,
+    "image": image.asset->url + "?w=400&h=400&fit=crop&q=80&auto=format",
     phones,
     email,
     bio,
@@ -233,7 +231,7 @@ export const fetchDepartments = async (): Promise<Department[]> => {
     "id": _id,
     name,
     description,
-    "image": image.asset->url,
+    "image": image.asset->url + "?w=600&q=80&auto=format",
     headerFont,
     order
   }`;
@@ -251,7 +249,7 @@ export const fetchHomePageData = async (): Promise<HomePage | null> => {
   // Query for the document that actually has images in it, to avoid empty duplicates
   const query = `*[_type == "homePage" && defined(hero.images)] | order(_updatedAt desc)[0] {
     "hero": {
-      "images": hero.images[].asset->url,
+      "images": hero.images[].asset->url + "?w=1600&q=80&auto=format",
       "title": hero.title,
       "subtitle": hero.subtitle,
       "overlayColor": hero.overlayColor,
@@ -263,7 +261,7 @@ export const fetchHomePageData = async (): Promise<HomePage | null> => {
       title,
       subtitle,
       description,
-      "images": images[].asset->url,
+      "images": images[].asset->url + "?w=1200&q=80&auto=format",
       features[] {
         icon,
         title,
@@ -281,7 +279,7 @@ export const fetchHomePageData = async (): Promise<HomePage | null> => {
     aboutSection {
       title,
       content,
-      "backgroundImage": backgroundImage.asset->url,
+      "backgroundImage": backgroundImage.asset->url + "?w=1600&q=60&auto=format",
       buttonText,
       buttonLink
     },
@@ -306,7 +304,7 @@ export const fetchHomePageData = async (): Promise<HomePage | null> => {
 export const fetchAboutPageData = async (): Promise<AboutPage | null> => {
   const query = `*[_type == "aboutPage"] | order(_updatedAt desc)[0] {
     "hero": {
-      "images": hero.images[].asset->url,
+      "images": hero.images[].asset->url + "?w=1600&q=80&auto=format",
       "title": hero.title,
       "subtitle": hero.subtitle,
       "overlayColor": hero.overlayColor
@@ -334,7 +332,7 @@ export const fetchStudentPortalApp = async (): Promise<any> => {
     title,
     subtitle,
     description,
-    "appImage": appImage.asset->url,
+    "appImage": appImage.asset->url + "?w=600&q=80&auto=format",
     features[] {
       icon,
       title,
@@ -378,8 +376,8 @@ export const fetchFacilities = async (): Promise<Facility[]> => {
     "id": _id,
     title,
     description,
-    "mainImage": mainImage.asset->url,
-    "gallery": gallery[].asset->url,
+    "mainImage": mainImage.asset->url + "?w=800&q=80&auto=format",
+    "gallery": gallery[].asset->url + "?w=600&q=80&auto=format",
     colSpan,
     icon,
     order
@@ -398,16 +396,16 @@ export const fetchAcademicLevels = async (): Promise<AcademicLevel[]> => {
     "id": _id,
     level,
     description,
-    "mainImage": mainImage.asset->url,
+    "mainImage": mainImage.asset->url + "?w=800&q=80&auto=format",
     features,
     extendedDescription,
     director {
       name,
       role,
-      "image": image.asset->url,
+      "image": image.asset->url + "?w=200&h=200&fit=crop&q=80&auto=format",
       message
     },
-    "gallery": gallery[].asset->url,
+    "gallery": gallery[].asset->url + "?w=600&q=80&auto=format",
     order
   }`;
   try {
@@ -443,7 +441,7 @@ export const fetchBranches = async (): Promise<Branch[]> => {
     name,
     location,
     description,
-    "image": image.asset->url,
+    "image": image.asset->url + "?w=600&q=80&auto=format",
     features,
     order
   }`;
@@ -460,7 +458,7 @@ export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
   const query = `*[_type == "socialPost"] | order(date desc) {
     "id": _id,
     content,
-    "images": images[].asset->url,
+    "images": images[].asset->url + "?w=600&q=80&auto=format",
     date,
     url,
     platform
@@ -477,7 +475,7 @@ export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
 export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> => {
   const query = `*[_type == "dembiDolloPage"] | order(_updatedAt desc)[0] {
     "hero": {
-      "images": hero.images[].asset->url,
+      "images": hero.images[].asset->url + "?w=1600&q=80&auto=format",
       "title": hero.title,
       "subtitle": hero.subtitle,
       "overlayColor": hero.overlayColor
@@ -486,7 +484,7 @@ export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> 
       title,
       description,
       "images": images[] {
-        "image": asset->url,
+        "image": asset->url + "?w=1200&q=80&auto=format",
         caption
       }
     },
@@ -494,7 +492,7 @@ export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> 
       title,
       description,
       "images": images[] {
-        "image": asset->url,
+        "image": asset->url + "?w=1200&q=80&auto=format",
         caption
       }
     },
@@ -502,7 +500,7 @@ export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> 
       title,
       description,
       "images": images[] {
-        "image": asset->url,
+        "image": asset->url + "?w=1200&q=80&auto=format",
         caption
       }
     },
@@ -510,10 +508,10 @@ export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> 
       sectionTitle,
       ideaTitle,
       ideaContent,
-      "ideaImage": ideaImage.asset->url,
+      "ideaImage": ideaImage.asset->url + "?w=1200&q=80&auto=format",
       locationTitle,
       locationContent,
-      "locationImage": locationImage.asset->url
+      "locationImage": locationImage.asset->url + "?w=1200&q=80&auto=format"
     },
     communitySupport {
       sectionTitle,
@@ -522,7 +520,7 @@ export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> 
         title,
         description,
         "images": images[] {
-          "image": asset->url,
+          "image": asset->url + "?w=800&q=80&auto=format",
           caption
         }
       }
@@ -533,7 +531,7 @@ export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> 
       "members": members[] {
         name,
         role,
-        "image": image.asset->url,
+        "image": image.asset->url + "?w=400&h=400&fit=crop&q=80&auto=format",
         phones,
         email,
         bio
