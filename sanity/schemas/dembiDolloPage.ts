@@ -103,7 +103,23 @@ export default defineType({
               title: 'Initiative',
               fields: [
                 { name: 'title', title: 'Initiative Title', type: 'string' },
-                { name: 'description', title: 'Initiative Description', type: 'text' },
+                {
+                  name: 'initiativeType',
+                  title: 'Icon Type',
+                  type: 'string',
+                  options: {
+                    list: [
+                      { title: '💙 Heart — General Support', value: 'heart' },
+                      { title: '📚 Book — Books/Education', value: 'book' },
+                      { title: '💻 Computer — Technology/Hardware', value: 'computer' },
+                      { title: '🎓 Graduation — Scholarships', value: 'graduation' },
+                      { title: '🤝 Handshake — Partnerships', value: 'handshake' },
+                      { title: '🎁 Gift — Material Donations', value: 'gift' },
+                      { title: '⏰ Time — Volunteer/Time', value: 'time' },
+                      { title: '💰 Money — Financial Support', value: 'money' },
+                    ],
+                  },
+                },
                 {
                   name: 'images',
                   title: 'Initiative Images',

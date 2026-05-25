@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Phone, Mail, MapPin, Heart, Users, ChevronLeft, ChevronRight, X, BookOpen, Lightbulb, Map } from 'lucide-react';
+import { Phone, Mail, MapPin, Heart, Users, ChevronLeft, ChevronRight, X, BookOpen, Lightbulb, Map, Laptop, GraduationCap, Handshake, Gift, Clock, Coins } from 'lucide-react';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import { dembiDolloPageData as mockData } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
@@ -386,15 +386,24 @@ function CommunitySupportSection({
                 <div className="bg-gradient-to-b from-gray-50 to-white hover:from-school-brand/5 hover:to-white transition-colors duration-300 rounded-2xl p-6 h-full shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 hover:border-school-brand/10">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
-                      <Heart size={20} className="text-school-pink" />
+                      {initiative.initiativeType === 'book' ? <BookOpen size={20} className="text-school-brand" /> :
+                       initiative.initiativeType === 'computer' ? <Laptop size={20} className="text-school-brand" /> :
+                       initiative.initiativeType === 'graduation' ? <GraduationCap size={20} className="text-school-brand" /> :
+                       initiative.initiativeType === 'handshake' ? <Handshake size={20} className="text-school-brand" /> :
+                       initiative.initiativeType === 'gift' ? <Gift size={20} className="text-school-brand" /> :
+                       initiative.initiativeType === 'time' ? <Clock size={20} className="text-school-brand" /> :
+                       initiative.initiativeType === 'money' ? <Coins size={20} className="text-school-brand" /> :
+                       <Heart size={20} className="text-school-pink" />}
                     </div>
                     <h3 className="font-display text-xl font-bold text-gray-800">
                       {initiative.title}
                     </h3>
                   </div>
-                  <p className="text-gray-600 mb-6 leading-relaxed line-clamp-3 hover:line-clamp-none transition-all">
-                    {initiative.description}
-                  </p>
+                  {initiative.description && (
+                    <p className="text-gray-600 mb-6 leading-relaxed line-clamp-3 hover:line-clamp-none transition-all">
+                      {initiative.description}
+                    </p>
+                  )}
                   <CommunityImageCarousel images={initiative.images || []} />
                 </div>
               </AnimatedSection>

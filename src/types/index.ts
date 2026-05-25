@@ -280,8 +280,9 @@ export interface DembiDolloStaff {
 
 export interface CommunityInitiative {
   title: string;
-  description: string;
-  images: DembiDolloGalleryItem[];
+  description?: string;
+  initiativeType?: string;
+  images?: DembiDolloGalleryItem[];
 }
 
 // Dembi Dollo Page

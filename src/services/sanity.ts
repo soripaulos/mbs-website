@@ -518,6 +518,7 @@ export const fetchDembiDolloPageData = async (): Promise<DembiDolloPage | null> 
       sectionDescription,
       "initiatives": initiatives[] {
         title,
+        initiativeType,
         description,
         "images": images[] {
           "image": asset->url + "?w=800&q=80&auto=format",
