@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, ArrowRight, Apple, PlayCircle, Globe, Calend
 import { toast } from 'sonner';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import DynamicIcon from '@/components/DynamicIcon';
+import LightboxGallery from '@/components/LightboxGallery';
 import { homePageData as mockHomePageData, socialPostsData } from '@/data/mockData';
 import { useSanityData, useSanityArrayData } from '@/hooks/useSanityData';
 import { fetchHomePageData, fetchStudentPortalApp, fetchSocialPosts } from '@/services/sanity';
@@ -225,6 +226,8 @@ function StudentPortalAppSection() {
 // Latest Updates Section
 function LatestUpdates({ latestUpdates }: { latestUpdates?: typeof mockHomePageData.latestUpdates }) {
   const [visibleCount, setVisibleCount] = useState(3);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const postsFetcher = useCallback(() => fetchSocialPosts(), []);
   const { data: posts, loading: postsLoading } = useSanityArrayData(postsFetcher, socialPostsData);
 
@@ -249,13 +252,21 @@ function LatestUpdates({ latestUpdates }: { latestUpdates?: typeof mockHomePageD
             <AnimatedSection key={post.id || index} delay={index * 150}>
               <div className="bg-white rounded-xl shadow-lg overflow-hidden card-hover border border-gray-100">
                 {post.images && post.images.length > 0 && (
-                  <div className="aspect-video overflow-hidden">
+                  <div
+                    className="aspect-video overflow-hidden cursor-pointer relative"
+                    onClick={() => { setLightboxImages(post.images); setLightboxIndex(0); }}
+                  >
                     <img
                       src={post.images[0]}
                       alt="Post"
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
+                    {post.images.length > 1 && (
+                      <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                        +{post.images.length - 1}
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="p-5">
@@ -288,6 +299,14 @@ function LatestUpdates({ latestUpdates }: { latestUpdates?: typeof mockHomePageD
           </div>
         )}
       </div>
+
+      {lightboxImages.length > 0 && (
+        <LightboxGallery
+          images={lightboxImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxImages([])}
+        />
+      )}
     </section>
   );
 }
