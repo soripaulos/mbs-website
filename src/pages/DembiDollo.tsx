@@ -473,10 +473,13 @@ export default function DembiDollo() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <div className="relative h-[70vh] min-h-[500px]">
+      <div className="relative" style={{ height: '70vh', minHeight: 500 }}>
         <HeroSlideshow
           images={data.hero?.images || []}
           overlayColor={data.hero?.overlayColor}
+          showDots={false}
+          showArrows={false}
+          autoPlay={true}
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
           <div className="max-w-4xl">
@@ -489,6 +492,20 @@ export default function DembiDollo() {
               </p>
             )}
           </div>
+        </div>
+        {/* Wave transition — positioned as the very bottom of the hero */}
+        <div className="absolute -bottom-1 left-0 w-full overflow-hidden leading-none">
+          <svg
+            className="block w-full"
+            style={{ height: 120 }}
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C57.1,118.92,156.86,79.08,321.39,56.44Z"
+              className="fill-white"
+            />
+          </svg>
         </div>
       </div>
 
