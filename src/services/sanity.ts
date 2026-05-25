@@ -61,7 +61,7 @@ function optimizeImageUrl(url: string | undefined | null, width = 1920, quality 
 }
 
 // Optimize an array of image URLs
-function optimizeImageUrls(
+export function _optimizeImageUrls(
   urls: (string | undefined | null)[] | undefined | null,
   width = 1920,
   quality = 80
