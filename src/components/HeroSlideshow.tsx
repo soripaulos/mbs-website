@@ -138,7 +138,7 @@ export default function HeroSlideshow({
       {/* Wave SVG */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
         <svg
-          className="relative block w-full h-16 md:h-24"
+          className="relative block w-full h-24 md:h-32"
           viewBox="0 0 1200 120"
           preserveAspectRatio="none"
         >
