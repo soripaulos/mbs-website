@@ -11,6 +11,7 @@ const navLinks = [
   { path: '/staff', label: 'STAFF' },
   { path: '/gallery', label: 'GALLERY' },
   { path: '/contact', label: 'CONTACT' },
+  { path: '/dembi-dollo', label: 'MBS DEMBI DOLLO' },
 ];
 
 export default function Navbar() {
