@@ -271,3 +271,79 @@ export interface HomePage {
   aboutSection: AboutSection;
   latestUpdates: LatestUpdates;
 }
+
+// Dembi Dollo Page
+export interface DembiDolloPage {
+  title: string;
+  hero: {
+    title: string;
+    subtitle: string;
+    images: string[];
+    overlayColor?: string;
+  };
+  story: {
+    sectionTitle: string;
+    ideaTitle: string;
+    ideaContent: string;
+    ideaImage: string;
+    ideaImageCaption?: string;
+    locationTitle: string;
+    locationContent: string;
+    locationImage: string;
+    locationImageCaption?: string;
+  };
+  gallery: {
+    sectionTitle: string;
+    sectionSubtitle: string;
+  };
+  compoundSection: {
+    title: string;
+    description: string;
+    images: { url: string; caption?: string }[];
+  };
+  classroomsSection: {
+    title: string;
+    description: string;
+    images: { url: string; caption?: string }[];
+  };
+  activitiesSection: {
+    title: string;
+    description: string;
+    images: { url: string; caption?: string }[];
+  };
+  staff: {
+    sectionTitle: string;
+    sectionSubtitle: string;
+    members: {
+      name: string;
+      role: string;
+      image: string;
+      isGroupPhoto: boolean;
+    }[];
+  };
+  communitySupport: {
+    sectionTitle: string;
+    sectionDescription: string;
+    localTitle: string;
+    localDescription: string;
+    internationalTitle: string;
+    internationalDescription: string;
+    initiatives: {
+      title: string;
+      description: string;
+      initiativeType: string;
+      images?: { url: string; caption?: string }[];
+    }[];
+  };
+  contact: {
+    sectionTitle: string;
+    sectionDescription: string;
+    address: string;
+    phone: string;
+    mapEmbedUrl: string;
+    ctaTitle: string;
+    ctaDescription: string;
+    ctaButtonText: string;
+    ctaButtonLink: string;
+  };
+}

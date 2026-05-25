@@ -15,6 +15,7 @@ import type {
   Service,
   Branch,
   SocialPost,
+  DembiDolloPage,
 } from '../types';
 
 // Fetch Site Settings (logo, social links, description, footer)
@@ -469,5 +470,109 @@ export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
   } catch (error) {
     console.error('[Sanity] Error fetching social posts:', error);
     return [];
+  }
+};
+
+// Fetch Dembi Dollo Page Data
+export const fetchDembiDolloPage = async (): Promise<DembiDolloPage | null> => {
+  const query = `*[_type == "dembiDolloPage"] | order(_updatedAt desc)[0] {
+    title,
+    hero {
+      title,
+      subtitle,
+      "images": images[].asset->url,
+      overlayColor
+    },
+    story {
+      sectionTitle,
+      ideaTitle,
+      ideaContent,
+      "ideaImage": ideaImage.asset->url,
+      "ideaImageCaption": ideaImage.caption,
+      locationTitle,
+      locationContent,
+      "locationImage": locationImage.asset->url,
+      "locationImageCaption": locationImage.caption
+    },
+    gallery {
+      sectionTitle,
+      "sectionSubtitle": sectionSubtitle
+    },
+    compoundSection {
+      title,
+      description,
+      "images": images[] {
+        "url": asset->url,
+        caption
+      }
+    },
+    classroomsSection {
+      title,
+      description,
+      "images": images[] {
+        "url": asset->url,
+        caption
+      }
+    },
+    activitiesSection {
+      title,
+      description,
+      "images": images[] {
+        "url": asset->url,
+        caption
+      }
+    },
+    staff {
+      sectionTitle,
+      "sectionSubtitle": sectionSubtitle,
+      "members": members[] {
+        name,
+        role,
+        "image": image.asset->url,
+        isGroupPhoto
+      }
+    },
+    communitySupport {
+      sectionTitle,
+      sectionDescription,
+      localTitle,
+      localDescription,
+      internationalTitle,
+      internationalDescription,
+      "initiatives": initiatives[] {
+        title,
+        description,
+        initiativeType,
+        "images": images[] {
+          "url": asset->url,
+          caption
+        }
+      }
+    },
+    contact {
+      sectionTitle,
+      sectionDescription,
+      address,
+      phone,
+      mapEmbedUrl,
+      ctaTitle,
+      ctaDescription,
+      ctaButtonText,
+      ctaButtonLink
+    }
+  }`;
+
+  try {
+    const result = await sanityClient.fetch(query);
+    if (result) {
+      // Ensure hero images
+      if (!result.hero?.images?.length) {
+        result.hero.images = ['https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600'];
+      }
+    }
+    return result;
+  } catch (error) {
+    console.error('[Sanity] Error fetching Dembi Dollo page data:', error);
+    return null;
   }
 };
