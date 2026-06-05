@@ -101,15 +101,20 @@ function ImageGrid({
 
 // ── HERO ──────────────────────────────────────────────────────────────────────
 function Hero({ hero }: { hero: typeof dembiDolloPageData.hero }) {
-  const heroImage = hero.images?.[0] || 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600';
+  const heroImage = hero.images?.[0];
 
   return (
     <div className="relative w-full" style={{ height: '85vh', minHeight: 560 }}>
       {/* Background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      />
+      {heroImage && (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        />
+      )}
+      {!heroImage && (
+        <div className="absolute inset-0 bg-school-brand" />
+      )}
       <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(15,30,70,0.55) 0%, rgba(15,30,70,0.75) 100%)' }} />
 
       {/* Content */}
@@ -182,20 +187,25 @@ function StorySection({ story }: { story: typeof dembiDolloPageData.story }) {
               {story.ideaContent}
             </p>
           </FadeUp>
-          <FadeUp delay={150}>
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src={story.ideaImage}
-                alt={story.ideaImageCaption}
-                className="w-full h-72 md:h-80 object-cover"
-              />
-              {story.ideaImageCaption && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                  <p className="text-white text-sm">{story.ideaImageCaption}</p>
-                </div>
-              )}
-            </div>
-          </FadeUp>
+          {!story.ideaImage && (
+            <p className="text-gray-400 italic">Image coming soon</p>
+          )}
+          {story.ideaImage && (
+            <FadeUp delay={150}>
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src={story.ideaImage}
+                  alt={story.ideaImageCaption}
+                  className="w-full h-72 md:h-80 object-cover"
+                />
+                {story.ideaImageCaption && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                    <p className="text-white text-sm">{story.ideaImageCaption}</p>
+                  </div>
+                )}
+              </div>
+            </FadeUp>
+          )}
         </div>
 
         {/* The Location */}
@@ -214,22 +224,25 @@ function StorySection({ story }: { story: typeof dembiDolloPageData.story }) {
               )}
             </div>
           </FadeUp>
-          <FadeUp className="order-1 md:order-2" delay={200}>
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-school-yellow flex items-center justify-center flex-shrink-0 shadow-lg">
-                <MapPin size={24} className="text-white" />
+          {!story.locationImage && (
+            <p className="text-gray-400 italic">Image coming soon</p>
+          )}
+          {story.locationImage && (
+            <FadeUp className="order-2 md:order-1" delay={100}>
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src={story.locationImage}
+                  alt={story.locationImageCaption}
+                  className="w-full h-72 md:h-80 object-cover"
+                />
+                {story.locationImageCaption && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                    <p className="text-white text-sm">{story.locationImageCaption}</p>
+                  </div>
+                )}
               </div>
-              <div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-3">
-                  {story.locationTitle}
-                </h2>
-                <div className="w-12 h-1 bg-school-yellow rounded-full" />
-              </div>
-            </div>
-            <p className="text-gray-600 leading-relaxed text-lg">
-              {story.locationContent}
-            </p>
-          </FadeUp>
+            </FadeUp>
+          )}
         </div>
       </div>
     </section>

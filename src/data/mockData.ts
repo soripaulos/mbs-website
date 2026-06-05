@@ -65,19 +65,21 @@ export const dembiDolloPageData: DembiDolloPage = {
   hero: {
     title: 'Makko Billi School — Dembi Dollo',
     subtitle: 'Bringing Quality Education to Western Ethiopia',
-    images: ['https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600'],
+    images: [
+      'https://cdn.sanity.io/images/yqwhfc1k/production/ace1d753d5fe46b2bcd206b4850dca8f6a06aaea-2560x1394.jpg',
+    ],
     overlayColor: 'rgba(37, 55, 107, 0.6)',
   },
   story: {
     sectionTitle: 'Our Story',
     ideaTitle: 'The Idea',
     ideaContent: 'Makko Billi School Dembi Dollo was born from a vision to extend quality education to one of Ethiopia\'s most underserved regions. Recognizing the critical need for modern educational facilities in Western Ethiopia, the founders embarked on a mission to create a learning environment that nurtures young minds and empowers communities.',
-    ideaImage: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200',
-    ideaImageCaption: 'Graduation celebration at Makko Billi School Dembi Dollo',
+    ideaImage: '',
+    ideaImageCaption: '',
     locationTitle: 'The Location',
     locationContent: 'Nestled in the heart of Dembi Dollo, a historic town in the Kellem Wollega Zone of the Oromia Region, our campus is strategically located to serve the local community. Dembi Dollo, rich in cultural heritage and natural beauty, provides an inspiring backdrop for learning and growth.',
-    locationImage: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=1200',
-    locationImageCaption: 'Children in Dembi Dollo — the community our school serves',
+    locationImage: '',
+    locationImageCaption: '',
   },
   gallery: {
     sectionTitle: 'Our Campus',
@@ -86,9 +88,7 @@ export const dembiDolloPageData: DembiDolloPage = {
   compoundSection: {
     title: 'School Compound',
     description: 'Our expansive campus features modern facilities, school buses, and beautiful outdoor spaces for students.',
-    images: [
-      { url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200', caption: 'School Buses & Campus at Dusk' },
-    ],
+    images: [],
   },
   classroomsSection: {
     title: 'Classrooms',
