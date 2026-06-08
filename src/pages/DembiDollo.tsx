@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  MapPin, Phone, Laptop, GraduationCap, Handshake, Gift, BookOpen, Mail, ChevronRight, Users, Clock, Coins
+  MapPin, Phone, Laptop, GraduationCap, Handshake, Gift, BookOpen, Mail, ChevronRight, Users
 } from 'lucide-react';
 import LightboxGallery from '@/components/LightboxGallery';
 import { useSanityData } from '@/hooks/useSanityData';
