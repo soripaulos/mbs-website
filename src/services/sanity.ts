@@ -554,6 +554,7 @@ export const fetchDembiDolloPage = async (): Promise<DembiDolloPage | null> => {
       sectionDescription,
       address,
       phone,
+      email,
       mapEmbedUrl,
       ctaTitle,
       ctaDescription,

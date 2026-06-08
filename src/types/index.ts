@@ -340,6 +340,7 @@ export interface DembiDolloPage {
     sectionDescription: string;
     address: string;
     phone: string;
+    email: string;
     mapEmbedUrl: string;
     ctaTitle: string;
     ctaDescription: string;

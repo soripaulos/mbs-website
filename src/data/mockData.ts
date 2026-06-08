@@ -119,6 +119,7 @@ export const dembiDolloPageData: DembiDolloPage = {
     sectionDescription: 'We welcome visitors, volunteers, and supporters who share our passion for education. Come see the impact of your support firsthand.',
     address: 'Dembi Dollo, Kellem Wollega Zone, Oromia, Ethiopia',
     phone: '+251917045795',
+    email: 'principal@makkobillischool.com',
     mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3945.8510095737493!2d34.81179780000001!3d8.5138433!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x17aabf681232aac5%3A0x6fe18ad28d57c9fb!2sMakko%20Billi%20School%20%2C%20Dembi%20Dollo!5e0!3m2!1sen!2set!4v1775741807834!5m2!1sen!2set',
     ctaTitle: 'Get Involved',
     ctaDescription: 'Interested in supporting our Dembi Dollo students? Whether you\'re a parent, alumnus, or community member, we\'d love to hear from you. Reach out to learn how you can make a difference.',
