@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  MapPin, Phone, Laptop, GraduationCap, Handshake, Gift, BookOpen, Mail, ChevronRight, Users, Clock, Coins
+  MapPin, Phone, Laptop, GraduationCap, Handshake, Gift, BookOpen, Mail, ChevronRight, Users
 } from 'lucide-react';
 import LightboxGallery from '@/components/LightboxGallery';
 import { useSanityData } from '@/hooks/useSanityData';
@@ -104,16 +104,13 @@ function Hero({ hero }: { hero: typeof dembiDolloPageData.hero }) {
   const heroImage = hero.images?.[0];
 
   return (
-    <div className="relative w-full" style={{ height: '85vh', minHeight: 560 }}>
-      {/* Background */}
+    <div className="relative w-full bg-school-brand" style={{ height: '85vh', minHeight: 560 }}>
+      {/* Background — bg-school-brand above is the fallback when the image fails to load */}
       {heroImage && (
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}
         />
-      )}
-      {!heroImage && (
-        <div className="absolute inset-0 bg-school-brand" />
       )}
       <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(15,30,70,0.55) 0%, rgba(15,30,70,0.75) 100%)' }} />
 
@@ -136,13 +133,14 @@ function Hero({ hero }: { hero: typeof dembiDolloPageData.hero }) {
             </p>
           </FadeUp>
           <FadeUp delay={300}>
-            <Link
-              to="#contact"
+            <a
+              href="#contact"
+              onClick={e => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
               className="inline-flex items-center gap-2 px-8 py-4 bg-school-yellow text-school-brand font-bold text-lg rounded-full hover:bg-white transition-colors shadow-lg"
             >
               Get Involved
               <ChevronRight size={20} />
-            </Link>
+            </a>
           </FadeUp>
         </div>
       </div>
@@ -210,24 +208,7 @@ function StorySection({ story }: { story: typeof dembiDolloPageData.story }) {
 
         {/* The Location */}
         <div className="grid md:grid-cols-2 gap-16 items-center">
-          <FadeUp className="order-2 md:order-1" delay={100}>
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src={story.locationImage}
-                alt={story.locationImageCaption}
-                className="w-full h-72 md:h-80 object-cover"
-              />
-              {story.locationImageCaption && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                  <p className="text-white text-sm">{story.locationImageCaption}</p>
-                </div>
-              )}
-            </div>
-          </FadeUp>
-          {!story.locationImage && (
-            <p className="text-gray-400 italic">Image coming soon</p>
-          )}
-          {story.locationImage && (
+          {story.locationImage ? (
             <FadeUp className="order-2 md:order-1" delay={100}>
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
@@ -242,7 +223,25 @@ function StorySection({ story }: { story: typeof dembiDolloPageData.story }) {
                 )}
               </div>
             </FadeUp>
+          ) : (
+            <p className="text-gray-400 italic order-2 md:order-1">Image coming soon</p>
           )}
+          <FadeUp className="order-1 md:order-2" delay={150}>
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-school-brand flex items-center justify-center flex-shrink-0 shadow-lg">
+                <MapPin size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-3">
+                  {story.locationTitle}
+                </h2>
+                <div className="w-12 h-1 bg-school-yellow rounded-full" />
+              </div>
+            </div>
+            <p className="text-gray-600 leading-relaxed text-lg">
+              {story.locationContent}
+            </p>
+          </FadeUp>
         </div>
       </div>
     </section>
@@ -479,7 +478,7 @@ function ContactSection({ contact }: { contact: typeof dembiDolloPageData.contac
               {[
                 { icon: <MapPin size={18} />, label: 'Address', value: contact.address },
                 { icon: <Phone size={18} />, label: 'Phone', value: contact.phone, href: `tel:${contact.phone}` },
-                { icon: <Mail size={18} />, label: 'Email', value: 'saratesfaye5@gmail.com', href: 'mailto:saratesfaye5@gmail.com' },
+                { icon: <Mail size={18} />, label: 'Email', value: contact.email, href: `mailto:${contact.email}` },
               ].map((row, i) => (
                 <div key={i} className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-school-yellow mt-0.5 flex-shrink-0">
