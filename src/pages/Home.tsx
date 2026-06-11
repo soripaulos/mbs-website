@@ -8,6 +8,7 @@ import LightboxGallery from '@/components/LightboxGallery';
 import { homePageData as mockHomePageData, socialPostsData } from '@/data/mockData';
 import { useSanityData, useSanityArrayData } from '@/hooks/useSanityData';
 import { fetchHomePageData, fetchStudentPortalApp, fetchSocialPosts } from '@/services/sanity';
+import { optimizeImageUrl } from '@/sanity/image';
 import { useCallback } from 'react';
 
 // Animation hook with reduced frequency
@@ -193,9 +194,14 @@ function StudentPortalAppSection() {
               <div className="absolute inset-0 bg-school-yellow/20 rounded-full blur-3xl transform scale-110" />
               <div className="relative bg-white rounded-3xl p-4 shadow-2xl">
                 <img
-                  src="https://cdn.sanity.io/images/yqwhfc1k/production/8508996403a729ae03430e7460e4a899b40d2c11-1181x768.png"
+                  src={optimizeImageUrl(
+                    'https://cdn.sanity.io/images/yqwhfc1k/production/8508996403a729ae03430e7460e4a899b40d2c11-1181x768.png',
+                    'appScreenshot',
+                  ) ?? ''}
                   alt="Student Portal App"
                   className="w-full rounded-2xl"
+                  loading="lazy"
+                  decoding="async"
                 />
                 {/* Floating Feature Cards */}
                 <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-3 shadow-lg">

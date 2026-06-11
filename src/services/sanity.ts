@@ -1,4 +1,9 @@
 import { sanityClient } from '../sanity/client';
+import {
+  optimizeImageUrl,
+  optimizeImageUrls,
+  applyPresetToPaths,
+} from '../sanity/image';
 import type {
   SiteSettings,
   GalleryImage,
@@ -18,15 +23,28 @@ import type {
   DembiDolloPage,
 } from '../types';
 
+// Back-compat shim so any other file in the codebase that still imports
+// the local helpers continues to work. New code should import from
+// '@/sanity/image' instead.
+export { optimizeImageUrl, optimizeImageUrls };
+
+// Apply the hero preset to the .images array on any hero-shaped object.
+// Returns a normalized object with a guaranteed `images: string[]`.
+function normalizeHero(hero: any): any {
+  const base = hero ?? {};
+  const images = optimizeImageUrls(base.images, 'hero');
+  return { ...base, images };
+}
+
 // Fetch Site Settings (logo, social links, description, footer)
 export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
   const query = `*[_type == "siteSettings"] | order(_updatedAt desc)[0] {
     title,
     description,
-    "logo": logo.asset->url + "?w=200&q=80&auto=format",
-    "logoMobile": logoMobile.asset->url + "?w=120&q=80&auto=format",
+    "logo": logo.asset->url,
+    "logoMobile": logoMobile.asset->url,
     "favicon": favicon.asset->url,
-    "footerLogo": footerLogo.asset->url + "?w=150&q=80&auto=format",
+    "footerLogo": footerLogo.asset->url,
     footerDescription,
     footerContact,
     copyright,
@@ -42,42 +60,16 @@ export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
 
   try {
     const result = await sanityClient.fetch(query);
+    if (!result) return null;
+    applyPresetToPaths(result, ['logo', 'logoMobile', 'footerLogo'], 'logo');
+    // favicon is left as-is — it's served as a 32x32 icon, optimization
+    // would just round-trip the same bytes.
     return result;
   } catch (error) {
     console.error('[Sanity] Error fetching site settings:', error);
     return null;
   }
 };
-
-// Helper: append optimization parameters to Sanity image URLs
-// Sanity CDN supports: w (width), h (height), q (quality), auto=format (webp/avif), fit, crop
-function optimizeImageUrl(url: string | undefined | null, width = 1920, quality = 80): string | undefined | null {
-  if (!url) return url;
-  if (url.includes('cdn.sanity.io')) {
-    const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}auto=format&w=${width}&q=${quality}&fit=max`;
-  }
-  return url;
-}
-
-// Optimize an array of image URLs
-function optimizeImageUrls(
-  urls: (string | undefined | null)[] | undefined | null,
-  width = 1920,
-  quality = 80
-): string[] {
-  if (!urls) return [];
-  return urls.filter(Boolean).map(u => optimizeImageUrl(u, width, quality)) as string[];
-}
-
-// Helper: ensure hero images is always an array (Sanity returns null if no images uploaded)
-function ensureHeroImages(hero: any): any {
-  if (!hero) return { images: [], title: '', subtitle: '', overlayColor: '' };
-  return {
-    ...hero,
-    images: optimizeImageUrls(hero.images, 1920, 80),
-  };
-}
 
 // Fetch Contact Page Data
 export const fetchContactPageData = async (): Promise<ContactInfo | null> => {
@@ -123,7 +115,7 @@ export const fetchContactPageData = async (): Promise<ContactInfo | null> => {
   try {
     const result = await sanityClient.fetch(query);
     if (!result) return null;
-    result.hero = ensureHeroImages(result.hero);
+    result.hero = normalizeHero(result.hero);
     return result;
   } catch (error) {
     console.error('[Sanity] Error fetching contact page data:', error);
@@ -152,7 +144,7 @@ export const fetchStaffPageData = async (): Promise<StaffPage | null> => {
 
   try {
     const result = await sanityClient.fetch(query);
-    result.hero = ensureHeroImages(result.hero);
+    result.hero = normalizeHero(result.hero);
     return result;
   } catch (error) {
     console.error('[Sanity] Error fetching staff page data:', error);
@@ -178,7 +170,7 @@ export const fetchGalleryPageData = async (): Promise<GalleryPage | null> => {
 
   try {
     const result = await sanityClient.fetch(query);
-    result.hero = ensureHeroImages(result.hero);
+    result.hero = normalizeHero(result.hero);
     return result;
   } catch (error) {
     console.error('[Sanity] Error fetching gallery page data:', error);
@@ -198,7 +190,13 @@ export const fetchGalleryImages = async (): Promise<GalleryImage[]> => {
   }`;
 
   try {
-    return await sanityClient.fetch(query);
+    const rows = await sanityClient.fetch(query);
+    return Array.isArray(rows)
+      ? rows.map((r) => {
+          applyPresetToPaths(r, ['image'], 'gallery');
+          return r;
+        })
+      : rows;
   } catch (error) {
     console.error('[Sanity] Error fetching gallery images:', error);
     return [];
@@ -220,7 +218,13 @@ export const fetchStaffProfiles = async (): Promise<StaffProfile[]> => {
   }`;
 
   try {
-    return await sanityClient.fetch(query);
+    const rows = await sanityClient.fetch(query);
+    return Array.isArray(rows)
+      ? rows.map((r) => {
+          applyPresetToPaths(r, ['image'], 'staffAvatar');
+          return r;
+        })
+      : rows;
   } catch (error) {
     console.error('[Sanity] Error fetching staff profiles:', error);
     return [];
@@ -239,7 +243,13 @@ export const fetchDepartments = async (): Promise<Department[]> => {
   }`;
 
   try {
-    return await sanityClient.fetch(query);
+    const rows = await sanityClient.fetch(query);
+    return Array.isArray(rows)
+      ? rows.map((r) => {
+          applyPresetToPaths(r, ['image'], 'gallery');
+          return r;
+        })
+      : rows;
   } catch (error) {
     console.error('[Sanity] Error fetching departments:', error);
     return [];
@@ -294,7 +304,12 @@ export const fetchHomePageData = async (): Promise<HomePage | null> => {
 
   try {
     const result = await sanityClient.fetch(query);
-    result.hero = ensureHeroImages(result.hero);
+    if (!result) return null;
+    result.hero = normalizeHero(result.hero);
+    applyPresetToPaths(result, [
+      'grandOpening.images[]',
+      'aboutSection.backgroundImage',
+    ], 'sectionBg');
     return result;
   } catch (error) {
     console.error('[Sanity] Error fetching home page data:', error);
@@ -319,7 +334,7 @@ export const fetchAboutPageData = async (): Promise<AboutPage | null> => {
 
   try {
     const result = await sanityClient.fetch(query);
-    result.hero = ensureHeroImages(result.hero);
+    result.hero = normalizeHero(result.hero);
     return result;
   } catch (error) {
     console.error('[Sanity] Error fetching about page data:', error);
@@ -348,7 +363,11 @@ export const fetchStudentPortalApp = async (): Promise<any> => {
   }`;
 
   try {
-    return await sanityClient.fetch(query);
+    const result = await sanityClient.fetch(query);
+    if (result) {
+      applyPresetToPaths(result, ['appImage'], 'appScreenshot');
+    }
+    return result;
   } catch (error) {
     console.error('[Sanity] Error fetching student portal app data:', error);
     return null;
@@ -385,7 +404,14 @@ export const fetchFacilities = async (): Promise<Facility[]> => {
     order
   }`;
   try {
-    return await sanityClient.fetch(query);
+    const rows = await sanityClient.fetch(query);
+    return Array.isArray(rows)
+      ? rows.map((r) => {
+          applyPresetToPaths(r, ['mainImage'], 'facility');
+          applyPresetToPaths(r, ['gallery[]'], 'gallery');
+          return r;
+        })
+      : rows;
   } catch (error) {
     console.error('[Sanity] Error fetching facilities:', error);
     return [];
@@ -411,7 +437,15 @@ export const fetchAcademicLevels = async (): Promise<AcademicLevel[]> => {
     order
   }`;
   try {
-    return await sanityClient.fetch(query);
+    const rows = await sanityClient.fetch(query);
+    return Array.isArray(rows)
+      ? rows.map((r) => {
+          applyPresetToPaths(r, ['mainImage'], 'facility');
+          applyPresetToPaths(r, ['gallery[]'], 'gallery');
+          applyPresetToPaths(r, ['director.image'], 'staffAvatar');
+          return r;
+        })
+      : rows;
   } catch (error) {
     console.error('[Sanity] Error fetching academic levels:', error);
     return [];
@@ -448,7 +482,13 @@ export const fetchBranches = async (): Promise<Branch[]> => {
     order
   }`;
   try {
-    return await sanityClient.fetch(query);
+    const rows = await sanityClient.fetch(query);
+    return Array.isArray(rows)
+      ? rows.map((r) => {
+          applyPresetToPaths(r, ['image'], 'branch');
+          return r;
+        })
+      : rows;
   } catch (error) {
     console.error('[Sanity] Error fetching branches:', error);
     return [];
@@ -466,7 +506,13 @@ export const fetchSocialPosts = async (): Promise<SocialPost[]> => {
     platform
   }`;
   try {
-    return await sanityClient.fetch(query);
+    const rows = await sanityClient.fetch(query);
+    return Array.isArray(rows)
+      ? rows.map((r) => {
+          applyPresetToPaths(r, ['images[]'], 'socialPost');
+          return r;
+        })
+      : rows;
   } catch (error) {
     console.error('[Sanity] Error fetching social posts:', error);
     return [];
@@ -565,12 +611,50 @@ export const fetchDembiDolloPage = async (): Promise<DembiDolloPage | null> => {
 
   try {
     const result = await sanityClient.fetch(query);
-    if (result) {
-      // Ensure hero images
-      if (!result.hero?.images?.length) {
-        result.hero.images = ['https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600'];
+    if (!result) return null;
+
+    // Hero
+    result.hero = normalizeHero(result.hero);
+    if (!result.hero?.images?.length) {
+      result.hero.images = ['https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600'];
+    }
+
+    // Story: 2 main images, no nested arrays
+    applyPresetToPaths(result, [
+      'story.ideaImage',
+      'story.locationImage',
+    ], 'sectionBg');
+
+    // Compound / Classrooms / Activities: each has an .images[] of { url, caption }
+    for (const section of ['compoundSection', 'classroomsSection', 'activitiesSection']) {
+      const arr = result[section]?.images;
+      if (Array.isArray(arr)) {
+        for (const item of arr) {
+          if (item?.url) item.url = optimizeImageUrl(item.url, 'sectionBg');
+        }
       }
     }
+
+    // Staff members inside DembiDollo (different schema — has members[].image)
+    const members = result.staff?.members;
+    if (Array.isArray(members)) {
+      for (const m of members) {
+        if (m?.image) m.image = optimizeImageUrl(m.image, 'staffAvatar');
+      }
+    }
+
+    // Community support initiatives have nested .images[] of { url, caption }
+    const initiatives = result.communitySupport?.initiatives;
+    if (Array.isArray(initiatives)) {
+      for (const init of initiatives) {
+        if (Array.isArray(init?.images)) {
+          for (const item of init.images) {
+            if (item?.url) item.url = optimizeImageUrl(item.url, 'gallery');
+          }
+        }
+      }
+    }
+
     return result;
   } catch (error) {
     console.error('[Sanity] Error fetching Dembi Dollo page data:', error);
