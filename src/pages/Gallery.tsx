@@ -1,67 +1,31 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import HeroSlideshow from '@/components/HeroSlideshow';
+import { useState, useEffect } from 'react';
+import { X, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
+import PageHero from '@/components/PageHero';
+import Reveal from '@/components/Reveal';
+import { DoodleStar } from '@/components/decor';
 import { galleryPageData as mockGalleryPageData, galleryImagesData as mockGalleryImages } from '@/data/mockData';
 import { useSanityData, useSanityArrayData } from '@/hooks/useSanityData';
 import { fetchGalleryPageData, fetchGalleryImages } from '@/services/sanity';
 import type { GalleryImage } from '@/types';
 
-// Animation hook
-function useIntersectionObserver(options = {}) {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+const CATEGORIES = [
+  { id: 'all', label: 'All', emoji: '✨' },
+  { id: 'campus', label: 'Campus', emoji: '🏫' },
+  { id: 'events', label: 'Events', emoji: '🎉' },
+  { id: 'classroom', label: 'Classroom', emoji: '📚' },
+  { id: 'sports', label: 'Sports', emoji: '⚽' },
+  { id: 'arts', label: 'Arts', emoji: '🎨' },
+  { id: 'science', label: 'Science', emoji: '🔬' },
+  { id: 'other', label: 'Other', emoji: '📌' },
+];
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsIntersecting(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.1, ...options });
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, [options]);
-
-  return { ref, isIntersecting };
-}
-
-// Animated Section Component
-function AnimatedSection({
-  children,
-  className = '',
-  delay = 0
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const { ref, isIntersecting } = useIntersectionObserver();
-
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ${className} ${isIntersecting
-        ? 'opacity-100 translate-y-0'
-        : 'opacity-0 translate-y-8'
-        }`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// Lightbox Component
+// ── LIGHTBOX ─────────────────────────────────────────────────────────────────
 function Lightbox({
   images,
   currentIndex,
   onClose,
   onNext,
-  onPrev
+  onPrev,
 }: {
   images: GalleryImage[];
   currentIndex: number;
@@ -75,10 +39,8 @@ function Lightbox({
       if (e.key === 'ArrowRight') onNext();
       if (e.key === 'ArrowLeft') onPrev();
     };
-
     document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
-
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
@@ -88,187 +50,176 @@ function Lightbox({
   const currentImage = images[currentIndex];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
-      {/* Close Button */}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-ink/95" onClick={onClose}>
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+        aria-label="Close"
+        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25"
       >
-        <X size={24} />
+        <X size={22} />
       </button>
 
-      {/* Navigation */}
       {images.length > 1 && (
         <>
           <button
-            onClick={onPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+            onClick={e => { e.stopPropagation(); onPrev(); }}
+            aria-label="Previous image"
+            className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 md:left-5"
           >
             <ChevronLeft size={24} />
           </button>
           <button
-            onClick={onNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+            onClick={e => { e.stopPropagation(); onNext(); }}
+            aria-label="Next image"
+            className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 md:right-5"
           >
             <ChevronRight size={24} />
           </button>
         </>
       )}
 
-      {/* Image */}
-      <div className="max-w-5xl max-h-[80vh] px-4">
+      <figure className="max-h-[88vh] max-w-5xl px-4" onClick={e => e.stopPropagation()}>
         <img
           src={currentImage.image}
           alt={currentImage.caption || 'Gallery image'}
-          className="max-w-full max-h-[80vh] object-contain rounded-lg"
+          className="max-h-[76vh] max-w-full rounded-2xl object-contain"
         />
-        {currentImage.caption && (
-          <p className="text-white text-center mt-4 text-lg">
-            {currentImage.caption}
+        <figcaption className="mt-4 text-center">
+          {currentImage.caption && <p className="font-hand text-2xl text-white">{currentImage.caption}</p>}
+          <p className="mt-1 text-sm text-white/50">
+            {currentIndex + 1} / {images.length}
           </p>
-        )}
-        <p className="text-white/60 text-center mt-2 text-sm">
-          {currentIndex + 1} / {images.length}
-        </p>
-      </div>
+        </figcaption>
+      </figure>
     </div>
   );
 }
 
-// Main Gallery Page
+// ── PAGE ─────────────────────────────────────────────────────────────────────
 export default function Gallery() {
-  const galleryFetcher = useCallback(
-    () => fetchGalleryPageData(),
-    []
-  );
-  const { data: galleryPage } = useSanityData(galleryFetcher, mockGalleryPageData);
+  const { data: galleryPage } = useSanityData(fetchGalleryPageData, mockGalleryPageData);
   const { data: galleryImages } = useSanityArrayData(fetchGalleryImages, mockGalleryImages);
 
+  const perPage = galleryPage?.settings?.imagesPerPage || 12;
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [visibleCount, setVisibleCount] = useState(galleryPage?.settings?.imagesPerPage || 12);
+  const [visibleCount, setVisibleCount] = useState(perPage);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const categories = ['all', 'campus', 'events', 'classroom', 'sports', 'arts', 'science', 'other'];
-
-  const filteredImages = selectedCategory === 'all'
-    ? galleryImages
-    : galleryImages.filter(img => img.category === selectedCategory);
+  const filteredImages =
+    selectedCategory === 'all'
+      ? galleryImages
+      : galleryImages.filter(img => img.category === selectedCategory);
 
   const visibleImages = filteredImages.slice(0, visibleCount);
 
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index);
-  };
-
-  const closeLightbox = () => {
-    setLightboxIndex(null);
-  };
-
-  const goToNext = () => {
-    if (lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex + 1) % filteredImages.length);
-    }
-  };
-
-  const goToPrev = () => {
-    if (lightboxIndex !== null) {
-      setLightboxIndex(lightboxIndex === 0 ? filteredImages.length - 1 : lightboxIndex - 1);
-    }
-  };
-
   return (
     <div className="min-h-screen">
-      <HeroSlideshow
-        images={galleryPage?.hero?.images}
-        title={galleryPage?.hero?.title}
+      <PageHero
+        title={galleryPage?.hero?.title || 'School Gallery'}
         subtitle={galleryPage?.hero?.subtitle}
-        overlayColor={galleryPage?.hero?.overlayColor}
+        images={galleryPage?.hero?.images}
+        accent="sky"
       />
 
-      {/* Gallery Content */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Category Filter */}
+      <section className="relative bg-paper py-12 md:py-16">
+        <DoodleStar className="absolute right-[6%] top-6 hidden h-7 w-7 text-sun-deep/60 animate-float md:block" />
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          {/* Category filters */}
           {galleryPage?.settings?.showCategories && (
-            <AnimatedSection className="mb-10">
-              <div className="flex flex-wrap justify-center gap-2">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => {
-                      setSelectedCategory(category);
-                      setVisibleCount(galleryPage?.settings?.imagesPerPage || 12);
-                    }}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-all ${selectedCategory === category
-                      ? 'bg-school-brand text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            <Reveal className="mb-10">
+              <div className="flex flex-wrap justify-center gap-2 md:gap-2.5">
+                {CATEGORIES.map(category => {
+                  const active = selectedCategory === category.id;
+                  return (
+                    <button
+                      key={category.id}
+                      onClick={() => {
+                        setSelectedCategory(category.id);
+                        setVisibleCount(perPage);
+                      }}
+                      className={`inline-flex items-center gap-1.5 rounded-full border-2 px-4 py-2 font-display text-sm font-bold transition-all ${
+                        active
+                          ? 'border-ink bg-brand text-white shadow-sticker-xs'
+                          : 'border-ink/10 bg-white text-ink/60 hover:border-ink/30 hover:bg-cream hover:text-brand'
                       }`}
-                  >
-                    {category}
-                  </button>
-                ))}
+                    >
+                      <span aria-hidden="true">{category.emoji}</span>
+                      {category.label}
+                    </button>
+                  );
+                })}
               </div>
-            </AnimatedSection>
+            </Reveal>
           )}
 
-          {/* Image Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {/* Masonry grid */}
+          <div className="columns-2 gap-4 md:columns-3 lg:columns-4 [&>*]:mb-4">
             {visibleImages.map((image, index) => (
-              <AnimatedSection key={image.id} delay={index * 50}>
-                <div
-                  onClick={() => openLightbox(index)}
-                  className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md card-hover"
+              <Reveal key={image.id} delay={(index % 4) * 60} className="break-inside-avoid">
+                <button
+                  type="button"
+                  onClick={() => setLightboxIndex(index)}
+                  className="group relative block w-full overflow-hidden rounded-2xl border-2 border-ink/10 bg-white p-1.5 transition-all hover:-translate-y-1 hover:shadow-soft"
+                  aria-label={image.caption || 'View image'}
                 >
-                  <img
-                    src={image.image}
-                    alt={image.caption || 'Gallery image'}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="block overflow-hidden rounded-xl bg-cream">
+                    <img
+                      src={image.image}
+                      alt={image.caption || 'Gallery image'}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </span>
+                  <span className="pointer-events-none absolute inset-1.5 rounded-xl bg-gradient-to-t from-ink/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   {image.caption && (
-                    <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                      <p className="text-white text-sm font-medium">{image.caption}</p>
-                    </div>
-                  )}
-                  <div className="absolute top-2 right-2">
-                    <span className="px-2 py-1 bg-white/90 text-school-brand text-xs font-semibold rounded-full capitalize">
-                      {image.category}
+                    <span className="pointer-events-none absolute inset-x-4 bottom-3.5 translate-y-2 text-left font-hand text-lg leading-tight text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      {image.caption}
                     </span>
-                  </div>
-                </div>
-              </AnimatedSection>
+                  )}
+                  <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-bold capitalize text-brand opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    {image.category}
+                  </span>
+                </button>
+              </Reveal>
             ))}
           </div>
 
-          {/* Load More Button */}
+          {/* Load more */}
           {visibleCount < filteredImages.length && (
-            <AnimatedSection className="text-center mt-10">
+            <div className="mt-12 text-center">
               <button
-                onClick={() => setVisibleCount(prev => prev + (galleryPage?.settings?.imagesPerPage || 12))}
-                className="px-8 py-3 bg-school-brand text-white rounded-full font-semibold hover:bg-school-dark-blue transition-colors"
+                onClick={() => setVisibleCount(c => c + perPage)}
+                className="btn-press inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-sun px-8 py-3.5 font-display font-bold text-ink shadow-sticker"
               >
-                {galleryPage?.settings?.loadMoreText || 'Load More'}
+                {galleryPage?.settings?.loadMoreText || 'Load More Photos'}
               </button>
-            </AnimatedSection>
+              <p className="mt-3 text-xs font-semibold text-ink/40">
+                Showing {visibleImages.length} of {filteredImages.length} photos
+              </p>
+            </div>
           )}
 
-          {/* Empty State */}
+          {/* Empty state */}
           {visibleImages.length === 0 && (
-            <AnimatedSection className="text-center py-16">
-              <p className="text-gray-500 text-lg">No images found in this category.</p>
-            </AnimatedSection>
+            <Reveal className="py-16 text-center">
+              <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl border-2 border-ink/10 bg-cream text-ink/30">
+                <ImageOff size={28} />
+              </span>
+              <p className="font-display text-lg font-bold text-ink/50">No photos in this category yet.</p>
+              <p className="mt-1 font-hand text-xl text-coral-deep">Check back soon!</p>
+            </Reveal>
           )}
         </div>
       </section>
 
-      {/* Lightbox */}
       {lightboxIndex !== null && (
         <Lightbox
           images={filteredImages}
           currentIndex={lightboxIndex}
-          onClose={closeLightbox}
-          onNext={goToNext}
-          onPrev={goToPrev}
+          onClose={() => setLightboxIndex(null)}
+          onNext={() => setLightboxIndex(i => (i! + 1) % filteredImages.length)}
+          onPrev={() => setLightboxIndex(i => (i! === 0 ? filteredImages.length - 1 : i! - 1))}
         />
       )}
     </div>

@@ -1,15 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import HeroSlideshow from '@/components/HeroSlideshow';
+import { MapPin, ChevronLeft, ChevronRight, ChevronDown, X, Check, ArrowRight, Camera } from 'lucide-react';
+import PageHero from '@/components/PageHero';
+import Reveal from '@/components/Reveal';
+import SectionHeading from '@/components/SectionHeading';
 import DynamicIcon from '@/components/DynamicIcon';
+import { Polaroid, Tape, Scallop, DoodleStar, DoodleSun, DoodleSwirl } from '@/components/decor';
 import {
   aboutPageData,
   statsData,
   facilitiesData,
   academicLevelsData,
   servicesData,
-  branchesData
+  branchesData,
 } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
 import {
@@ -18,131 +21,25 @@ import {
   fetchFacilities,
   fetchAcademicLevels,
   fetchServices,
-  fetchBranches
+  fetchBranches,
 } from '@/services/sanity';
-import { useCallback } from 'react';
+import type { AcademicLevel, Facility } from '@/types';
 
-// Animation hook with reduced frequency
-function useIntersectionObserver(options = {}) {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+const NO_IMAGE =
+  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23fbf3e4" width="400" height="300"/%3E%3Ctext fill="%23b9b09c" font-family="sans-serif" font-size="18" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3EPhoto coming soon%3C/text%3E%3C/svg%3E';
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsIntersecting(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.15, ...options });
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, [options]);
-
-  return { ref, isIntersecting };
-}
-
-// Animated Section Component
-function AnimatedSection({
-  children,
-  className = '',
-  delay = 0
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const { ref, isIntersecting } = useIntersectionObserver();
-
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${className} ${isIntersecting
-        ? 'opacity-100 translate-y-0'
-        : 'opacity-0 translate-y-10'
-        }`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// Stats Section
-function StatsSection() {
-  const fetcher = useCallback(() => fetchStats(), []);
-  const { data: stats } = useSanityData(fetcher, statsData);
-  const [counters, setCounters] = useState<number[]>([]);
-  const { ref, isIntersecting } = useIntersectionObserver();
-
-  useEffect(() => {
-    if (!isIntersecting || stats.length === 0) return;
-
-    const duration = 2000;
-    const steps = 60;
-    const interval = duration / steps;
-
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-
-      setCounters(stats.map(stat => Math.floor(stat.value * easeOut)));
-
-      if (step >= steps) {
-        clearInterval(timer);
-        setCounters(stats.map(stat => stat.value));
-      }
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [isIntersecting, stats]);
-
-  if (stats.length === 0) return null;
-
-  return (
-    <div ref={ref} className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-          {stats.map((stat, index) => (
-            <div key={stat.id} className="text-center">
-              <div className="font-display text-4xl md:text-5xl font-bold text-school-brand mb-2">
-                {counters[index] !== undefined ? counters[index] : stat.value}
-                <span className="text-school-yellow">{stat.suffix}</span>
-              </div>
-              <div className="text-gray-500 text-sm uppercase tracking-wider">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Intro Section
+// ── INTRO ────────────────────────────────────────────────────────────────────
 function IntroSection({ intro }: { intro: typeof aboutPageData.intro }) {
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <AnimatedSection>
-          <span className="inline-block px-4 py-1 bg-school-brand/10 text-school-brand text-sm font-bold rounded-full mb-4">
-            ABOUT US
-          </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-8">
-            {intro?.title || ''}
-          </h2>
-        </AnimatedSection>
-        <div className="space-y-4">
+    <section className="relative bg-paper py-16 md:py-20">
+      <DoodleSwirl className="absolute left-6 top-10 hidden h-10 w-20 text-coral/30 md:block" />
+      <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+        <SectionHeading eyebrow="Our story" title={intro?.title || 'About Us'} accent="coral" />
+        <div className="mt-8 space-y-5">
           {intro?.content?.map((paragraph, index) => (
-            <AnimatedSection key={index} delay={150 + index * 150}>
-              <p className="text-gray-600 leading-relaxed">{paragraph}</p>
-            </AnimatedSection>
+            <Reveal key={index} delay={120 + index * 120}>
+              <p className="leading-relaxed text-ink/70 md:text-lg">{paragraph}</p>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -150,9 +47,179 @@ function IntroSection({ intro }: { intro: typeof aboutPageData.intro }) {
   );
 }
 
-// Academics Section - Moved above Facilities with Image Slider
+// ── STATS ────────────────────────────────────────────────────────────────────
+const STAT_STYLES = [
+  'bg-sun rotate-[-1.5deg]',
+  'bg-white rotate-[1deg]',
+  'bg-coral rotate-[-1deg] text-white',
+  'bg-white rotate-[1.5deg]',
+];
+
+function StatsSection() {
+  const fetcher = useCallback(() => fetchStats(), []);
+  const { data: stats } = useSanityData(fetcher, statsData);
+  const [counters, setCounters] = useState<number[]>([]);
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started || stats.length === 0) return;
+    const duration = 1800;
+    const steps = 50;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const eased = 1 - Math.pow(1 - step / steps, 3);
+      setCounters(stats.map(s => Math.floor(s.value * eased)));
+      if (step >= steps) {
+        clearInterval(timer);
+        setCounters(stats.map(s => s.value));
+      }
+    }, duration / steps);
+    return () => clearInterval(timer);
+  }, [started, stats]);
+
+  if (stats.length === 0) return null;
+
+  return (
+    <div ref={ref} className="bg-paper pb-16 md:pb-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {stats.map((stat, index) => (
+            <Reveal key={stat.id} delay={index * 100} variant="pop">
+              <div
+                className={`h-full rounded-3xl border-2 border-ink p-5 text-center shadow-sticker-sm transition-transform hover:rotate-0 md:p-7 ${
+                  STAT_STYLES[index % 4]
+                }`}
+              >
+                <p className="font-display text-3xl font-bold md:text-5xl">
+                  {counters[index] !== undefined ? counters[index] : stat.value}
+                  <span className={index % 4 === 2 ? 'text-sun' : 'text-coral-deep'}>{stat.suffix}</span>
+                </p>
+                <p
+                  className={`mt-1.5 text-[11px] font-bold uppercase tracking-widest md:text-xs ${
+                    index % 4 === 2 ? 'text-white/80' : 'text-ink/50'
+                  }`}
+                >
+                  {stat.label}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── ACADEMICS / LEARNING PATHWAYS ────────────────────────────────────────────
+function PathwayContent({ level }: { level: AcademicLevel }) {
+  const allImages =
+    level.gallery?.length > 0 ? level.gallery : level.mainImage ? [level.mainImage] : [];
+
+  return (
+    <div
+      id="active-pathway-content"
+      className="scroll-mt-28 rounded-[2rem] border-2 border-ink/10 bg-white p-6 shadow-soft md:p-10"
+    >
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
+        {/* Description & director */}
+        <div className="space-y-7">
+          <div className="flex items-center gap-3">
+            <span className="h-9 w-2 rounded-full bg-sun" />
+            <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">
+              {level.level} Overview
+            </h3>
+          </div>
+          {level.extendedDescription && (
+            <p className="leading-relaxed text-ink/70 md:text-lg">{level.extendedDescription}</p>
+          )}
+
+          {level.director && (
+            <div className="relative rounded-2xl border-2 border-ink/10 bg-cream p-5 md:p-6">
+              <Tape color="bg-coral/60" className="h-5 w-16" />
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-coral-deep">
+                {level.director.role}
+              </p>
+              <div className="flex items-start gap-4">
+                {level.director.image && (
+                  <img
+                    src={level.director.image}
+                    alt={level.director.name}
+                    className="h-16 w-16 rounded-2xl border-2 border-ink/10 bg-white object-cover"
+                    loading="lazy"
+                  />
+                )}
+                <div>
+                  <p className="font-display text-lg font-bold text-brand">{level.director.name}</p>
+                  {level.director.message && (
+                    <p className="mt-1.5 font-hand text-xl leading-snug text-ink/60">
+                      “{level.director.message}”
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {level.features?.length > 0 && (
+            <div className="flex flex-wrap gap-2.5">
+              {level.features.map((feature, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-2 rounded-full border-2 border-ink/10 bg-paper px-4 py-1.5 text-sm font-semibold text-ink/75"
+                >
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-leaf/15 p-0.5 text-leaf">
+                    <Check size={13} strokeWidth={3.5} />
+                  </span>
+                  {feature}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Photo grid */}
+        <div>
+          <h4 className="mb-4 font-hand text-2xl text-coral-deep md:text-3xl">Life in {level.level} ✨</h4>
+          <div className="grid auto-rows-[110px] grid-cols-2 gap-3 md:auto-rows-[130px] md:gap-4">
+            {allImages.slice(0, 5).map((img, i) => (
+              <div key={i} className="img-zoom overflow-hidden rounded-2xl border-2 border-ink/10 bg-cream">
+                <img src={img} alt={`${level.level} photo ${i + 1}`} className="h-full w-full object-cover" loading="lazy" />
+              </div>
+            ))}
+            <Link
+              to="/gallery"
+              className="btn-press flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-ink bg-brand text-white shadow-sticker-sm"
+            >
+              <Camera size={22} />
+              <span className="font-display text-lg font-bold leading-none">Explore</span>
+              <span className="text-xs text-white/70">See full gallery</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AcademicsSection() {
-  const academicsRef = useRef<HTMLDivElement>(null);
   const fetcher = useCallback(() => fetchAcademicLevels(), []);
   const { data: academicLevels } = useSanityData(fetcher, academicLevelsData);
   const [activeLevel, setActiveLevel] = useState<string>(academicLevels[0]?.id || '');
@@ -163,256 +230,143 @@ function AcademicsSection() {
     }
   }, [academicLevels, activeLevel]);
 
-  // Scroll to expanded content when active level changes
   const handleLevelClick = (id: string) => {
     setActiveLevel(id);
-
-    // Use a small timeout to allow React to render the expanded view and transitions to start
     setTimeout(() => {
       const element = document.getElementById('active-pathway-content');
       if (element) {
-        const offset = 100; // Account for fixed header
-        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-        window.scrollTo({
-          top: elementPosition - offset,
-          behavior: 'smooth'
-        });
+        const top = element.getBoundingClientRect().top + window.pageYOffset - 110;
+        window.scrollTo({ top, behavior: 'smooth' });
       }
-    }, 100);
+    }, 120);
   };
 
   if (!academicLevels || academicLevels.length === 0) return null;
 
   const activeData = academicLevels.find(l => l.id === activeLevel) || academicLevels[0];
 
-  const renderActiveContent = () => {
-    if (!activeData) return null;
-    return (
-      <div id="active-pathway-content" className="bg-white rounded-[2rem] shadow-sm p-6 md:p-10 border border-gray-100 scroll-mt-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-
-          {/* Left: Description & Director */}
-          <AnimatedSection delay={200}>
-            <div className="space-y-8">
-              <div className="flex items-center gap-4">
-                <div className="w-1.5 h-8 bg-school-yellow rounded-full"></div>
-                <h3 className="font-display text-3xl font-bold text-school-brand">
-                  {activeData.level} Overview
-                </h3>
-              </div>
-              <p className="text-gray-600 leading-relaxed text-lg">{activeData.extendedDescription}</p>
-
-              {activeData.director && (
-                <div className="bg-[#f4f7fb] rounded-2xl p-6">
-                  <p className="text-[10px] font-bold text-school-pink uppercase tracking-widest mb-3">{activeData.director.role}</p>
-                  <div className="flex items-start gap-4">
-                    {activeData.director.image && (
-                      <img
-                        src={activeData.director.image}
-                        alt={activeData.director.name}
-                        className="w-16 h-16 rounded-full object-cover shadow-sm bg-white"
-                        loading="lazy"
-                      />
-                    )}
-                    <div>
-                      <p className="font-bold text-school-brand text-lg">{activeData.director.name}</p>
-                      {activeData.director.message && (
-                        <p className="text-sm text-gray-500 mt-2 italic flex">
-                          <span className="text-2xl leading-none text-gray-300 mr-1 opacity-50 font-serif">"</span>
-                          {activeData.director.message}
-                          <span className="text-2xl leading-none text-gray-300 ml-1 opacity-50 font-serif">"</span>
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <div className="flex flex-wrap gap-3">
-                  {activeData.features.map((feature: string, idx: number) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-sm text-gray-700 border border-gray-200"
-                    >
-                      <div className="w-4 h-4 rounded-full border border-school-brand flex items-center justify-center">
-                        <svg className="w-2.5 h-2.5 text-school-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      {feature}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
-
-          {/* Right: Uniform Bento Gallery */}
-          <AnimatedSection delay={300}>
-            <div className="space-y-4">
-              <h4 className="font-display font-bold text-school-brand text-xl lg:hidden mb-4">Life in {activeData.level}</h4>
-              <h4 className="font-display font-bold text-school-brand text-xl hidden lg:block mb-6">Life in {activeData.level}</h4>
-
-              {(() => {
-                const allImages = activeData.gallery?.length > 0
-                  ? activeData.gallery
-                  : activeData.mainImage ? [activeData.mainImage] : [];
-
-                if (allImages.length === 0) return null;
-
-                return (
-                  <div className="grid grid-cols-2 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[140px]">
-                    {/* Map up to 5 images into standard 1x1 grid slots */}
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className={`rounded-2xl overflow-hidden shadow-sm bg-gray-100 ${!allImages[i] ? 'hidden md:block opacity-50' : ''}`}
-                      >
-                        {allImages[i] ? (
-                          <img src={allImages[i]} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-300">
-                            <span className="text-4xl text-gray-200 tracking-widest leading-none">...</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-
-                    {/* 6th Slot: Explore tile */}
-                    <Link
-                      to="/gallery"
-                      className="rounded-2xl bg-[#2d3a77] flex flex-col items-center justify-center text-white hover:bg-school-brand transition-colors shadow-sm"
-                    >
-                      <span className="font-display font-bold text-xl mb-1">Explore</span>
-                      <span className="text-white/80 text-sm">See full gallery</span>
-                    </Link>
-                  </div>
-                );
-              })()}
-            </div>
-          </AnimatedSection>
-
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <section ref={academicsRef} className="py-16 md:py-24 bg-gray-50 scroll-mt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection className="text-center mb-12">
-          <span className="inline-block px-4 py-1 bg-school-pink/20 text-school-pink text-sm font-bold rounded-full mb-4">
-            ACADEMICS
-          </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-2">
-            Learning Pathways
-          </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto">
-            Click on each level to explore our curriculum, meet the directors, and see our students in action.
-          </p>
-        </AnimatedSection>
+    <section className="relative overflow-hidden bg-cream py-16 md:py-24">
+      <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />
+      <DoodleSun className="absolute -right-8 top-10 h-24 w-24 text-sun/50 animate-spin-slow" />
 
-        {/* Level Cards */}
-        <AnimatedSection delay={150} className="mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {academicLevels.map((level) => {
-              const isActive = activeLevel === level.id;
-              return (
-                <div key={level.id} className="relative flex flex-col">
-                  {/* Card Header */}
-                  <div
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow="Academics"
+          title="Learning Pathways"
+          subtitle="Tap a level to explore the curriculum, meet the directors, and see our students in action."
+          accent="coral"
+          className="mb-10 md:mb-14"
+        />
+
+        {/* Level cards */}
+        <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {academicLevels.map((level, idx) => {
+            const isActive = activeLevel === level.id;
+            return (
+              <div key={level.id} className="flex flex-col">
+                <Reveal delay={idx * 100} className="h-full">
+                  <button
+                    type="button"
                     onClick={() => handleLevelClick(level.id)}
-                    className={`relative cursor-pointer rounded-2xl overflow-hidden bg-white shadow-sm transition-all duration-300 transform md:hover:-translate-y-1 ${isActive ? 'ring-2 ring-school-yellow ring-offset-2' : 'border border-gray-100 hover:shadow-md'
-                      }`}
+                    aria-expanded={isActive}
+                    className={`group relative block h-full w-full rounded-3xl border-2 bg-white p-3 pb-5 text-center transition-all duration-300 ${
+                      isActive
+                        ? 'border-ink shadow-sticker-sun md:-translate-y-1.5'
+                        : 'border-ink/10 shadow-sm hover:-translate-y-1 hover:shadow-soft'
+                    }`}
                   >
-                    {/* Top Image */}
-                    <div className="h-48 w-full overflow-hidden">
-                      <img
-                        src={level.mainImage || 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=800&q=80'}
-                        alt={level.level}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                      />
-                    </div>
+                    <span className="img-zoom block overflow-hidden rounded-2xl">
+                      <span className="block aspect-[16/10]">
+                        <img
+                          src={level.mainImage || NO_IMAGE}
+                          alt={level.level}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      </span>
+                    </span>
+                    <span className="mt-4 block font-display text-xl font-bold text-brand">{level.level}</span>
+                    <span className="mt-1 block px-3 text-sm leading-snug text-ink/55">{level.description}</span>
+                    <span
+                      className={`absolute -bottom-3.5 left-1/2 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border-2 border-ink text-ink transition-all duration-300 ${
+                        isActive ? 'rotate-180 bg-sun opacity-100' : 'bg-white opacity-0 group-hover:opacity-100'
+                      }`}
+                    >
+                      <ChevronDown size={17} strokeWidth={3} />
+                    </span>
+                  </button>
+                </Reveal>
 
-                    {/* Chevron over edge for active state */}
-                    {isActive && (
-                      <div className="absolute left-1/2 -ml-4 top-44 w-8 h-8 bg-school-yellow rounded-full flex items-center justify-center text-white shadow-md z-10 transition-transform">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                      </div>
-                    )}
-
-                    {/* Bottom Content */}
-                    <div className="p-6 text-center">
-                      <h3 className="font-display font-bold text-xl text-school-brand mb-2">{level.level}</h3>
-                      <p className="text-gray-500 text-sm line-clamp-2">{level.description}</p>
-                    </div>
-                  </div>
-
-                  {/* Mobile expanded view injected right under the card */}
-                  <div className={`md:hidden transition-all duration-500 ease-in-out overflow-hidden ${isActive ? 'max-h-[3000px] opacity-100 mt-6 mb-8' : 'max-h-0 opacity-0'}`}>
-                    {isActive && renderActiveContent()}
-                  </div>
+                {/* Mobile: expand right under the tapped card */}
+                <div
+                  className={`md:hidden ${isActive ? 'mt-7 animate-fade-in-up' : 'hidden'}`}
+                >
+                  {isActive && <PathwayContent level={activeData} />}
                 </div>
-              );
-            })}
-          </div>
-        </AnimatedSection>
-
-        {/* Desktop Active Level Content container (hidden on mobile) */}
-        <div className="hidden md:block max-w-6xl mx-auto">
-          {renderActiveContent()}
+              </div>
+            );
+          })}
         </div>
 
+        {/* Desktop: expanded panel below the cards */}
+        <div className="hidden md:block">
+          <Reveal key={activeData.id} variant="fade">
+            <PathwayContent level={activeData} />
+          </Reveal>
+        </div>
       </div>
     </section>
   );
 }
 
-// Facility Gallery Modal
-function FacilityGalleryModal({
-  facility,
-  onClose
-}: {
-  facility: any;
-  onClose: () => void;
-}) {
+// ── FACILITIES ───────────────────────────────────────────────────────────────
+function FacilityGalleryModal({ facility, onClose }: { facility: Facility; onClose: () => void }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const allImages = [facility.mainImage, ...facility.gallery].filter(Boolean);
+  const allImages = [facility.mainImage, ...(facility.gallery || [])].filter(Boolean) as string[];
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight') setCurrentIndex(i => (i + 1) % allImages.length);
+      if (e.key === 'ArrowLeft') setCurrentIndex(i => (i - 1 + allImages.length) % allImages.length);
+    };
+    document.addEventListener('keydown', handler);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handler);
+    };
+  }, [onClose, allImages.length]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-ink/95 p-4" onClick={onClose}>
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+        aria-label="Close"
+        className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25"
       >
-        <X size={24} />
+        <X size={22} />
       </button>
 
-      <div className="max-w-4xl w-full">
-        <div className="relative aspect-video rounded-xl overflow-hidden">
-          <img
-            src={allImages[currentIndex]}
-            alt={facility.title}
-            className="w-full h-full object-cover"
-          />
-
+      <div className="w-full max-w-4xl" onClick={e => e.stopPropagation()}>
+        <div className="relative overflow-hidden rounded-3xl border-2 border-white/15">
+          <div className="aspect-video bg-ink">
+            <img src={allImages[currentIndex]} alt={facility.title} className="h-full w-full object-cover" />
+          </div>
           {allImages.length > 1 && (
             <>
               <button
-                onClick={() => setCurrentIndex((prev) => (prev - 1 + allImages.length) % allImages.length)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center text-school-brand hover:bg-white transition-colors"
+                onClick={() => setCurrentIndex(i => (i - 1 + allImages.length) % allImages.length)}
+                aria-label="Previous photo"
+                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink transition-colors hover:bg-sun"
               >
                 <ChevronLeft size={20} />
               </button>
               <button
-                onClick={() => setCurrentIndex((prev) => (prev + 1) % allImages.length)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center text-school-brand hover:bg-white transition-colors"
+                onClick={() => setCurrentIndex(i => (i + 1) % allImages.length)}
+                aria-label="Next photo"
+                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink transition-colors hover:bg-sun"
               >
                 <ChevronRight size={20} />
               </button>
@@ -421,22 +375,25 @@ function FacilityGalleryModal({
         </div>
 
         <div className="mt-4 text-center">
-          <h3 className="text-white font-bold text-xl">{facility.title}</h3>
-          <p className="text-white/70 mt-1">{facility.description}</p>
-          <p className="text-white/50 text-sm mt-2">{currentIndex + 1} / {allImages.length}</p>
+          <h3 className="font-display text-xl font-bold text-white">{facility.title}</h3>
+          <p className="mt-1 text-sm text-white/60">{facility.description}</p>
+          <p className="mt-1.5 text-xs text-white/40">
+            {currentIndex + 1} / {allImages.length}
+          </p>
         </div>
 
-        {/* Thumbnails */}
         {allImages.length > 1 && (
-          <div className="flex justify-center gap-2 mt-4">
+          <div className="mt-4 flex justify-center gap-2 overflow-x-auto pb-1">
             {allImages.map((img, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
-                className={`w-16 h-12 rounded-lg overflow-hidden border-2 transition-all ${idx === currentIndex ? 'border-school-yellow' : 'border-transparent opacity-60'
-                  }`}
+                aria-label={`Photo ${idx + 1}`}
+                className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                  idx === currentIndex ? 'border-sun' : 'border-transparent opacity-50 hover:opacity-80'
+                }`}
               >
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                <img src={img} alt="" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>
@@ -446,79 +403,74 @@ function FacilityGalleryModal({
   );
 }
 
-// Facilities Section - Now with expandable gallery
 function FacilitiesSection() {
   const fetcher = useCallback(() => fetchFacilities(), []);
   const { data: facilities } = useSanityData(fetcher, facilitiesData);
-  const [selectedFacility, setSelectedFacility] = useState<any | null>(null);
+  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
 
   if (!facilities || facilities.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection className="text-center mb-12">
-          <span className="inline-block px-4 py-1 bg-school-yellow/20 text-school-brand text-sm font-bold rounded-full mb-4">
-            CAMPUS INFRASTRUCTURE
-          </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-2">
-            World-Class Facilities
-          </h2>
-          <p className="text-gray-500">Click any facility to view more photos.</p>
-        </AnimatedSection>
+    <section className="bg-paper py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow="Campus infrastructure"
+          title="World-Class Facilities"
+          subtitle="Tap any facility to flip through more photos."
+          accent="sun"
+          className="mb-10 md:mb-14"
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {facilities.map((facility, index) => (
-            <AnimatedSection
+            <Reveal
               key={facility.id}
-              delay={index * 100}
-              className={facility.colSpan === 2 ? 'md:col-span-2' : ''}
+              delay={(index % 3) * 100}
+              className={facility.colSpan === 2 ? 'sm:col-span-2' : ''}
             >
-              <div
+              <button
+                type="button"
                 onClick={() => setSelectedFacility(facility)}
-                className="group relative rounded-2xl overflow-hidden shadow-lg card-hover cursor-pointer"
+                className="card-hover group relative block w-full overflow-hidden rounded-3xl border-2 border-ink/10 text-left"
               >
-                <div className={`${facility.colSpan === 2 ? 'aspect-[2/1]' : 'aspect-square'}`}>
+                <div className={facility.colSpan === 2 ? 'aspect-[2/1]' : 'aspect-[4/3] sm:aspect-square'}>
                   <img
-                    src={facility.mainImage || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect fill="%23e5e7eb" width="400" height="400"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="20" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E'}
+                    src={facility.mainImage || NO_IMAGE}
                     alt={facility.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DynamicIcon name={facility.icon} size={20} className="text-school-yellow" />
-                    <h3 className="font-display font-bold text-xl text-white">
-                      {facility.title}
-                    </h3>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+                  <div className="mb-1.5 flex items-center gap-2.5">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sun text-ink">
+                      <DynamicIcon name={facility.icon} size={18} />
+                    </span>
+                    <h3 className="font-display text-xl font-bold text-white">{facility.title}</h3>
                   </div>
-                  <p className="text-white/80 text-sm">{facility.description}</p>
+                  <p className="text-sm leading-snug text-white/75">{facility.description}</p>
                   {facility.gallery?.length > 0 && (
-                    <p className="text-school-yellow text-xs mt-2 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 bg-school-yellow rounded-full" />
+                    <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-bold text-sun backdrop-blur-sm">
+                      <Camera size={12} />
                       {facility.gallery.length + 1} photos
                     </p>
                   )}
                 </div>
-              </div>
-            </AnimatedSection>
+              </button>
+            </Reveal>
           ))}
         </div>
       </div>
 
-      {/* Gallery Modal */}
       {selectedFacility && (
-        <FacilityGalleryModal
-          facility={selectedFacility}
-          onClose={() => setSelectedFacility(null)}
-        />
+        <FacilityGalleryModal facility={selectedFacility} onClose={() => setSelectedFacility(null)} />
       )}
     </section>
   );
 }
 
-// Services Section
+// ── SERVICES ─────────────────────────────────────────────────────────────────
 function ServicesSection() {
   const fetcher = useCallback(() => fetchServices(), []);
   const { data: services } = useSanityData(fetcher, servicesData);
@@ -526,40 +478,33 @@ function ServicesSection() {
   if (!services || services.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection className="text-center mb-12">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-2">
-            Beyond the Classroom
-          </h2>
-          <p className="text-gray-500">
-            Integrated technology and holistic support for a thriving student life.
-          </p>
-        </AnimatedSection>
+    <section className="relative overflow-hidden bg-cream py-16 md:py-24">
+      <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />
+      <DoodleStar className="absolute right-[8%] top-12 h-7 w-7 text-coral/60 animate-float" />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow="Student life"
+          title="Beyond the Classroom"
+          subtitle="Integrated technology and holistic support for a thriving student life."
+          accent="sky"
+          className="mb-10 md:mb-14"
+        />
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (
-            <AnimatedSection key={service.id} delay={index * 100}>
-              <div className="bg-white rounded-xl p-6 shadow-md card-hover h-full">
-                <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+            <Reveal key={service.id} delay={(index % 3) * 100}>
+              <div className="card-hover h-full rounded-3xl border-2 border-ink/10 bg-white p-6">
+                <span
+                  className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink/10 text-brand"
                   style={{ backgroundColor: service.iconColor || '#e0e7ff' }}
                 >
-                  <DynamicIcon
-                    name={service.icon}
-                    size={24}
-                    className="text-school-brand"
-                  />
-                </div>
-                <h3
-                  className="font-display font-bold text-lg mb-2"
-                  style={{ color: service.iconColor || '#2d4289' }}
-                >
-                  {service.title}
-                </h3>
-                <p className="text-gray-600 text-sm">{service.description}</p>
+                  <DynamicIcon name={service.icon} size={22} />
+                </span>
+                <h3 className="mb-1.5 font-display text-lg font-bold text-brand">{service.title}</h3>
+                <p className="text-sm leading-relaxed text-ink/60">{service.description}</p>
               </div>
-            </AnimatedSection>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -567,7 +512,7 @@ function ServicesSection() {
   );
 }
 
-// Branches Section
+// ── BRANCHES ─────────────────────────────────────────────────────────────────
 function BranchesSection() {
   const fetcher = useCallback(() => fetchBranches(), []);
   const { data: branches } = useSanityData(fetcher, branchesData);
@@ -575,105 +520,113 @@ function BranchesSection() {
   if (!branches || branches.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection className="text-center mb-12">
-          <span className="inline-block px-4 py-1 bg-school-brand/10 text-school-brand text-sm font-bold rounded-full mb-4">
-            OUR NETWORK
-          </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-2">
-            Expanding Horizons
-          </h2>
-          <p className="text-gray-500">Bringing quality education to more communities.</p>
-        </AnimatedSection>
+    <section className="bg-paper py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow="Our network"
+          title="Expanding Horizons"
+          subtitle="Bringing quality education to more communities."
+          accent="coral"
+          className="mb-12 md:mb-16"
+        />
 
-        <div className="space-y-12">
-          {branches.map((branch, index) => (
-            <AnimatedSection key={branch.id} delay={index * 200}>
-              <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''
-                }`}>
-                <div className={index % 2 === 1 ? 'lg:order-2' : ''}>
-                  <div className="rounded-2xl overflow-hidden shadow-lg">
-                    <img
-                      src={branch.image || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450"%3E%3Crect fill="%23e5e7eb" width="800" height="450"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="24" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E'}
+        <div className="space-y-16 md:space-y-20">
+          {branches.map((branch, index) => {
+            const flipped = index % 2 === 1;
+            return (
+              <Reveal key={branch.id}>
+                <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-14">
+                  <div className={flipped ? 'lg:order-2' : ''}>
+                    <Polaroid
+                      src={branch.image || NO_IMAGE}
                       alt={branch.name}
-                      className="w-full aspect-video object-cover"
+                      imgClassName="aspect-video"
+                      caption={branch.location}
+                      tape
+                      tapeColor={flipped ? 'bg-coral/70' : 'bg-sun/80'}
+                      className={flipped ? 'rotate-[1.25deg]' : 'rotate-[-1.25deg]'}
                     />
                   </div>
-                </div>
-                <div className={index % 2 === 1 ? 'lg:order-1' : ''}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <MapPin size={18} className="text-school-yellow" />
-                    <span className="text-school-pink font-bold text-sm uppercase tracking-wider">
+                  <div className={flipped ? 'lg:order-1' : ''}>
+                    <p className="mb-2 inline-flex items-center gap-1.5 font-hand text-2xl text-coral-deep">
+                      <MapPin size={18} className="text-sun-deep" />
                       {branch.location}
-                    </span>
-                  </div>
-                  <h3 className="font-display text-2xl font-bold text-school-brand mb-4">
-                    {branch.name}
-                  </h3>
-                  <p className="text-gray-600 mb-6">{branch.description}</p>
-                  <div>
-                    <h4 className="font-bold text-school-brand mb-3">Campus Highlights</h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {branch.features?.map((feature, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-school-yellow rounded-full" />
-                          <span className="text-gray-600 text-sm">{feature}</span>
+                    </p>
+                    <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">{branch.name}</h3>
+                    <p className="mt-4 leading-relaxed text-ink/65">{branch.description}</p>
+                    {branch.features?.length > 0 && (
+                      <div className="mt-6">
+                        <h4 className="mb-3 font-display font-bold text-ink">Campus Highlights</h4>
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                          {branch.features.map((feature, idx) => (
+                            <div key={idx} className="flex items-center gap-2.5">
+                              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-leaf/15 text-leaf">
+                                <Check size={12} strokeWidth={3.5} />
+                              </span>
+                              <span className="text-sm font-semibold text-ink/70">{feature}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            </AnimatedSection>
-          ))}
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-// CTA Section
+// ── CTA ──────────────────────────────────────────────────────────────────────
 function CTASection() {
   return (
-    <section className="py-16 md:py-24 bg-school-brand">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <AnimatedSection>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
-            Join Our Community
-          </h2>
-          <p className="text-white/80 mb-8 max-w-2xl mx-auto">
-            Be part of a legacy that values integrity, innovation, and inclusivity.
-            Discover what makes Makko Billi School the perfect place for your child's future.
-          </p>
-          <button className="px-8 py-3 bg-school-yellow text-school-brand rounded-full font-bold hover:bg-white transition-colors shadow-lg">
-            Apply for Admission
-          </button>
-        </AnimatedSection>
-      </div>
+    <section className="bg-paper px-4 pb-4 sm:px-6">
+      <Reveal variant="pop">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] border-2 border-ink bg-sun shadow-sticker">
+          <div className="absolute inset-0 bg-dots opacity-30" aria-hidden="true" />
+          <DoodleSun className="absolute -right-8 -top-8 h-28 w-28 text-white/50 animate-spin-slow" />
+          <DoodleStar className="absolute bottom-8 left-8 h-7 w-7 text-coral animate-float" />
+
+          <div className="relative mx-auto max-w-2xl px-6 py-14 text-center md:py-16">
+            <p className="mb-1 font-hand text-2xl text-coral-deep md:text-3xl">Ready to join us?</p>
+            <h2 className="font-display text-3xl font-bold text-ink md:text-4xl">Join Our Community</h2>
+            <p className="mx-auto mt-4 max-w-xl leading-relaxed text-ink/70">
+              Be part of a legacy that values integrity, innovation, and inclusivity. Discover what makes
+              Makko Billi School the perfect place for your child's future.
+            </p>
+            <Link
+              to="/contact"
+              className="btn-press mt-8 inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-brand px-7 py-3.5 font-display font-bold text-white shadow-sticker"
+            >
+              Apply for Admission
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+          <Scallop className="relative h-4 text-paper md:h-5" />
+        </div>
+      </Reveal>
     </section>
   );
 }
 
-// Main About Page
+// ── PAGE ─────────────────────────────────────────────────────────────────────
 export default function About() {
-  const aboutFetcher = useCallback(
-    () => fetchAboutPageData(),
-    []
-  );
+  const aboutFetcher = useCallback(() => fetchAboutPageData(), []);
   const { data: pageData } = useSanityData(aboutFetcher, aboutPageData);
 
   return (
     <div className="min-h-screen">
-      <HeroSlideshow
-        images={pageData?.hero?.images}
-        title={pageData?.hero?.title}
+      <PageHero
+        title={pageData?.hero?.title || 'About Us'}
         subtitle={pageData?.hero?.subtitle}
-        overlayColor={pageData?.hero?.overlayColor}
+        images={pageData?.hero?.images}
+        accent="sun"
       />
       {pageData?.intro && <IntroSection intro={pageData.intro} />}
       <StatsSection />
-      {/* Learning Pathways moved above Facilities */}
       <AcademicsSection />
       <FacilitiesSection />
       <ServicesSection />

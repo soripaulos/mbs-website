@@ -48,17 +48,30 @@ module.exports = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // School custom colors
+        // ── Makko Billi design system ──────────────────────────────
+        // Brand colors (kept from the logo / previous site)
         'school-brand': '#2d4289',
         'school-yellow': '#fed250',
         'school-pink': '#f179aa',
         'school-blue': '#3b82f6',
         'school-dark-blue': '#1a1b5e',
+        // New "paper & sticker" palette
+        ink: '#252b4a',
+        brand: '#2d4289',
+        navy: '#1a1b5e',
+        paper: '#fffcf5',
+        cream: '#fbf3e4',
+        sun: '#fed250',
+        'sun-deep': '#f5b91e',
+        coral: '#f179aa',
+        'coral-deep': '#e0497f',
+        leaf: '#37a876',
+        sky: '#6fa8ff',
       },
       fontFamily: {
-        sans: ['Nunito', 'sans-serif'],
-        display: ['Fredoka', 'sans-serif'],
-        hand: ['Patrick Hand', 'cursive'],
+        sans: ['Nunito', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['"Baloo 2"', 'ui-rounded', 'sans-serif'],
+        hand: ['Caveat', 'cursive'],
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",
@@ -66,9 +79,18 @@ module.exports = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
         xs: "calc(var(--radius) - 6px)",
+        blob: "62% 38% 46% 54% / 60% 47% 53% 40%",
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        soft: "0 12px 32px -14px rgba(37, 43, 74, 0.28)",
+        sticker: "6px 6px 0 0 #252b4a",
+        'sticker-sm': "4px 4px 0 0 #252b4a",
+        'sticker-xs': "2.5px 2.5px 0 0 #252b4a",
+        'sticker-sun': "6px 6px 0 0 #fed250",
+        'sticker-coral': "6px 6px 0 0 #f179aa",
+        'sticker-brand': "6px 6px 0 0 #2d4289",
+        'sticker-white': "6px 6px 0 0 #ffffff",
       },
       keyframes: {
         "accordion-down": {
@@ -83,33 +105,47 @@ module.exports = {
           "0%,70%,100%": { opacity: "1" },
           "20%,50%": { opacity: "0" },
         },
-        "blob": {
-          "0%": { transform: "translate(0px, 0px) scale(1)" },
-          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
-          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
-          "100%": { transform: "translate(0px, 0px) scale(1)" },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "float-rotate": {
+          "0%, 100%": { transform: "translateY(0) rotate(-6deg)" },
+          "50%": { transform: "translateY(-12px) rotate(4deg)" },
+        },
+        wiggle: {
+          "0%, 100%": { transform: "rotate(-2.5deg)" },
+          "50%": { transform: "rotate(2.5deg)" },
+        },
+        "pop-in": {
+          "0%": { opacity: "0", transform: "scale(0.85)" },
+          "70%": { transform: "scale(1.04)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
         },
         "fade-in-up": {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "slide-in-left": {
-          "0%": { opacity: "0", transform: "translateX(-30px)" },
-          "100%": { opacity: "1", transform: "translateX(0)" },
-        },
-        "slide-in-right": {
-          "0%": { opacity: "0", transform: "translateX(30px)" },
-          "100%": { opacity: "1", transform: "translateX(0)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
-        "blob": "blob 7s infinite",
+        marquee: "marquee 28s linear infinite",
+        float: "float 6s ease-in-out infinite",
+        "float-rotate": "float-rotate 7s ease-in-out infinite",
+        wiggle: "wiggle 0.4s ease-in-out",
+        "pop-in": "pop-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "spin-slow": "spin-slow 24s linear infinite",
         "fade-in-up": "fade-in-up 0.6s ease-out forwards",
-        "slide-in-left": "slide-in-left 0.6s ease-out forwards",
-        "slide-in-right": "slide-in-right 0.6s ease-out forwards",
       },
     },
   },

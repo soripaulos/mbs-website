@@ -17,7 +17,8 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Instant jump on route change — smooth-scrolling from deep in a page is disorienting
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, [pathname]);
 
   return null;
@@ -50,7 +51,7 @@ function App() {
     <HashRouter>
       <DocumentHead />
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-paper">
         <Navbar />
         <main className="flex-grow">
           <Routes>

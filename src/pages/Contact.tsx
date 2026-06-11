@@ -1,173 +1,127 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Phone, Mail, MapPin, Send } from 'lucide-react';
-import HeroSlideshow from '@/components/HeroSlideshow';
+import { useState } from 'react';
+import { Phone, Mail, MapPin, Send, CheckCircle2 } from 'lucide-react';
+import PageHero from '@/components/PageHero';
+import Reveal from '@/components/Reveal';
+import SectionHeading from '@/components/SectionHeading';
+import { DoodleStar, DoodleSwirl } from '@/components/decor';
 import { contactPageData as mockContactData } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
 import { fetchContactPageData } from '@/services/sanity';
+import type { ContactInfo } from '@/types';
 
-// Animation hook
-function useIntersectionObserver(options = {}) {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+const inputClass =
+  'w-full rounded-xl border-2 border-ink/15 bg-paper px-4 py-3 text-ink placeholder:text-ink/35 outline-none transition-colors focus:border-brand focus:bg-white';
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsIntersecting(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.1, ...options });
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, [options]);
-
-  return { ref, isIntersecting };
-}
-
-// Animated Section Component
-function AnimatedSection({
-  children,
-  className = '',
-  delay = 0
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const { ref, isIntersecting } = useIntersectionObserver();
-
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ${className} ${isIntersecting
-        ? 'opacity-100 translate-y-0'
-        : 'opacity-0 translate-y-8'
-        }`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// Contact Info Cards
-function ContactInfoCards({ contactData }: { contactData: typeof mockContactData }) {
+// ── INFO CARDS ───────────────────────────────────────────────────────────────
+function ContactInfoCards({ contactData }: { contactData: ContactInfo }) {
   const phones = contactData?.phones;
   const emails = contactData?.emails;
   const addresses = contactData?.addresses;
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      {/* Phone Numbers */}
-      <AnimatedSection delay={100}>
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center h-full">
-          <div className="w-14 h-14 bg-school-brand/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Phone size={28} className="text-school-brand" />
-          </div>
-          <h3 className="font-display font-semibold text-lg text-school-brand mb-4">
-            Phone Numbers
-          </h3>
-          <div className="space-y-2">
-            {(phones?.mainPhones || []).map((phone: string, idx: number) => (
+  const cards = [
+    {
+      icon: Phone,
+      title: 'Phone Numbers',
+      chip: 'bg-brand text-white',
+      rotate: 'md:rotate-[-1deg]',
+      content: (
+        <>
+          <div className="space-y-1.5">
+            {(phones?.mainPhones || []).map((phone, idx) => (
               <a
                 key={idx}
                 href={`tel:${phone}`}
-                className="block text-school-pink hover:text-school-brand transition-colors"
+                className="block font-semibold text-brand transition-colors hover:text-coral-deep"
               >
                 {phone}
               </a>
             ))}
           </div>
           {phones?.departmentPhones && phones.departmentPhones.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              {phones.departmentPhones.map((dept: any, idx: number) => (
-                <div key={idx} className="text-sm text-gray-600 mb-1">
-                  <span className="font-medium">{dept.department}:</span>{' '}
-                  <a href={`tel:${dept.phone}`} className="text-school-pink hover:underline">
+            <div className="mt-4 space-y-1.5 border-t-2 border-dashed border-ink/10 pt-4">
+              {phones.departmentPhones.map((dept, idx) => (
+                <p key={idx} className="text-sm text-ink/60">
+                  <span className="font-bold">{dept.department}:</span>{' '}
+                  <a href={`tel:${dept.phone}`} className="font-semibold text-brand hover:text-coral-deep">
                     {dept.phone}
                   </a>
-                </div>
+                </p>
               ))}
             </div>
           )}
+        </>
+      ),
+    },
+    {
+      icon: Mail,
+      title: 'Email',
+      chip: 'bg-sun text-ink',
+      rotate: '',
+      content: (
+        <div className="space-y-3">
+          {(emails || []).map((email, idx) => (
+            <p key={idx} className="text-sm">
+              <span className="block text-xs font-bold uppercase tracking-wide text-ink/40">{email.department}</span>
+              <a
+                href={`mailto:${email.email}`}
+                className="break-all font-semibold text-brand transition-colors hover:text-coral-deep"
+              >
+                {email.email}
+              </a>
+            </p>
+          ))}
         </div>
-      </AnimatedSection>
+      ),
+    },
+    {
+      icon: MapPin,
+      title: 'Address',
+      chip: 'bg-coral text-white',
+      rotate: 'md:rotate-[1deg]',
+      content: (
+        <div className="space-y-3.5">
+          {(addresses || []).map((addr, idx) => (
+            <p key={idx} className="text-sm">
+              <span className="block font-display font-bold text-coral-deep">{addr.name}</span>
+              <span className="block text-ink/65">{addr.address}</span>
+              <span className="block text-ink/45">{addr.city}</span>
+            </p>
+          ))}
+        </div>
+      ),
+    },
+  ];
 
-      {/* Email */}
-      <AnimatedSection delay={200}>
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center h-full">
-          <div className="w-14 h-14 bg-school-yellow/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Mail size={28} className="text-school-brand" />
+  return (
+    <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-7">
+      {cards.map((card, i) => (
+        <Reveal key={card.title} delay={i * 120} variant="pop">
+          <div
+            className={`h-full rounded-3xl border-2 border-ink/10 bg-white p-6 text-center shadow-soft transition-transform duration-300 hover:rotate-0 md:p-7 ${card.rotate}`}
+          >
+            <span className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-ink shadow-sticker-xs ${card.chip}`}>
+              <card.icon size={24} />
+            </span>
+            <h3 className="mb-4 font-display text-lg font-bold text-brand">{card.title}</h3>
+            {card.content}
           </div>
-          <h3 className="font-display font-semibold text-lg text-school-brand mb-4">
-            Email
-          </h3>
-          <div className="space-y-2">
-            {(emails || []).map((email: any, idx: number) => (
-              <div key={idx} className="text-sm">
-                <span className="text-gray-500">{email.department}</span>
-                <a
-                  href={`mailto:${email.email}`}
-                  className="block text-school-pink hover:text-school-brand transition-colors"
-                >
-                  {email.email}
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </AnimatedSection>
-
-      {/* Address */}
-      <AnimatedSection delay={300}>
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center h-full">
-          <div className="w-14 h-14 bg-school-pink/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <MapPin size={28} className="text-school-brand" />
-          </div>
-          <h3 className="font-display font-semibold text-lg text-school-brand mb-4">
-            Address
-          </h3>
-          <div className="space-y-3">
-            {(addresses || []).map((addr: any, idx: number) => (
-              <div key={idx} className="text-sm">
-                <p className="font-medium text-school-pink">{addr.name}</p>
-                <p className="text-gray-600">{addr.address}</p>
-                <p className="text-gray-500">{addr.city}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </AnimatedSection>
+        </Reveal>
+      ))}
     </div>
   );
 }
 
-// Contact Form
-function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
+// ── FORM ─────────────────────────────────────────────────────────────────────
+function ContactForm({ contactData }: { contactData: ContactInfo }) {
   const form = contactData?.form;
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
     const { name, email, subject, message } = formData;
     const body = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
-    const mailtoUrl = `mailto:info@makkobillischool.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
-
-    setIsSubmitting(false);
+    window.location.href = `mailto:info@makkobillischool.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setSubmitted(true);
     setFormData({ name: '', email: '', subject: '', message: '' });
   };
@@ -176,139 +130,128 @@ function ContactForm({ contactData }: { contactData: typeof mockContactData }) {
 
   if (submitted) {
     return (
-      <AnimatedSection className="bg-white rounded-2xl shadow-lg p-8 text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Send size={32} className="text-green-600" />
+      <Reveal variant="pop">
+        <div className="rounded-3xl border-2 border-ink bg-white p-10 text-center shadow-sticker-sun">
+          <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-leaf/15 text-leaf">
+            <CheckCircle2 size={34} />
+          </span>
+          <h3 className="font-display text-2xl font-bold text-brand">Message Sent!</h3>
+          <p className="mt-2 text-ink/60">Thank you for reaching out. We'll get back to you soon.</p>
+          <button
+            onClick={() => setSubmitted(false)}
+            className="mt-5 font-display font-bold text-coral-deep underline decoration-wavy underline-offset-4 hover:text-brand"
+          >
+            Send another message
+          </button>
         </div>
-        <h3 className="font-display text-xl font-semibold text-school-brand mb-2">
-          Message Sent!
-        </h3>
-        <p className="text-gray-600">
-          Thank you for reaching out. We'll get back to you soon.
-        </p>
-        <button
-          onClick={() => setSubmitted(false)}
-          className="mt-4 text-school-brand hover:text-school-pink transition-colors"
-        >
-          Send another message
-        </button>
-      </AnimatedSection>
+      </Reveal>
     );
   }
 
   return (
-    <AnimatedSection delay={400}>
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {form?.nameLabel || 'Name'}
-            </label>
+    <Reveal delay={150}>
+      <form
+        onSubmit={handleSubmit}
+        className="relative rounded-3xl border-2 border-ink/10 bg-white p-6 shadow-soft md:p-9"
+      >
+        <DoodleStar className="absolute -right-3 -top-3 h-8 w-8 rotate-12 text-sun" />
+        <p className="mb-6 text-center font-hand text-3xl text-coral-deep md:text-left">
+          Send us a message ✏️
+        </p>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-bold text-ink/70">{form?.nameLabel || 'Name'} *</span>
             <input
               type="text"
               required
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
               placeholder="Your Name"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-school-brand focus:border-transparent outline-none transition-all"
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {form?.emailLabel || 'Email'}
-            </label>
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-bold text-ink/70">{form?.emailLabel || 'Email'} *</span>
             <input
               type="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={e => setFormData({ ...formData, email: e.target.value })}
               placeholder="example@email.com"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-school-brand focus:border-transparent outline-none transition-all"
+              className={inputClass}
             />
-          </div>
-        </div>
-        <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {form?.subjectLabel || 'Subject'}
           </label>
+        </div>
+        <label className="mt-5 block">
+          <span className="mb-1.5 block text-sm font-bold text-ink/70">{form?.subjectLabel || 'Subject'} *</span>
           <input
             type="text"
             required
             value={formData.subject}
-            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-            placeholder="Your Message Subject"
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-school-brand focus:border-transparent outline-none transition-all"
+            onChange={e => setFormData({ ...formData, subject: e.target.value })}
+            placeholder="What is it about?"
+            className={inputClass}
           />
-        </div>
-        <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {form?.messageLabel || 'Message'}
-          </label>
+        </label>
+        <label className="mt-5 block">
+          <span className="mb-1.5 block text-sm font-bold text-ink/70">{form?.messageLabel || 'Message'} *</span>
           <textarea
             required
             rows={5}
             value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            placeholder="Your Message Here"
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-school-brand focus:border-transparent outline-none transition-all resize-none"
+            onChange={e => setFormData({ ...formData, message: e.target.value })}
+            placeholder="Write your message here…"
+            className={`${inputClass} resize-none`}
           />
-        </div>
+        </label>
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="mt-6 w-full md:w-auto px-8 py-3 bg-school-brand text-white rounded-full font-semibold hover:bg-school-dark-blue transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="btn-press mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-brand px-8 py-3.5 font-display font-bold text-white shadow-sticker md:w-auto"
         >
-          {isSubmitting ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Sending...
-            </>
-          ) : (
-            <>
-              {form?.submitText || 'Send Message'}
-              <Send size={18} />
-            </>
-          )}
+          {form?.submitText || 'Send Message'}
+          <Send size={17} />
         </button>
       </form>
-    </AnimatedSection>
+    </Reveal>
   );
 }
 
-// Map Section
-function MapSection({ contactData }: { contactData: typeof mockContactData }) {
+// ── MAPS ─────────────────────────────────────────────────────────────────────
+function MapSection({ contactData }: { contactData: ContactInfo }) {
   const mapLocations = contactData?.mapLocations;
-
   if (!mapLocations || mapLocations.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="space-y-12">
-          {mapLocations.map((location: any, index: number) => (
-            <AnimatedSection key={index} delay={index * 150}>
-              <div>
-                <h3
-                  className="font-display text-xl font-semibold mb-4"
-                  style={{ color: location.titleColor || '#2d4289' }}
-                >
+    <section className="relative overflow-hidden bg-cream py-16 md:py-24">
+      <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow="Come say hi!"
+          title="Find Us on the Map"
+          accent="coral"
+          className="mb-10 md:mb-14"
+        />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          {mapLocations.map((location, index) => (
+            <Reveal key={index} delay={index * 130} className={mapLocations.length === 1 ? 'lg:col-span-2' : ''}>
+              <div className="overflow-hidden rounded-3xl border-2 border-ink/10 bg-white p-2.5 shadow-soft">
+                <p className="flex items-center gap-2 px-3 py-2.5 font-display text-lg font-bold" style={{ color: location.titleColor || '#2d4289' }}>
+                  <MapPin size={18} />
                   {location.title}
-                </h3>
-                <div className="rounded-2xl overflow-hidden shadow-lg bg-gray-200">
-                  <iframe
-                    src={location.embedUrl}
-                    width="100%"
-                    height="400"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={location.title}
-                    className="w-full"
-                  />
-                </div>
+                </p>
+                <iframe
+                  src={location.embedUrl}
+                  width="100%"
+                  height="380"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={location.title}
+                  className="w-full rounded-2xl"
+                />
               </div>
-            </AnimatedSection>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -316,39 +259,33 @@ function MapSection({ contactData }: { contactData: typeof mockContactData }) {
   );
 }
 
-// Main Contact Page
+// ── PAGE ─────────────────────────────────────────────────────────────────────
 export default function Contact() {
-  const contactFetcher = useCallback(
-    () => fetchContactPageData(),
-    []
-  );
-  const { data: contactData } = useSanityData(contactFetcher, mockContactData);
+  const { data: contactData } = useSanityData(fetchContactPageData, mockContactData);
 
   return (
     <div className="min-h-screen">
-      <HeroSlideshow
-        images={contactData?.hero?.images}
-        title={contactData?.hero?.title}
+      <PageHero
+        title={contactData?.hero?.title || 'Contact Us'}
         subtitle={contactData?.hero?.subtitle}
-        overlayColor={contactData?.hero?.overlayColor}
+        images={contactData?.hero?.images}
+        accent="coral"
       />
 
-      {/* Contact Info Section */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-4">
-              {contactData.sectionTitle}
-            </h2>
-            <div className="w-20 h-1 bg-school-yellow mx-auto rounded-full" />
-          </AnimatedSection>
-
+      <section className="relative bg-paper py-14 md:py-20">
+        <DoodleSwirl className="absolute left-8 top-8 hidden h-9 w-20 text-sun/70 lg:block" />
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <SectionHeading
+            eyebrow="We'd love to hear from you"
+            title={contactData.sectionTitle || 'Our Address & Contact Details'}
+            accent="sun"
+            className="mb-10 md:mb-14"
+          />
           <ContactInfoCards contactData={contactData} />
           <ContactForm contactData={contactData} />
         </div>
       </section>
 
-      {/* Map Section */}
       <MapSection contactData={contactData} />
     </div>
   );

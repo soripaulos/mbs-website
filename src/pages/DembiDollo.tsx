@@ -1,9 +1,12 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  MapPin, Phone, Laptop, GraduationCap, Handshake, Gift, BookOpen, Mail, ChevronRight, Users
+  MapPin, Phone, Laptop, GraduationCap, Handshake, Gift, BookOpen, Mail, ChevronRight, Users, Lightbulb,
 } from 'lucide-react';
+import Reveal from '@/components/Reveal';
+import SectionHeading from '@/components/SectionHeading';
 import LightboxGallery from '@/components/LightboxGallery';
+import { Polaroid, Scallop, Tape, DoodleStar, DoodleSun } from '@/components/decor';
 import { useSanityData } from '@/hooks/useSanityData';
 import { fetchDembiDolloPage } from '@/services/sanity';
 import { dembiDolloPageData } from '@/data/mockData';
@@ -16,52 +19,8 @@ const ICON_MAP: Record<string, React.ElementType> = {
   gift: Gift,
 };
 
-function useIntersectionObserver(options = {}) {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsIntersecting(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.12, ...options });
-
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return { ref, isIntersecting };
-}
-
-function FadeUp({
-  children, className = '', delay = 0
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const { ref, isIntersecting } = useIntersectionObserver();
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${className} ${
-        isIntersecting ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// Image Grid with Lightbox
-function ImageGrid({
-  images,
-}: {
-  images: { url: string; caption?: string }[];
-}) {
+// ── IMAGE GRID WITH LIGHTBOX ─────────────────────────────────────────────────
+function ImageGrid({ images }: { images: { url: string; caption?: string }[] }) {
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
@@ -69,23 +28,27 @@ function ImageGrid({
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         {images.map((img, i) => (
-          <div
+          <button
             key={i}
-            className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-md"
+            type="button"
+            className="group relative overflow-hidden rounded-2xl border-2 border-ink/10 bg-white p-1.5 transition-all hover:-translate-y-1 hover:shadow-soft"
             onClick={() => {
               setLightboxImages(images.map(x => x.url));
               setLightboxIndex(i);
             }}
+            aria-label={img.caption || 'View photo'}
           >
-            <img
-              src={img.url}
-              alt={img.caption || ''}
-              className="w-full h-48 md:h-56 object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-          </div>
+            <span className="block overflow-hidden rounded-xl">
+              <img
+                src={img.url}
+                alt={img.caption || ''}
+                className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105 md:h-52"
+                loading="lazy"
+              />
+            </span>
+          </button>
         ))}
       </div>
       {lightboxImages.length > 0 && (
@@ -99,278 +62,235 @@ function ImageGrid({
   );
 }
 
-// ── HERO ──────────────────────────────────────────────────────────────────────
+// ── HERO ─────────────────────────────────────────────────────────────────────
 function Hero({ hero }: { hero: typeof dembiDolloPageData.hero }) {
   const heroImage = hero.images?.[0];
 
   return (
-    <div className="relative w-full bg-school-brand" style={{ height: '85vh', minHeight: 560 }}>
-      {/* Background — bg-school-brand above is the fallback when the image fails to load */}
+    <header className="relative overflow-hidden bg-brand">
       {heroImage && (
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
+        <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" loading="eager" fetchPriority="high" />
       )}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(15,30,70,0.55) 0%, rgba(15,30,70,0.75) 100%)' }} />
+      <div
+        className="absolute inset-0"
+        style={{ background: 'linear-gradient(to bottom, rgba(26,27,94,0.55) 0%, rgba(26,27,94,0.8) 100%)' }}
+      />
+      <div className="absolute inset-0 bg-dots opacity-20" aria-hidden="true" />
+      <DoodleStar className="absolute right-[10%] top-24 h-6 w-6 text-sun/80 animate-float" />
 
-      {/* Content */}
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-6">
-        <div className="max-w-4xl">
-          <FadeUp>
-            <span className="inline-block px-5 py-1.5 bg-white/15 text-white/90 text-xs font-bold uppercase tracking-widest rounded-full mb-6 backdrop-blur-sm border border-white/20">
-              Dembi Dollo Campus
-            </span>
-          </FadeUp>
-          <FadeUp delay={100}>
-            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
-              {hero.title}
-            </h1>
-          </FadeUp>
-          <FadeUp delay={200}>
-            <p className="text-white/80 text-lg md:text-2xl max-w-2xl mx-auto mb-10">
-              {hero.subtitle}
-            </p>
-          </FadeUp>
-          <FadeUp delay={300}>
-            <a
-              href="#contact"
-              onClick={e => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-school-yellow text-school-brand font-bold text-lg rounded-full hover:bg-white transition-colors shadow-lg"
-            >
-              Get Involved
-              <ChevronRight size={20} />
-            </a>
-          </FadeUp>
-        </div>
+      <div className="relative mx-auto flex min-h-[72vh] max-w-4xl flex-col items-center justify-center px-4 pb-20 pt-32 text-center sm:px-6">
+        <Reveal>
+          <span className="mb-5 inline-block rounded-full border-2 border-white/25 bg-white/10 px-5 py-1.5 font-display text-xs font-bold uppercase tracking-widest text-white backdrop-blur-sm">
+            Dembi Dollo Campus
+          </span>
+        </Reveal>
+        <Reveal delay={100}>
+          <h1 className="font-display text-4xl font-bold leading-[1.05] text-white sm:text-5xl lg:text-6xl">
+            {hero.title}
+          </h1>
+        </Reveal>
+        <Reveal delay={200}>
+          <p className="mx-auto mt-4 max-w-2xl font-hand text-2xl text-sun sm:text-3xl">{hero.subtitle}</p>
+        </Reveal>
+        <Reveal delay={300}>
+          <a
+            href="#contact"
+            onClick={e => {
+              e.preventDefault();
+              document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="btn-press mt-9 inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-sun px-7 py-3.5 font-display text-base font-bold text-ink shadow-sticker"
+          >
+            Get Involved
+            <ChevronRight size={18} />
+          </a>
+        </Reveal>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-        <span className="text-white/50 text-xs uppercase tracking-widest">Scroll</span>
-        <div className="w-px h-8 bg-gradient-to-b from-white/50 to-transparent" />
-      </div>
-    </div>
+      <Scallop className="relative h-5 text-paper md:h-7" />
+    </header>
   );
 }
 
-// ── OUR STORY ─────────────────────────────────────────────────────────────────
+// ── OUR STORY ────────────────────────────────────────────────────────────────
 function StorySection({ story }: { story: typeof dembiDolloPageData.story }) {
   return (
-    <section className="py-24 md:py-32 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Section header */}
-        <FadeUp className="text-center mb-20">
-          <span className="inline-block px-4 py-1 bg-school-brand/10 text-school-brand text-sm font-bold rounded-full mb-4 tracking-wider uppercase">
-            {story.sectionTitle}
-          </span>
-        </FadeUp>
+    <section className="bg-paper py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow={story.sectionTitle || 'Our Story'}
+          title="How It All Started"
+          accent="sun"
+          className="mb-14 md:mb-20"
+        />
 
         {/* The Idea */}
-        <div className="grid md:grid-cols-2 gap-16 items-center mb-24">
-          <FadeUp>
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-school-brand flex items-center justify-center flex-shrink-0 shadow-lg">
-                <span className="text-white font-display font-bold text-2xl">✦</span>
-              </div>
-              <div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-3">
-                  {story.ideaTitle}
-                </h2>
-                <div className="w-12 h-1 bg-school-yellow rounded-full" />
-              </div>
+        <div className="mb-16 grid items-center gap-10 md:mb-24 md:grid-cols-2 md:gap-14">
+          <Reveal variant="left">
+            <div className="mb-5 flex items-center gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-ink bg-sun text-ink shadow-sticker-xs">
+                <Lightbulb size={22} />
+              </span>
+              <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">{story.ideaTitle}</h3>
             </div>
-            <p className="text-gray-600 leading-relaxed text-lg">
-              {story.ideaContent}
-            </p>
-          </FadeUp>
-          {!story.ideaImage && (
-            <p className="text-gray-400 italic">Image coming soon</p>
-          )}
-          {story.ideaImage && (
-            <FadeUp delay={150}>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src={story.ideaImage}
-                  alt={story.ideaImageCaption}
-                  className="w-full h-72 md:h-80 object-cover"
-                />
-                {story.ideaImageCaption && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                    <p className="text-white text-sm">{story.ideaImageCaption}</p>
-                  </div>
-                )}
-              </div>
-            </FadeUp>
-          )}
+            <p className="leading-relaxed text-ink/70 md:text-lg">{story.ideaContent}</p>
+          </Reveal>
+          <Reveal variant="right" delay={120}>
+            {story.ideaImage ? (
+              <Polaroid
+                src={story.ideaImage}
+                alt={story.ideaImageCaption || story.ideaTitle}
+                caption={story.ideaImageCaption}
+                imgClassName="aspect-[4/3]"
+                tape
+                className="rotate-[1.25deg]"
+              />
+            ) : (
+              <p className="text-center font-hand text-2xl text-ink/30">photo coming soon…</p>
+            )}
+          </Reveal>
         </div>
 
         {/* The Location */}
-        <div className="grid md:grid-cols-2 gap-16 items-center">
-          {story.locationImage ? (
-            <FadeUp className="order-2 md:order-1" delay={100}>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src={story.locationImage}
-                  alt={story.locationImageCaption}
-                  className="w-full h-72 md:h-80 object-cover"
-                />
-                {story.locationImageCaption && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                    <p className="text-white text-sm">{story.locationImageCaption}</p>
-                  </div>
-                )}
-              </div>
-            </FadeUp>
-          ) : (
-            <p className="text-gray-400 italic order-2 md:order-1">Image coming soon</p>
-          )}
-          <FadeUp className="order-1 md:order-2" delay={150}>
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-school-brand flex items-center justify-center flex-shrink-0 shadow-lg">
-                <MapPin size={24} className="text-white" />
-              </div>
-              <div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-3">
-                  {story.locationTitle}
-                </h2>
-                <div className="w-12 h-1 bg-school-yellow rounded-full" />
-              </div>
+        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-14">
+          <Reveal variant="left" className="order-2 md:order-1">
+            {story.locationImage ? (
+              <Polaroid
+                src={story.locationImage}
+                alt={story.locationImageCaption || story.locationTitle}
+                caption={story.locationImageCaption}
+                imgClassName="aspect-[4/3]"
+                tape
+                tapeColor="bg-coral/70"
+                className="rotate-[-1.25deg]"
+              />
+            ) : (
+              <p className="text-center font-hand text-2xl text-ink/30">photo coming soon…</p>
+            )}
+          </Reveal>
+          <Reveal variant="right" delay={120} className="order-1 md:order-2">
+            <div className="mb-5 flex items-center gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-ink bg-coral text-white shadow-sticker-xs">
+                <MapPin size={22} />
+              </span>
+              <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">{story.locationTitle}</h3>
             </div>
-            <p className="text-gray-600 leading-relaxed text-lg">
-              {story.locationContent}
-            </p>
-          </FadeUp>
+            <p className="leading-relaxed text-ink/70 md:text-lg">{story.locationContent}</p>
+          </Reveal>
         </div>
       </div>
     </section>
   );
 }
 
-// ── CAMPUS GALLERY TEASER ──────────────────────────────────────────────────────
+// ── CAMPUS GALLERY TEASER ────────────────────────────────────────────────────
 function CampusTeaser({ gallery }: { gallery: typeof dembiDolloPageData.gallery }) {
   return (
-    <section className="py-20 bg-school-brand">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <FadeUp>
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-              <MapPin size={18} className="text-school-yellow" />
-            </div>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white">
-              {gallery.sectionTitle}
-            </h2>
+    <section className="bg-paper px-4 pb-16 sm:px-6 md:pb-20">
+      <Reveal variant="pop">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] border-2 border-ink bg-brand shadow-sticker-sun">
+          <div className="absolute inset-0 bg-dots opacity-30" aria-hidden="true" />
+          <DoodleSun className="absolute -left-8 -top-8 h-24 w-24 text-sun/30 animate-spin-slow" />
+          <div className="relative mx-auto max-w-2xl px-6 py-14 text-center md:py-16">
+            <h2 className="font-display text-3xl font-bold text-white md:text-4xl">{gallery.sectionTitle}</h2>
+            <p className="mt-3 font-hand text-2xl text-sun">{gallery.sectionSubtitle}</p>
+            <Link
+              to="/gallery"
+              className="btn-press mt-7 inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-sun px-7 py-3.5 font-display font-bold text-ink shadow-sticker"
+            >
+              View Full Gallery
+              <ChevronRight size={18} />
+            </Link>
           </div>
-          <p className="text-white/70 text-lg mb-10 max-w-xl mx-auto">
-            {gallery.sectionSubtitle}
-          </p>
-          <Link
-            to="/gallery"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-school-brand font-bold text-lg rounded-full hover:bg-school-yellow transition-colors shadow-xl"
-          >
-            View Full Gallery
-            <ChevronRight size={20} />
-          </Link>
-        </FadeUp>
-      </div>
+        </div>
+      </Reveal>
     </section>
   );
 }
 
-// ── COMPOUND / CLASSROOMS / ACTIVITIES ─────────────────────────────────────────
+// ── COMPOUND / CLASSROOMS / ACTIVITIES ───────────────────────────────────────
 function SectionBlock({
   title,
   description,
   images,
-  badge,
-  bgClass = 'bg-white',
+  eyebrow,
+  accent,
+  bgClass = 'bg-paper',
 }: {
   title: string;
   description: string;
   images: { url: string; caption?: string }[];
-  badge?: string;
+  eyebrow: string;
+  accent: 'sun' | 'coral' | 'sky';
   bgClass?: string;
 }) {
   if (!images?.length) return null;
 
   return (
-    <section className={`py-20 ${bgClass}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <FadeUp className="mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-6">
-            <div>
-              {badge && (
-                <span className="inline-block mb-3 px-3 py-1 bg-school-yellow/20 text-school-brand text-xs font-bold uppercase tracking-widest rounded-full">
-                  {badge}
-                </span>
-              )}
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand">
-                {title}
-              </h2>
-            </div>
-            <div className="w-16 h-1 bg-school-yellow rounded-full sm:mb-2" />
-          </div>
-          <p className="text-gray-500 mt-4 max-w-xl text-lg leading-relaxed">
-            {description}
-          </p>
-        </FadeUp>
-        <FadeUp delay={120}>
+    <section className={`relative overflow-hidden py-16 md:py-20 ${bgClass}`}>
+      {bgClass.includes('cream') && <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />}
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow={eyebrow}
+          title={title}
+          subtitle={description}
+          accent={accent}
+          align="left"
+          className="mb-10"
+        />
+        <Reveal delay={100}>
           <ImageGrid images={images} />
-        </FadeUp>
+        </Reveal>
       </div>
     </section>
   );
 }
 
-// ── STAFF ─────────────────────────────────────────────────────────────────────
+// ── STAFF ────────────────────────────────────────────────────────────────────
 function StaffSection({ staff }: { staff: typeof dembiDolloPageData.staff }) {
   if (!staff.members?.length) return null;
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <FadeUp className="text-center mb-14">
-          <span className="inline-block px-4 py-1 bg-school-brand/10 text-school-brand text-sm font-bold rounded-full mb-4 tracking-wider uppercase">
-            {staff.sectionTitle}
-          </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-4">
-            Meet Our Team
-          </h2>
-          <p className="text-gray-500 max-w-xl mx-auto text-lg">
-            {staff.sectionSubtitle}
-          </p>
-        </FadeUp>
+    <section className="relative overflow-hidden bg-cream py-16 md:py-24">
+      <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow={staff.sectionTitle || 'Our Team'}
+          title="Meet Our Team"
+          subtitle={staff.sectionSubtitle}
+          accent="coral"
+          className="mb-12 md:mb-14"
+        />
 
         <div className="space-y-8">
           {staff.members.map((member, i) => (
-            <FadeUp key={i} delay={i * 100}>
-              <div className="bg-white rounded-2xl overflow-hidden shadow-md flex flex-col md:flex-row items-center">
-                <div className="w-full md:w-1/2 shrink-0">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-64 md:h-80 object-cover"
-                  />
-                </div>
-                <div className="p-8 md:p-10 flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Users size={20} className="text-school-yellow" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                      {member.role}
-                    </span>
+            <Reveal key={i} delay={i * 100}>
+              <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-ink/10 bg-white p-4 shadow-soft md:flex-row md:gap-10 md:p-5">
+                <div className="relative w-full shrink-0 md:w-1/2">
+                  <Tape />
+                  <div className="overflow-hidden rounded-2xl">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="h-60 w-full object-cover md:h-80"
+                      loading="lazy"
+                    />
                   </div>
-                  <h3 className="font-display text-2xl font-bold text-school-brand mb-2">
-                    {member.name}
-                  </h3>
+                </div>
+                <div className="flex-1 pb-4 text-center md:pb-0 md:text-left">
+                  <p className="mb-2 flex items-center justify-center gap-2 font-hand text-2xl text-coral-deep md:justify-start">
+                    <Users size={18} className="text-sun-deep" />
+                    {member.role}
+                  </p>
+                  <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">{member.name}</h3>
                   {member.isGroupPhoto && (
-                    <span className="inline-block mt-2 px-3 py-1 bg-school-brand/10 text-school-brand text-xs font-semibold rounded-full">
+                    <span className="mt-3 inline-block rounded-full border-2 border-ink/10 bg-cream px-3.5 py-1 text-xs font-bold text-brand">
                       Group Photo
                     </span>
                   )}
                 </div>
               </div>
-            </FadeUp>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -378,77 +298,62 @@ function StaffSection({ staff }: { staff: typeof dembiDolloPageData.staff }) {
   );
 }
 
-// ── COMMUNITY SUPPORT ──────────────────────────────────────────────────────────
+// ── COMMUNITY SUPPORT ────────────────────────────────────────────────────────
 function CommunitySection({ cs }: { cs: typeof dembiDolloPageData.communitySupport }) {
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <FadeUp className="text-center mb-4">
-          <span className="inline-block px-4 py-1 bg-school-yellow/20 text-school-brand text-sm font-bold rounded-full mb-4 tracking-wider uppercase">
-            Together for Education
-          </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-school-brand mb-4">
-            {cs.sectionTitle}
-          </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
-            {cs.sectionDescription}
-          </p>
-        </FadeUp>
+    <section className="bg-paper py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading
+          eyebrow="Together for education"
+          title={cs.sectionTitle || 'Community Support'}
+          subtitle={cs.sectionDescription}
+          accent="sun"
+          className="mb-12 md:mb-14"
+        />
 
         {/* Local & International */}
-        <div className="grid md:grid-cols-2 gap-6 mb-14">
+        <div className="mb-14 grid gap-6 md:grid-cols-2 md:gap-7">
           {[
-            { title: cs.localTitle, desc: cs.localDescription, icon: <MapPin size={20} />, color: 'bg-school-brand' },
-            { title: cs.internationalTitle, desc: cs.internationalDescription, icon: <GraduationCap size={20} />, color: 'bg-school-yellow' },
+            { title: cs.localTitle, desc: cs.localDescription, icon: MapPin, chip: 'bg-brand text-white', rotate: 'md:rotate-[-0.75deg]' },
+            { title: cs.internationalTitle, desc: cs.internationalDescription, icon: GraduationCap, chip: 'bg-sun text-ink', rotate: 'md:rotate-[0.75deg]' },
           ].map((item, i) => (
-            <FadeUp key={i} delay={i * 100}>
-              <div className="bg-gray-50 rounded-2xl p-8 h-full border border-gray-100">
-                <div className={`w-12 h-12 rounded-xl ${item.color} flex items-center justify-center mb-5 text-white`}>
-                  {item.icon}
-                </div>
-                <h3 className="font-display text-xl font-bold text-school-brand mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-gray-500 leading-relaxed">{item.desc}</p>
+            <Reveal key={i} delay={i * 120} variant="pop">
+              <div className={`h-full rounded-3xl border-2 border-ink/10 bg-white p-7 shadow-soft transition-transform hover:rotate-0 md:p-8 ${item.rotate}`}>
+                <span className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink shadow-sticker-xs ${item.chip}`}>
+                  <item.icon size={22} />
+                </span>
+                <h3 className="mb-3 font-display text-xl font-bold text-brand">{item.title}</h3>
+                <p className="leading-relaxed text-ink/60">{item.desc}</p>
               </div>
-            </FadeUp>
+            </Reveal>
           ))}
         </div>
 
         {/* Initiatives */}
         {cs.initiatives?.length > 0 && (
           <div>
-            <FadeUp className="mb-10">
-              <h3 className="font-display text-2xl font-bold text-school-brand text-center">
-                How You Can Help
-              </h3>
-            </FadeUp>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Reveal className="mb-10 text-center">
+              <p className="mb-1 font-hand text-2xl text-coral-deep">Every bit counts!</p>
+              <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">How You Can Help</h3>
+            </Reveal>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {cs.initiatives.map((init, i) => {
                 const IconComp = ICON_MAP[init.initiativeType] || Gift;
                 return (
-                  <FadeUp key={i} delay={i * 80}>
-                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:shadow-md hover:border-school-brand/20 transition-all duration-300 h-full flex flex-col">
-                      <div className="w-12 h-12 rounded-xl bg-school-brand/10 flex items-center justify-center mb-5 flex-shrink-0">
-                        <IconComp size={22} className="text-school-brand" />
-                      </div>
-                      <h4 className="font-display text-lg font-bold text-school-brand mb-3">
-                        {init.title}
-                      </h4>
-                      <p className="text-gray-500 text-sm leading-relaxed flex-grow">
-                        {init.description}
-                      </p>
+                  <Reveal key={i} delay={(i % 3) * 90}>
+                    <div className="card-hover flex h-full flex-col rounded-3xl border-2 border-ink/10 bg-white p-6">
+                      <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-cream text-brand">
+                        <IconComp size={22} />
+                      </span>
+                      <h4 className="mb-2 font-display text-lg font-bold text-brand">{init.title}</h4>
+                      <p className="flex-grow text-sm leading-relaxed text-ink/60">{init.description}</p>
                       {init.images?.length ? (
-                        <div className="mt-4 rounded-xl overflow-hidden">
-                          <img
-                            src={init.images[0].url}
-                            alt={init.title}
-                            className="w-full h-36 object-cover"
-                          />
+                        <div className="mt-4 overflow-hidden rounded-2xl border-2 border-ink/10">
+                          <img src={init.images[0].url} alt={init.title} className="h-36 w-full object-cover" loading="lazy" />
                         </div>
                       ) : null}
                     </div>
-                  </FadeUp>
+                  </Reveal>
                 );
               })}
             </div>
@@ -459,63 +364,60 @@ function CommunitySection({ cs }: { cs: typeof dembiDolloPageData.communitySuppo
   );
 }
 
-// ── CONTACT ────────────────────────────────────────────────────────────────────
+// ── CONTACT ──────────────────────────────────────────────────────────────────
 function ContactSection({ contact }: { contact: typeof dembiDolloPageData.contact }) {
   return (
-    <section id="contact" className="py-20 bg-school-brand">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-14 items-start">
-          <FadeUp>
-            <span className="inline-block px-4 py-1 bg-white/15 text-white/80 text-sm font-bold rounded-full mb-6 tracking-wider uppercase">
-              {contact.sectionTitle}
-            </span>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
-              Visit &amp; Support Us
-            </h2>
-            <p className="text-white/60 mb-10 text-lg">{contact.sectionDescription}</p>
+    <section id="contact" className="relative overflow-hidden bg-navy py-16 md:py-24">
+      <Scallop className="absolute inset-x-0 top-0 h-5 rotate-180 text-paper md:h-6" />
+      <div className="absolute inset-0 bg-dots opacity-20" aria-hidden="true" />
+      <DoodleStar className="absolute left-[8%] top-20 h-6 w-6 text-sun/60 animate-float" />
 
-            <div className="space-y-6">
+      <div className="relative mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+        <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-14">
+          <Reveal>
+            <p className="mb-1 font-hand text-2xl text-sun md:text-3xl">{contact.sectionTitle}</p>
+            <h2 className="font-display text-3xl font-bold text-white md:text-4xl">Visit & Support Us</h2>
+            <p className="mt-4 leading-relaxed text-white/65 md:text-lg">{contact.sectionDescription}</p>
+
+            <div className="mt-9 space-y-5">
               {[
-                { icon: <MapPin size={18} />, label: 'Address', value: contact.address },
-                { icon: <Phone size={18} />, label: 'Phone', value: contact.phone, href: `tel:${contact.phone}` },
-                { icon: <Mail size={18} />, label: 'Email', value: contact.email, href: `mailto:${contact.email}` },
+                { icon: MapPin, label: 'Address', value: contact.address, href: undefined as string | undefined },
+                { icon: Phone, label: 'Phone', value: contact.phone, href: `tel:${contact.phone}` },
+                { icon: Mail, label: 'Email', value: contact.email, href: `mailto:${contact.email}` },
               ].map((row, i) => (
                 <div key={i} className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-school-yellow mt-0.5 flex-shrink-0">
-                    {row.icon}
-                  </div>
-                  <div>
-                    <p className="text-white/40 text-xs uppercase tracking-widest mb-1">{row.label}</p>
+                  <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-sun">
+                    <row.icon size={18} />
+                  </span>
+                  <span>
+                    <span className="block text-[11px] font-bold uppercase tracking-widest text-white/40">{row.label}</span>
                     {row.href ? (
-                      <a href={row.href} className="text-white hover:text-school-yellow transition-colors text-base">
+                      <a href={row.href} className="break-all text-white transition-colors hover:text-sun">
                         {row.value}
                       </a>
                     ) : (
-                      <p className="text-white text-base">{row.value}</p>
+                      <span className="text-white">{row.value}</span>
                     )}
-                  </div>
+                  </span>
                 </div>
               ))}
             </div>
 
-            {/* CTA */}
-            <div className="mt-10 bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-              <h3 className="font-display text-xl font-bold text-white mb-2">
-                {contact.ctaTitle}
-              </h3>
-              <p className="text-white/60 mb-6 text-sm">{contact.ctaDescription}</p>
+            <div className="mt-10 rounded-3xl border-2 border-white/15 bg-white/10 p-7 backdrop-blur-sm md:p-8">
+              <h3 className="font-display text-xl font-bold text-white">{contact.ctaTitle}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/60">{contact.ctaDescription}</p>
               <a
                 href={contact.ctaButtonLink}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-school-yellow text-school-brand font-bold rounded-full hover:bg-white transition-colors"
+                className="btn-press mt-6 inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-sun px-6 py-3 font-display font-bold text-ink shadow-sticker-sm"
               >
                 {contact.ctaButtonText}
-                <ChevronRight size={18} />
+                <ChevronRight size={17} />
               </a>
             </div>
-          </FadeUp>
+          </Reveal>
 
-          <FadeUp delay={150}>
-            <div className="rounded-2xl overflow-hidden shadow-2xl h-full min-h-[400px]">
+          <Reveal delay={150}>
+            <div className="overflow-hidden rounded-3xl border-2 border-white/15 bg-white p-2.5 shadow-soft">
               <iframe
                 src={contact.mapEmbedUrl}
                 width="100%"
@@ -525,33 +427,34 @@ function ContactSection({ contact }: { contact: typeof dembiDolloPageData.contac
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Makko Billi School Dembi Dollo"
+                className="rounded-2xl"
               />
             </div>
-          </FadeUp>
+          </Reveal>
         </div>
       </div>
     </section>
   );
 }
 
-// ── MAIN PAGE ──────────────────────────────────────────────────────────────────
+// ── PAGE ─────────────────────────────────────────────────────────────────────
 export default function DembiDollo() {
   const fetcher = useCallback(() => fetchDembiDolloPage(), []);
   const { data } = useSanityData(fetcher, dembiDolloPageData);
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="flex min-h-screen items-center justify-center bg-paper">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-school-brand/30 border-t-school-brand rounded-full animate-spin" />
-          <p className="text-gray-400 text-sm">Loading...</p>
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand/20 border-t-brand" />
+          <p className="font-hand text-2xl text-ink/40">loading…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Hero hero={data.hero} />
       <StorySection story={data.story} />
       <CampusTeaser gallery={data.gallery} />
@@ -561,8 +464,9 @@ export default function DembiDollo() {
           title={data.compoundSection.title}
           description={data.compoundSection.description}
           images={data.compoundSection.images}
-          badge="Campus"
-          bgClass="bg-white"
+          eyebrow="Campus"
+          accent="sun"
+          bgClass="bg-paper"
         />
       )}
 
@@ -571,8 +475,9 @@ export default function DembiDollo() {
           title={data.classroomsSection.title}
           description={data.classroomsSection.description}
           images={data.classroomsSection.images}
-          badge="Learning"
-          bgClass="bg-gray-50"
+          eyebrow="Learning"
+          accent="coral"
+          bgClass="bg-cream"
         />
       )}
 
@@ -581,8 +486,9 @@ export default function DembiDollo() {
           title={data.activitiesSection.title}
           description={data.activitiesSection.description}
           images={data.activitiesSection.images}
-          badge="Student Life"
-          bgClass="bg-white"
+          eyebrow="Student life"
+          accent="sky"
+          bgClass="bg-paper"
         />
       )}
 
