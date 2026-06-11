@@ -1,12 +1,25 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  MapPin, Phone, Laptop, GraduationCap, Handshake, Gift, BookOpen, Mail, ChevronRight, Users, Lightbulb,
+  MapPin,
+  Phone,
+  Mail,
+  Laptop,
+  GraduationCap,
+  Handshake,
+  Gift,
+  BookOpen,
+  Users,
+  ArrowUpRight,
+  ArrowDown,
+  Lightbulb,
 } from 'lucide-react';
 import Reveal from '@/components/Reveal';
+import WordReveal from '@/components/WordReveal';
 import SectionHeading from '@/components/SectionHeading';
+import Marquee from '@/components/Marquee';
 import LightboxGallery from '@/components/LightboxGallery';
-import { Polaroid, Scallop, Tape, DoodleStar, DoodleSun } from '@/components/decor';
+import { useParallax } from '@/hooks/useParallax';
 import { useSanityData } from '@/hooks/useSanityData';
 import { fetchDembiDolloPage } from '@/services/sanity';
 import { dembiDolloPageData } from '@/data/mockData';
@@ -21,224 +34,246 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 // ── IMAGE GRID WITH LIGHTBOX ─────────────────────────────────────────────────
 function ImageGrid({ images }: { images: { url: string; caption?: string }[] }) {
-  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   if (!images?.length) return null;
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
         {images.map((img, i) => (
           <button
             key={i}
             type="button"
-            className="group relative overflow-hidden rounded-2xl border-2 border-ink/10 bg-white p-1.5 transition-all hover:-translate-y-1 hover:shadow-soft"
-            onClick={() => {
-              setLightboxImages(images.map(x => x.url));
-              setLightboxIndex(i);
-            }}
+            className="img-zoom block overflow-hidden rounded-2xl bg-ink/5"
+            onClick={() => setLightboxIndex(i)}
             aria-label={img.caption || 'View photo'}
           >
-            <span className="block overflow-hidden rounded-xl">
-              <img
-                src={img.url}
-                alt={img.caption || ''}
-                className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105 md:h-52"
-                loading="lazy"
-              />
-            </span>
+            <img
+              src={img.url}
+              alt={img.caption || ''}
+              className="h-40 w-full object-cover md:h-56"
+              loading="lazy"
+              decoding="async"
+            />
           </button>
         ))}
       </div>
-      {lightboxImages.length > 0 && (
+      {lightboxIndex !== null && (
         <LightboxGallery
-          images={lightboxImages}
+          images={images.map(x => x.url)}
+          captions={images.map(x => x.caption)}
           initialIndex={lightboxIndex}
-          onClose={() => setLightboxImages([])}
+          onClose={() => setLightboxIndex(null)}
         />
       )}
     </>
   );
 }
 
-// ── HERO ─────────────────────────────────────────────────────────────────────
+// ── HERO — full-bleed editorial ──────────────────────────────────────────────
 function Hero({ hero }: { hero: typeof dembiDolloPageData.hero }) {
   const heroImage = hero.images?.[0];
 
   return (
-    <header className="relative overflow-hidden bg-brand">
+    <header className="relative flex min-h-[88svh] flex-col justify-end overflow-hidden bg-night">
       {heroImage && (
-        <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" loading="eager" fetchPriority="high" />
+        <img
+          src={heroImage}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
       )}
-      <div
-        className="absolute inset-0"
-        style={{ background: 'linear-gradient(to bottom, rgba(26,27,94,0.55) 0%, rgba(26,27,94,0.8) 100%)' }}
-      />
-      <div className="absolute inset-0 bg-dots opacity-20" aria-hidden="true" />
-      <DoodleStar className="absolute right-[10%] top-24 h-6 w-6 text-sun/80 animate-float" />
+      <div className="absolute inset-0 bg-gradient-to-t from-night via-night/45 to-night/25" />
 
-      <div className="relative mx-auto flex min-h-[72vh] max-w-4xl flex-col items-center justify-center px-4 pb-20 pt-32 text-center sm:px-6">
-        <Reveal>
-          <span className="mb-5 inline-block rounded-full border-2 border-white/25 bg-white/10 px-5 py-1.5 font-display text-xs font-bold uppercase tracking-widest text-white backdrop-blur-sm">
-            Dembi Dollo Campus
-          </span>
+      <div className="relative mx-auto w-full max-w-[1200px] px-5 pb-14 pt-40 md:px-8 md:pb-20">
+        <Reveal variant="fade">
+          <div className="mb-6 flex items-center gap-3 font-label text-[11px] font-semibold uppercase tracking-[0.3em] text-bone/70 md:text-xs">
+            <span className="text-sun">Campus 02</span>
+            <span className="h-1 w-1 rotate-45 bg-sun" />
+            <span>Kellem Wollega, Oromia</span>
+          </div>
         </Reveal>
-        <Reveal delay={100}>
-          <h1 className="font-display text-4xl font-bold leading-[1.05] text-white sm:text-5xl lg:text-6xl">
-            {hero.title}
-          </h1>
-        </Reveal>
-        <Reveal delay={200}>
-          <p className="mx-auto mt-4 max-w-2xl font-hand text-2xl text-sun sm:text-3xl">{hero.subtitle}</p>
-        </Reveal>
-        <Reveal delay={300}>
-          <a
-            href="#contact"
-            onClick={e => {
-              e.preventDefault();
-              document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="btn-press mt-9 inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-sun px-7 py-3.5 font-display text-base font-bold text-ink shadow-sticker"
-          >
-            Get Involved
-            <ChevronRight size={18} />
-          </a>
-        </Reveal>
+        <WordReveal
+          text={hero.title}
+          as="h1"
+          delay={100}
+          className="max-w-4xl font-display text-[2.6rem] font-bold leading-[0.98] tracking-tight text-bone sm:text-6xl md:text-7xl"
+        />
+        <div className="mt-7 flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
+          <Reveal variant="fade" delay={400}>
+            <p className="max-w-md text-base leading-relaxed text-bone/70 md:text-lg">
+              {hero.subtitle}
+            </p>
+          </Reveal>
+          <Reveal variant="fade" delay={500}>
+            <a
+              href="#contact"
+              onClick={e => {
+                e.preventDefault();
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-sun px-7 py-3.5 font-label text-[13px] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bone"
+            >
+              Get Involved
+              <ArrowDown size={15} className="transition-transform duration-300 group-hover:translate-y-0.5" />
+            </a>
+          </Reveal>
+        </div>
       </div>
-
-      <Scallop className="relative h-5 text-paper md:h-7" />
     </header>
   );
 }
 
-// ── OUR STORY ────────────────────────────────────────────────────────────────
+// ── STORY ────────────────────────────────────────────────────────────────────
+function StoryImage({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
+  const ref = useParallax<HTMLImageElement>(18);
+  return (
+    <figure>
+      <div className="overflow-hidden rounded-3xl bg-ink/5">
+        <div className="aspect-[4/3]">
+          <img
+            ref={ref}
+            src={src}
+            alt={alt}
+            className="h-full w-full scale-[1.12] object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
+      {caption && (
+        <figcaption className="mt-3 font-label text-[11px] font-medium uppercase tracking-[0.18em] text-ink/40">
+          {caption}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
 function StorySection({ story }: { story: typeof dembiDolloPageData.story }) {
   return (
-    <section className="bg-paper py-16 md:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="bg-bone py-16 md:py-28">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index="01"
           eyebrow={story.sectionTitle || 'Our Story'}
           title="How It All Started"
-          accent="sun"
-          className="mb-14 md:mb-20"
+          className="mb-12 md:mb-20"
         />
 
         {/* The Idea */}
-        <div className="mb-16 grid items-center gap-10 md:mb-24 md:grid-cols-2 md:gap-14">
-          <Reveal variant="left">
-            <div className="mb-5 flex items-center gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-ink bg-sun text-ink shadow-sticker-xs">
-                <Lightbulb size={22} />
-              </span>
-              <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">{story.ideaTitle}</h3>
-            </div>
-            <p className="leading-relaxed text-ink/70 md:text-lg">{story.ideaContent}</p>
-          </Reveal>
-          <Reveal variant="right" delay={120}>
-            {story.ideaImage ? (
-              <Polaroid
-                src={story.ideaImage}
-                alt={story.ideaImageCaption || story.ideaTitle}
-                caption={story.ideaImageCaption}
-                imgClassName="aspect-[4/3]"
-                tape
-                className="rotate-[1.25deg]"
-              />
-            ) : (
-              <p className="text-center font-hand text-2xl text-ink/30">photo coming soon…</p>
-            )}
-          </Reveal>
+        <div className="mb-16 grid items-center gap-10 md:mb-24 md:grid-cols-2 md:gap-16">
+          <div>
+            <Reveal variant="fade">
+              <div className="mb-5 flex items-center gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink text-sun">
+                  <Lightbulb size={20} />
+                </span>
+                <h3 className="font-display text-2xl font-bold tracking-tight text-ink md:text-3xl">
+                  {story.ideaTitle}
+                </h3>
+              </div>
+              <p className="leading-relaxed text-ink/65 md:text-lg">{story.ideaContent}</p>
+            </Reveal>
+          </div>
+          {story.ideaImage && (
+            <Reveal variant="fade" delay={150}>
+              <StoryImage src={story.ideaImage} alt={story.ideaTitle} caption={story.ideaImageCaption} />
+            </Reveal>
+          )}
         </div>
 
         {/* The Location */}
-        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-14">
-          <Reveal variant="left" className="order-2 md:order-1">
-            {story.locationImage ? (
-              <Polaroid
+        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
+          {story.locationImage && (
+            <Reveal variant="fade" className="order-2 md:order-1">
+              <StoryImage
                 src={story.locationImage}
-                alt={story.locationImageCaption || story.locationTitle}
+                alt={story.locationTitle}
                 caption={story.locationImageCaption}
-                imgClassName="aspect-[4/3]"
-                tape
-                tapeColor="bg-coral/70"
-                className="rotate-[-1.25deg]"
               />
-            ) : (
-              <p className="text-center font-hand text-2xl text-ink/30">photo coming soon…</p>
-            )}
-          </Reveal>
-          <Reveal variant="right" delay={120} className="order-1 md:order-2">
-            <div className="mb-5 flex items-center gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-ink bg-coral text-white shadow-sticker-xs">
-                <MapPin size={22} />
-              </span>
-              <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">{story.locationTitle}</h3>
-            </div>
-            <p className="leading-relaxed text-ink/70 md:text-lg">{story.locationContent}</p>
-          </Reveal>
+            </Reveal>
+          )}
+          <div className="order-1 md:order-2">
+            <Reveal variant="fade" delay={120}>
+              <div className="mb-5 flex items-center gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand text-bone">
+                  <MapPin size={20} />
+                </span>
+                <h3 className="font-display text-2xl font-bold tracking-tight text-ink md:text-3xl">
+                  {story.locationTitle}
+                </h3>
+              </div>
+              <p className="leading-relaxed text-ink/65 md:text-lg">{story.locationContent}</p>
+            </Reveal>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-// ── CAMPUS GALLERY TEASER ────────────────────────────────────────────────────
+// ── CAMPUS TEASER ────────────────────────────────────────────────────────────
 function CampusTeaser({ gallery }: { gallery: typeof dembiDolloPageData.gallery }) {
   return (
-    <section className="bg-paper px-4 pb-16 sm:px-6 md:pb-20">
-      <Reveal variant="pop">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] border-2 border-ink bg-brand shadow-sticker-sun">
-          <div className="absolute inset-0 bg-dots opacity-30" aria-hidden="true" />
-          <DoodleSun className="absolute -left-8 -top-8 h-24 w-24 text-sun/30 animate-spin-slow" />
-          <div className="relative mx-auto max-w-2xl px-6 py-14 text-center md:py-16">
-            <h2 className="font-display text-3xl font-bold text-white md:text-4xl">{gallery.sectionTitle}</h2>
-            <p className="mt-3 font-hand text-2xl text-sun">{gallery.sectionSubtitle}</p>
-            <Link
-              to="/gallery"
-              className="btn-press mt-7 inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-sun px-7 py-3.5 font-display font-bold text-ink shadow-sticker"
-            >
-              View Full Gallery
-              <ChevronRight size={18} />
-            </Link>
-          </div>
+    <section className="border-y border-ink/10 bg-bone">
+      <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-6 px-5 py-12 md:flex-row md:items-center md:px-8 md:py-16">
+        <div>
+          <WordReveal
+            text={gallery.sectionTitle}
+            as="h2"
+            className="font-display text-3xl font-bold tracking-tight text-ink md:text-4xl"
+          />
+          <Reveal variant="fade" delay={200}>
+            <p className="mt-2 text-ink/55 md:text-lg">{gallery.sectionSubtitle}</p>
+          </Reveal>
         </div>
-      </Reveal>
+        <Link
+          to="/gallery"
+          className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-ink px-7 py-3.5 font-label text-[13px] font-semibold uppercase tracking-[0.12em] text-bone transition-colors hover:bg-brand"
+        >
+          View Full Gallery
+          <ArrowUpRight
+            size={16}
+            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        </Link>
+      </div>
     </section>
   );
 }
 
 // ── COMPOUND / CLASSROOMS / ACTIVITIES ───────────────────────────────────────
 function SectionBlock({
+  index,
+  eyebrow,
   title,
   description,
   images,
-  eyebrow,
-  accent,
-  bgClass = 'bg-paper',
 }: {
+  index: string;
+  eyebrow: string;
   title: string;
   description: string;
   images: { url: string; caption?: string }[];
-  eyebrow: string;
-  accent: 'sun' | 'coral' | 'sky';
-  bgClass?: string;
 }) {
   if (!images?.length) return null;
 
   return (
-    <section className={`relative overflow-hidden py-16 md:py-20 ${bgClass}`}>
-      {bgClass.includes('cream') && <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />}
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-ink/10 bg-bone py-16 md:py-24">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index={index}
           eyebrow={eyebrow}
           title={title}
           subtitle={description}
-          accent={accent}
-          align="left"
-          className="mb-10"
+          className="mb-10 md:mb-12"
         />
-        <Reveal delay={100}>
+        <Reveal variant="fade" delay={100}>
           <ImageGrid images={images} />
         </Reveal>
       </div>
@@ -251,40 +286,40 @@ function StaffSection({ staff }: { staff: typeof dembiDolloPageData.staff }) {
   if (!staff.members?.length) return null;
 
   return (
-    <section className="relative overflow-hidden bg-cream py-16 md:py-24">
-      <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="noise relative overflow-hidden bg-night py-16 text-bone md:py-28">
+      <div className="relative mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index="05"
           eyebrow={staff.sectionTitle || 'Our Team'}
-          title="Meet Our Team"
+          title="The People On the Ground"
           subtitle={staff.sectionSubtitle}
-          accent="coral"
-          className="mb-12 md:mb-14"
+          dark
+          className="mb-12 md:mb-16"
         />
 
-        <div className="space-y-8">
+        <div className="space-y-5">
           {staff.members.map((member, i) => (
-            <Reveal key={i} delay={i * 100}>
-              <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-ink/10 bg-white p-4 shadow-soft md:flex-row md:gap-10 md:p-5">
-                <div className="relative w-full shrink-0 md:w-1/2">
-                  <Tape />
-                  <div className="overflow-hidden rounded-2xl">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="h-60 w-full object-cover md:h-80"
-                      loading="lazy"
-                    />
-                  </div>
+            <Reveal key={i} variant="fade" delay={i * 90}>
+              <div className="grid grid-cols-1 overflow-hidden rounded-3xl border border-white/10 md:grid-cols-2">
+                <div className="img-zoom">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="h-60 w-full object-cover md:h-80"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
-                <div className="flex-1 pb-4 text-center md:pb-0 md:text-left">
-                  <p className="mb-2 flex items-center justify-center gap-2 font-hand text-2xl text-coral-deep md:justify-start">
-                    <Users size={18} className="text-sun-deep" />
+                <div className="flex flex-col justify-center p-7 md:p-12">
+                  <div className="flex items-center gap-2.5 font-label text-[11px] font-semibold uppercase tracking-[0.25em] text-sun">
+                    <Users size={13} />
                     {member.role}
-                  </p>
-                  <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">{member.name}</h3>
+                  </div>
+                  <h3 className="mt-3 font-display text-2xl font-bold tracking-tight md:text-3xl">
+                    {member.name}
+                  </h3>
                   {member.isGroupPhoto && (
-                    <span className="mt-3 inline-block rounded-full border-2 border-ink/10 bg-cream px-3.5 py-1 text-xs font-bold text-brand">
+                    <span className="mt-4 w-fit rounded-full border border-white/15 px-3.5 py-1 font-label text-[10px] font-semibold uppercase tracking-[0.16em] text-bone/55">
                       Group Photo
                     </span>
                   )}
@@ -301,29 +336,36 @@ function StaffSection({ staff }: { staff: typeof dembiDolloPageData.staff }) {
 // ── COMMUNITY SUPPORT ────────────────────────────────────────────────────────
 function CommunitySection({ cs }: { cs: typeof dembiDolloPageData.communitySupport }) {
   return (
-    <section className="bg-paper py-16 md:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="bg-bone py-16 md:py-28">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index="06"
           eyebrow="Together for education"
           title={cs.sectionTitle || 'Community Support'}
           subtitle={cs.sectionDescription}
-          accent="sun"
-          className="mb-12 md:mb-14"
+          className="mb-12 md:mb-16"
         />
 
         {/* Local & International */}
-        <div className="mb-14 grid gap-6 md:grid-cols-2 md:gap-7">
+        <div className="mb-14 grid gap-5 md:grid-cols-2">
           {[
-            { title: cs.localTitle, desc: cs.localDescription, icon: MapPin, chip: 'bg-brand text-white', rotate: 'md:rotate-[-0.75deg]' },
-            { title: cs.internationalTitle, desc: cs.internationalDescription, icon: GraduationCap, chip: 'bg-sun text-ink', rotate: 'md:rotate-[0.75deg]' },
+            { title: cs.localTitle, desc: cs.localDescription, icon: MapPin },
+            { title: cs.internationalTitle, desc: cs.internationalDescription, icon: GraduationCap },
           ].map((item, i) => (
-            <Reveal key={i} delay={i * 120} variant="pop">
-              <div className={`h-full rounded-3xl border-2 border-ink/10 bg-white p-7 shadow-soft transition-transform hover:rotate-0 md:p-8 ${item.rotate}`}>
-                <span className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink shadow-sticker-xs ${item.chip}`}>
-                  <item.icon size={22} />
-                </span>
-                <h3 className="mb-3 font-display text-xl font-bold text-brand">{item.title}</h3>
-                <p className="leading-relaxed text-ink/60">{item.desc}</p>
+            <Reveal key={i} variant="fade" delay={i * 110}>
+              <div className="group h-full rounded-3xl border border-ink/10 bg-white p-7 transition-colors duration-300 hover:border-ink/30 md:p-9">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-sun">
+                    <item.icon size={19} />
+                  </span>
+                  <span className="font-label text-xs font-medium text-ink/25">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <h3 className="mt-6 font-display text-xl font-bold tracking-tight text-ink md:text-2xl">
+                  {item.title}
+                </h3>
+                <p className="mt-3 leading-relaxed text-ink/55">{item.desc}</p>
               </div>
             </Reveal>
           ))}
@@ -332,24 +374,40 @@ function CommunitySection({ cs }: { cs: typeof dembiDolloPageData.communitySuppo
         {/* Initiatives */}
         {cs.initiatives?.length > 0 && (
           <div>
-            <Reveal className="mb-10 text-center">
-              <p className="mb-1 font-hand text-2xl text-coral-deep">Every bit counts!</p>
-              <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">How You Can Help</h3>
+            <Reveal variant="fade" className="mb-9">
+              <h3 className="font-display text-2xl font-bold tracking-tight text-ink md:text-3xl">
+                How You Can Help
+              </h3>
             </Reveal>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {cs.initiatives.map((init, i) => {
                 const IconComp = ICON_MAP[init.initiativeType] || Gift;
                 return (
-                  <Reveal key={i} delay={(i % 3) * 90}>
-                    <div className="card-hover flex h-full flex-col rounded-3xl border-2 border-ink/10 bg-white p-6">
-                      <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-cream text-brand">
-                        <IconComp size={22} />
-                      </span>
-                      <h4 className="mb-2 font-display text-lg font-bold text-brand">{init.title}</h4>
-                      <p className="flex-grow text-sm leading-relaxed text-ink/60">{init.description}</p>
+                  <Reveal key={i} variant="fade" delay={(i % 3) * 90}>
+                    <div className="flex h-full flex-col rounded-3xl border border-ink/10 bg-white p-6 transition-colors duration-300 hover:border-ink/30 md:p-7">
+                      <div className="flex items-center justify-between">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bone text-brand">
+                          <IconComp size={18} />
+                        </span>
+                        <span className="font-label text-xs font-medium text-ink/25">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <h4 className="mt-5 font-display text-lg font-bold tracking-tight text-ink">
+                        {init.title}
+                      </h4>
+                      <p className="mt-2 flex-grow text-sm leading-relaxed text-ink/55">
+                        {init.description}
+                      </p>
                       {init.images?.length ? (
-                        <div className="mt-4 overflow-hidden rounded-2xl border-2 border-ink/10">
-                          <img src={init.images[0].url} alt={init.title} className="h-36 w-full object-cover" loading="lazy" />
+                        <div className="img-zoom mt-5 overflow-hidden rounded-2xl">
+                          <img
+                            src={init.images[0].url}
+                            alt={init.title}
+                            className="h-36 w-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
                         </div>
                       ) : null}
                     </div>
@@ -367,67 +425,74 @@ function CommunitySection({ cs }: { cs: typeof dembiDolloPageData.communitySuppo
 // ── CONTACT ──────────────────────────────────────────────────────────────────
 function ContactSection({ contact }: { contact: typeof dembiDolloPageData.contact }) {
   return (
-    <section id="contact" className="relative overflow-hidden bg-navy py-16 md:py-24">
-      <Scallop className="absolute inset-x-0 top-0 h-5 rotate-180 text-paper md:h-6" />
-      <div className="absolute inset-0 bg-dots opacity-20" aria-hidden="true" />
-      <DoodleStar className="absolute left-[8%] top-20 h-6 w-6 text-sun/60 animate-float" />
+    <section id="contact" className="noise relative overflow-hidden bg-night py-16 text-bone md:py-28">
+      <div className="relative mx-auto max-w-[1200px] px-5 md:px-8">
+        <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <SectionHeading
+              index="07"
+              eyebrow={contact.sectionTitle || 'Visit & support us'}
+              title="Come See It for Yourself"
+              subtitle={contact.sectionDescription}
+              dark
+            />
 
-      <div className="relative mx-auto max-w-6xl px-4 pt-8 sm:px-6">
-        <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-14">
-          <Reveal>
-            <p className="mb-1 font-hand text-2xl text-sun md:text-3xl">{contact.sectionTitle}</p>
-            <h2 className="font-display text-3xl font-bold text-white md:text-4xl">Visit & Support Us</h2>
-            <p className="mt-4 leading-relaxed text-white/65 md:text-lg">{contact.sectionDescription}</p>
-
-            <div className="mt-9 space-y-5">
+            <div className="mt-10 divide-y divide-white/10 border-y border-white/10">
               {[
                 { icon: MapPin, label: 'Address', value: contact.address, href: undefined as string | undefined },
                 { icon: Phone, label: 'Phone', value: contact.phone, href: `tel:${contact.phone}` },
                 { icon: Mail, label: 'Email', value: contact.email, href: `mailto:${contact.email}` },
               ].map((row, i) => (
-                <div key={i} className="flex items-start gap-4">
-                  <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-sun">
-                    <row.icon size={18} />
+                <div key={i} className="flex items-center gap-5 py-4">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-sun">
+                    <row.icon size={16} />
                   </span>
-                  <span>
-                    <span className="block text-[11px] font-bold uppercase tracking-widest text-white/40">{row.label}</span>
+                  <span className="min-w-0">
+                    <span className="block font-label text-[10px] font-semibold uppercase tracking-[0.22em] text-bone/40">
+                      {row.label}
+                    </span>
                     {row.href ? (
-                      <a href={row.href} className="break-all text-white transition-colors hover:text-sun">
+                      <a
+                        href={row.href}
+                        className="break-all font-medium transition-colors hover:text-sun"
+                      >
                         {row.value}
                       </a>
                     ) : (
-                      <span className="text-white">{row.value}</span>
+                      <span className="font-medium">{row.value}</span>
                     )}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="mt-10 rounded-3xl border-2 border-white/15 bg-white/10 p-7 backdrop-blur-sm md:p-8">
-              <h3 className="font-display text-xl font-bold text-white">{contact.ctaTitle}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/60">{contact.ctaDescription}</p>
+            <div className="mt-9 rounded-3xl border border-white/10 bg-white/5 p-7 md:p-8">
+              <h3 className="font-display text-xl font-bold tracking-tight">{contact.ctaTitle}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-bone/55">{contact.ctaDescription}</p>
               <a
                 href={contact.ctaButtonLink}
-                className="btn-press mt-6 inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-sun px-6 py-3 font-display font-bold text-ink shadow-sticker-sm"
+                className="group mt-6 inline-flex items-center gap-2 rounded-full bg-sun px-6 py-3 font-label text-xs font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bone"
               >
                 {contact.ctaButtonText}
-                <ChevronRight size={17} />
+                <ArrowUpRight
+                  size={15}
+                  className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
               </a>
             </div>
-          </Reveal>
+          </div>
 
-          <Reveal delay={150}>
-            <div className="overflow-hidden rounded-3xl border-2 border-white/15 bg-white p-2.5 shadow-soft">
+          <Reveal variant="fade" delay={150}>
+            <div className="overflow-hidden rounded-3xl border border-white/10">
               <iframe
                 src={contact.mapEmbedUrl}
                 width="100%"
                 height="100%"
-                style={{ border: 0, minHeight: 480 }}
+                style={{ border: 0, minHeight: 520 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Makko Billi School Dembi Dollo"
-                className="rounded-2xl"
               />
             </div>
           </Reveal>
@@ -444,10 +509,12 @@ export default function DembiDollo() {
 
   if (!data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-paper">
+      <div className="flex min-h-screen items-center justify-center bg-bone">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand/20 border-t-brand" />
-          <p className="font-hand text-2xl text-ink/40">loading…</p>
+          <div className="h-9 w-9 animate-spin rounded-full border-2 border-ink/15 border-t-ink" />
+          <p className="font-label text-xs font-medium uppercase tracking-[0.25em] text-ink/40">
+            Loading
+          </p>
         </div>
       </div>
     );
@@ -456,39 +523,45 @@ export default function DembiDollo() {
   return (
     <div className="min-h-screen">
       <Hero hero={data.hero} />
+      <Marquee
+        items={[
+          'Dembi Dollo Campus',
+          'Kellem Wollega',
+          'Quality Education',
+          'Community Powered',
+          'Western Ethiopia',
+        ]}
+      />
       <StorySection story={data.story} />
       <CampusTeaser gallery={data.gallery} />
 
       {data.compoundSection?.images?.length > 0 && (
         <SectionBlock
+          index="02"
+          eyebrow="Campus"
           title={data.compoundSection.title}
           description={data.compoundSection.description}
           images={data.compoundSection.images}
-          eyebrow="Campus"
-          accent="sun"
-          bgClass="bg-paper"
         />
       )}
 
       {data.classroomsSection?.images?.length > 0 && (
         <SectionBlock
+          index="03"
+          eyebrow="Learning"
           title={data.classroomsSection.title}
           description={data.classroomsSection.description}
           images={data.classroomsSection.images}
-          eyebrow="Learning"
-          accent="coral"
-          bgClass="bg-cream"
         />
       )}
 
       {data.activitiesSection?.images?.length > 0 && (
         <SectionBlock
+          index="04"
+          eyebrow="Student life"
           title={data.activitiesSection.title}
           description={data.activitiesSection.description}
           images={data.activitiesSection.images}
-          eyebrow="Student life"
-          accent="sky"
-          bgClass="bg-paper"
         />
       )}
 

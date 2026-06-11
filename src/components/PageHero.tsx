@@ -1,86 +1,94 @@
+import { Link } from 'react-router-dom';
 import Reveal from '@/components/Reveal';
-import { Polaroid, Scallop, DoodleStar, DoodleSun, DoodleSwirl } from '@/components/decor';
-
-const ACCENTS = {
-  sun: { hand: 'text-sun', squiggle: 'text-sun' },
-  coral: { hand: 'text-coral', squiggle: 'text-coral' },
-  sky: { hand: 'text-sky', squiggle: 'text-sky' },
-};
+import WordReveal from '@/components/WordReveal';
+import { useParallax } from '@/hooks/useParallax';
 
 /**
- * Compact, mobile-first page banner that replaces the old full-screen hero
- * slideshow on inner pages. Sanity hero images become playful taped polaroids
- * instead of a dark full-bleed background.
+ * Editorial page opener: breadcrumb rail, oversized masked headline and an
+ * asymmetric image band built from the page's Sanity hero images.
+ * Compact on mobile by design — no more full-screen empty banners.
  */
 export default function PageHero({
+  crumb,
   title,
   subtitle,
   images = [],
-  accent = 'sun',
-  children,
 }: {
+  crumb: string;
   title?: string;
   subtitle?: string;
   images?: string[];
-  accent?: keyof typeof ACCENTS;
-  children?: React.ReactNode;
 }) {
-  const photos = (images || []).filter(Boolean).slice(0, 2);
-  const a = ACCENTS[accent];
+  const photos = (images || []).filter(Boolean).slice(0, 3);
+  const p1 = useParallax<HTMLImageElement>(16);
+  const p2 = useParallax<HTMLImageElement>(26);
+  const p3 = useParallax<HTMLImageElement>(20);
+  const parallaxRefs = [p1, p2, p3];
 
   return (
-    <header className="relative overflow-hidden bg-brand">
-      {/* texture + doodles */}
-      <div className="absolute inset-0 bg-dots opacity-40" aria-hidden="true" />
-      <DoodleSun className="absolute -left-8 top-12 h-24 w-24 text-sun/40 animate-spin-slow" />
-      <DoodleStar className="absolute right-[8%] top-16 h-7 w-7 text-coral/70 animate-float" />
-      <DoodleStar className="absolute left-[16%] bottom-20 h-5 w-5 text-sun/60 animate-float [animation-delay:1.2s]" />
-      <DoodleSwirl className="absolute -right-4 bottom-16 h-12 w-24 text-white/20" />
+    <header className="bg-bone pt-24 md:pt-32">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
+        {/* breadcrumb rail */}
+        <Reveal variant="fade">
+          <div className="flex items-center gap-3 border-t border-ink/15 pt-5 font-label text-[11px] font-medium uppercase tracking-[0.3em] text-ink/50 md:text-xs">
+            <Link to="/" className="transition-colors hover:text-ink">
+              Home
+            </Link>
+            <span className="h-1 w-1 rotate-45 bg-sun" />
+            <span className="text-ink">{crumb}</span>
+          </div>
+        </Reveal>
 
-      <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 pb-16 pt-28 text-center sm:px-6 md:pb-20 md:pt-36 lg:flex-row lg:items-center lg:justify-between lg:text-left">
-        <div className="max-w-2xl">
-          <Reveal>
-            <h1 className="font-display text-4xl font-bold leading-[1.05] text-white drop-shadow-sm sm:text-5xl md:text-6xl">
-              {title}
-            </h1>
-          </Reveal>
+        <div className="flex flex-col gap-4 pb-10 pt-8 md:flex-row md:items-end md:justify-between md:pb-14 md:pt-12">
+          <WordReveal
+            text={title || crumb}
+            as="h1"
+            className="max-w-3xl font-display text-[2.75rem] font-bold leading-[0.98] tracking-tight text-ink sm:text-6xl md:text-7xl"
+          />
           {subtitle && (
-            <Reveal delay={120}>
-              <p className={`mt-3 font-hand text-2xl sm:text-3xl md:text-4xl ${a.hand}`}>
-                {subtitle}
-              </p>
+            <Reveal variant="fade" delay={300} className="md:max-w-xs md:pb-2 md:text-right">
+              <p className="text-base leading-snug text-ink/55 md:text-lg">{subtitle}</p>
             </Reveal>
           )}
-          {children && <Reveal delay={220} className="mt-6">{children}</Reveal>}
         </div>
-
-        {/* taped photos — compact fan, never a giant empty banner on mobile */}
-        {photos.length > 0 && (
-          <Reveal variant="pop" delay={150} className="hidden shrink-0 sm:block">
-            <div className="relative h-44 w-64 md:h-52 md:w-80">
-              <Polaroid
-                src={photos[0]}
-                imgClassName="aspect-[4/3] h-full"
-                tape
-                eager
-                className={`absolute inset-0 rotate-[-4deg] ${photos[1] ? 'z-10 w-[78%]' : 'w-full'}`}
-              />
-              {photos[1] && (
-                <Polaroid
-                  src={photos[1]}
-                  imgClassName="aspect-[4/3] h-full"
-                  tape
-                  tapeColor="bg-coral/70"
-                  className="absolute bottom-0 right-0 w-[62%] rotate-[5deg]"
-                />
-              )}
-            </div>
-          </Reveal>
-        )}
       </div>
 
-      {/* scallop into the page background */}
-      <Scallop className="relative h-5 text-paper md:h-7" />
+      {/* asymmetric image band */}
+      {photos.length > 0 && (
+        <div className="mx-auto max-w-[1200px] px-5 md:px-8">
+          <Reveal variant="fade" delay={150}>
+            <div
+              className={`grid gap-3 md:gap-4 ${
+                photos.length === 1
+                  ? 'grid-cols-1'
+                  : photos.length === 2
+                    ? 'grid-cols-[1.6fr_1fr]'
+                    : 'grid-cols-[1.6fr_1fr_0.8fr]'
+              }`}
+            >
+              {photos.map((src, i) => (
+                <div
+                  key={i}
+                  className={`overflow-hidden rounded-2xl bg-ink/5 md:rounded-3xl ${
+                    i === 0 ? 'h-48 sm:h-64 md:h-[22rem]' : 'h-48 sm:h-64 md:h-[22rem]'
+                  } ${i === 2 ? 'hidden sm:block' : ''}`}
+                >
+                  <img
+                    ref={parallaxRefs[i]}
+                    src={src}
+                    alt=""
+                    className="h-full w-full scale-[1.12] object-cover"
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    fetchPriority={i === 0 ? 'high' : undefined}
+                    decoding="async"
+                  />
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      )}
+      <div className="h-12 md:h-20" />
     </header>
   );
 }

@@ -1,11 +1,21 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, ChevronLeft, ChevronRight, ChevronDown, X, Check, ArrowRight, Camera } from 'lucide-react';
+import {
+  MapPin,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  X,
+  Check,
+  Camera,
+  Quote,
+} from 'lucide-react';
 import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
+import WordReveal from '@/components/WordReveal';
 import SectionHeading from '@/components/SectionHeading';
 import DynamicIcon from '@/components/DynamicIcon';
-import { Polaroid, Tape, Scallop, DoodleStar, DoodleSun, DoodleSwirl } from '@/components/decor';
+import { useParallax } from '@/hooks/useParallax';
 import {
   aboutPageData,
   statsData,
@@ -26,35 +36,52 @@ import {
 import type { AcademicLevel, Facility } from '@/types';
 
 const NO_IMAGE =
-  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23fbf3e4" width="400" height="300"/%3E%3Ctext fill="%23b9b09c" font-family="sans-serif" font-size="18" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3EPhoto coming soon%3C/text%3E%3C/svg%3E';
+  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"%3E%3Crect fill="%23e8e6df" width="800" height="500"/%3E%3Ctext fill="%23a9a698" font-family="sans-serif" font-size="20" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3EPhoto coming soon%3C/text%3E%3C/svg%3E';
 
-// ── INTRO ────────────────────────────────────────────────────────────────────
+// ── INTRO — editorial two-column ─────────────────────────────────────────────
 function IntroSection({ intro }: { intro: typeof aboutPageData.intro }) {
+  const paragraphs = intro?.content || [];
+
   return (
-    <section className="relative bg-paper py-16 md:py-20">
-      <DoodleSwirl className="absolute left-6 top-10 hidden h-10 w-20 text-coral/30 md:block" />
-      <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <SectionHeading eyebrow="Our story" title={intro?.title || 'About Us'} accent="coral" />
-        <div className="mt-8 space-y-5">
-          {intro?.content?.map((paragraph, index) => (
-            <Reveal key={index} delay={120 + index * 120}>
-              <p className="leading-relaxed text-ink/70 md:text-lg">{paragraph}</p>
-            </Reveal>
-          ))}
+    <section className="border-t border-ink/10 bg-bone py-16 md:py-24">
+      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 px-5 md:grid-cols-[260px_1fr] md:gap-16 md:px-8">
+        <div className="md:sticky md:top-28 md:self-start">
+          <Reveal variant="fade">
+            <div className="flex items-center gap-3 font-label text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/55 md:text-xs">
+              <span className="text-brand">01</span>
+              <span className="h-px w-10 bg-ink/25" />
+              <span>Our Story</span>
+            </div>
+          </Reveal>
+        </div>
+        <div>
+          <WordReveal
+            text={intro?.title || 'About Makko Billi School'}
+            as="h2"
+            className="font-display text-2xl font-bold leading-snug tracking-tight text-ink md:text-4xl md:leading-[1.2]"
+          />
+          <div className="mt-8 space-y-6">
+            {paragraphs.map((paragraph, index) => (
+              <Reveal key={index} variant="fade" delay={index * 100}>
+                <p
+                  className={
+                    index === 0
+                      ? 'text-lg leading-relaxed text-ink/75 md:text-xl'
+                      : 'leading-relaxed text-ink/60'
+                  }
+                >
+                  {paragraph}
+                </p>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-// ── STATS ────────────────────────────────────────────────────────────────────
-const STAT_STYLES = [
-  'bg-sun rotate-[-1.5deg]',
-  'bg-white rotate-[1deg]',
-  'bg-coral rotate-[-1deg] text-white',
-  'bg-white rotate-[1.5deg]',
-];
-
+// ── STATS — dark count-up band ───────────────────────────────────────────────
 function StatsSection() {
   const fetcher = useCallback(() => fetchStats(), []);
   const { data: stats } = useSanityData(fetcher, statsData);
@@ -80,7 +107,7 @@ function StatsSection() {
 
   useEffect(() => {
     if (!started || stats.length === 0) return;
-    const duration = 1800;
+    const duration = 1700;
     const steps = 50;
     let step = 0;
     const timer = setInterval(() => {
@@ -98,25 +125,17 @@ function StatsSection() {
   if (stats.length === 0) return null;
 
   return (
-    <div ref={ref} className="bg-paper pb-16 md:pb-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+    <div ref={ref} className="noise relative overflow-hidden bg-night py-12 text-bone md:py-16">
+      <div className="relative mx-auto max-w-[1200px] px-5 md:px-8">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
           {stats.map((stat, index) => (
-            <Reveal key={stat.id} delay={index * 100} variant="pop">
-              <div
-                className={`h-full rounded-3xl border-2 border-ink p-5 text-center shadow-sticker-sm transition-transform hover:rotate-0 md:p-7 ${
-                  STAT_STYLES[index % 4]
-                }`}
-              >
-                <p className="font-display text-3xl font-bold md:text-5xl">
+            <Reveal key={stat.id} variant="fade" delay={index * 90}>
+              <div className={index > 0 ? 'md:border-l md:border-white/10 md:pl-8' : ''}>
+                <p className="font-label text-4xl font-bold tracking-tight md:text-6xl">
                   {counters[index] !== undefined ? counters[index] : stat.value}
-                  <span className={index % 4 === 2 ? 'text-sun' : 'text-coral-deep'}>{stat.suffix}</span>
+                  <span className="text-sun">{stat.suffix}</span>
                 </p>
-                <p
-                  className={`mt-1.5 text-[11px] font-bold uppercase tracking-widest md:text-xs ${
-                    index % 4 === 2 ? 'text-white/80' : 'text-ink/50'
-                  }`}
-                >
+                <p className="mt-2 font-label text-[10px] font-medium uppercase tracking-[0.22em] text-bone/45 md:text-xs">
                   {stat.label}
                 </p>
               </div>
@@ -128,92 +147,103 @@ function StatsSection() {
   );
 }
 
-// ── ACADEMICS / LEARNING PATHWAYS ────────────────────────────────────────────
-function PathwayContent({ level }: { level: AcademicLevel }) {
-  const allImages =
-    level.gallery?.length > 0 ? level.gallery : level.mainImage ? [level.mainImage] : [];
+// ── ACADEMICS — sticky side-rail explorer ────────────────────────────────────
+function PathwayPanel({ level }: { level: AcademicLevel }) {
+  const gallery = level.gallery?.length > 0 ? level.gallery : level.mainImage ? [level.mainImage] : [];
 
   return (
-    <div
-      id="active-pathway-content"
-      className="scroll-mt-28 rounded-[2rem] border-2 border-ink/10 bg-white p-6 shadow-soft md:p-10"
-    >
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
-        {/* Description & director */}
-        <div className="space-y-7">
-          <div className="flex items-center gap-3">
-            <span className="h-9 w-2 rounded-full bg-sun" />
-            <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">
-              {level.level} Overview
-            </h3>
-          </div>
-          {level.extendedDescription && (
-            <p className="leading-relaxed text-ink/70 md:text-lg">{level.extendedDescription}</p>
-          )}
+    <div className="animate-fade-in overflow-hidden rounded-3xl border border-ink/10 bg-white">
+      {/* header image */}
+      <div className="relative h-44 w-full overflow-hidden md:h-60">
+        <img
+          src={level.mainImage || NO_IMAGE}
+          alt={level.level}
+          className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-night/70 via-transparent to-transparent" />
+        <div className="absolute bottom-4 left-5 md:bottom-5 md:left-7">
+          <p className="font-label text-[10px] font-semibold uppercase tracking-[0.25em] text-sun">
+            Learning Pathway
+          </p>
+          <h3 className="mt-1 font-display text-2xl font-bold text-bone md:text-3xl">{level.level}</h3>
+        </div>
+      </div>
 
-          {level.director && (
-            <div className="relative rounded-2xl border-2 border-ink/10 bg-cream p-5 md:p-6">
-              <Tape color="bg-coral/60" className="h-5 w-16" />
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-coral-deep">
-                {level.director.role}
-              </p>
-              <div className="flex items-start gap-4">
-                {level.director.image && (
-                  <img
-                    src={level.director.image}
-                    alt={level.director.name}
-                    className="h-16 w-16 rounded-2xl border-2 border-ink/10 bg-white object-cover"
-                    loading="lazy"
-                  />
+      <div className="p-5 md:p-8">
+        {level.extendedDescription && (
+          <p className="leading-relaxed text-ink/65 md:text-lg">{level.extendedDescription}</p>
+        )}
+
+        {/* director */}
+        {level.director && (
+          <div className="mt-7 rounded-2xl bg-bone p-5 md:p-6">
+            <div className="flex items-start gap-4">
+              {level.director.image && (
+                <img
+                  src={level.director.image}
+                  alt={level.director.name}
+                  className="h-14 w-14 rounded-full object-cover"
+                  loading="lazy"
+                />
+              )}
+              <div className="min-w-0">
+                <p className="font-label text-[10px] font-semibold uppercase tracking-[0.22em] text-brand">
+                  {level.director.role}
+                </p>
+                <p className="mt-0.5 font-display text-lg font-bold text-ink">{level.director.name}</p>
+                {level.director.message && (
+                  <p className="mt-2 flex gap-2 text-sm italic leading-relaxed text-ink/55">
+                    <Quote size={14} className="mt-0.5 shrink-0 rotate-180 text-sun" />
+                    {level.director.message}
+                  </p>
                 )}
-                <div>
-                  <p className="font-display text-lg font-bold text-brand">{level.director.name}</p>
-                  {level.director.message && (
-                    <p className="mt-1.5 font-hand text-xl leading-snug text-ink/60">
-                      “{level.director.message}”
-                    </p>
-                  )}
-                </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {level.features?.length > 0 && (
-            <div className="flex flex-wrap gap-2.5">
-              {level.features.map((feature, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-2 rounded-full border-2 border-ink/10 bg-paper px-4 py-1.5 text-sm font-semibold text-ink/75"
-                >
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-leaf/15 p-0.5 text-leaf">
-                    <Check size={13} strokeWidth={3.5} />
-                  </span>
-                  {feature}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* features */}
+        {level.features?.length > 0 && (
+          <div className="mt-7 flex flex-wrap gap-2">
+            {level.features.map((feature, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center gap-1.5 rounded-full border border-ink/15 px-3.5 py-1.5 font-label text-xs font-medium text-ink/70"
+              >
+                <Check size={12} strokeWidth={3} className="text-leaf" />
+                {feature}
+              </span>
+            ))}
+          </div>
+        )}
 
-        {/* Photo grid */}
-        <div>
-          <h4 className="mb-4 font-hand text-2xl text-coral-deep md:text-3xl">Life in {level.level} ✨</h4>
-          <div className="grid auto-rows-[110px] grid-cols-2 gap-3 md:auto-rows-[130px] md:gap-4">
-            {allImages.slice(0, 5).map((img, i) => (
-              <div key={i} className="img-zoom overflow-hidden rounded-2xl border-2 border-ink/10 bg-cream">
-                <img src={img} alt={`${level.level} photo ${i + 1}`} className="h-full w-full object-cover" loading="lazy" />
+        {/* gallery strip */}
+        {gallery.length > 0 && (
+          <div className="no-scrollbar -mx-5 mt-7 flex gap-3 overflow-x-auto px-5 md:-mx-8 md:px-8">
+            {gallery.slice(0, 6).map((img, i) => (
+              <div key={i} className="h-28 w-40 shrink-0 overflow-hidden rounded-xl bg-ink/5 md:h-32 md:w-48">
+                <img
+                  src={img}
+                  alt={`${level.level} photo ${i + 1}`}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             ))}
             <Link
               to="/gallery"
-              className="btn-press flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-ink bg-brand text-white shadow-sticker-sm"
+              className="flex h-28 w-40 shrink-0 flex-col items-center justify-center gap-1.5 rounded-xl bg-ink text-bone transition-colors hover:bg-brand md:h-32 md:w-48"
             >
-              <Camera size={22} />
-              <span className="font-display text-lg font-bold leading-none">Explore</span>
-              <span className="text-xs text-white/70">See full gallery</span>
+              <Camera size={18} />
+              <span className="font-label text-xs font-semibold uppercase tracking-[0.14em]">
+                Full Gallery
+              </span>
             </Link>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -222,98 +252,101 @@ function PathwayContent({ level }: { level: AcademicLevel }) {
 function AcademicsSection() {
   const fetcher = useCallback(() => fetchAcademicLevels(), []);
   const { data: academicLevels } = useSanityData(fetcher, academicLevelsData);
-  const [activeLevel, setActiveLevel] = useState<string>(academicLevels[0]?.id || '');
+  const [activeId, setActiveId] = useState<string>(academicLevels[0]?.id || '');
 
   useEffect(() => {
-    if (academicLevels?.length > 0 && !academicLevels.find(l => l.id === activeLevel)) {
-      setActiveLevel(academicLevels[0].id);
+    if (academicLevels?.length > 0 && !academicLevels.find(l => l.id === activeId)) {
+      setActiveId(academicLevels[0].id);
     }
-  }, [academicLevels, activeLevel]);
-
-  const handleLevelClick = (id: string) => {
-    setActiveLevel(id);
-    setTimeout(() => {
-      const element = document.getElementById('active-pathway-content');
-      if (element) {
-        const top = element.getBoundingClientRect().top + window.pageYOffset - 110;
-        window.scrollTo({ top, behavior: 'smooth' });
-      }
-    }, 120);
-  };
+  }, [academicLevels, activeId]);
 
   if (!academicLevels || academicLevels.length === 0) return null;
 
-  const activeData = academicLevels.find(l => l.id === activeLevel) || academicLevels[0];
+  const active = academicLevels.find(l => l.id === activeId) || academicLevels[0];
 
   return (
-    <section className="relative overflow-hidden bg-cream py-16 md:py-24">
-      <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />
-      <DoodleSun className="absolute -right-8 top-10 h-24 w-24 text-sun/50 animate-spin-slow" />
-
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="bg-bone py-16 md:py-28">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index="02"
           eyebrow="Academics"
           title="Learning Pathways"
-          subtitle="Tap a level to explore the curriculum, meet the directors, and see our students in action."
-          accent="coral"
+          subtitle="From kindergarten through grade 12 — explore each level's curriculum, meet its director, and see students in action."
           className="mb-10 md:mb-14"
         />
 
-        {/* Level cards */}
-        <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {academicLevels.map((level, idx) => {
-            const isActive = activeLevel === level.id;
-            return (
-              <div key={level.id} className="flex flex-col">
-                <Reveal delay={idx * 100} className="h-full">
-                  <button
-                    type="button"
-                    onClick={() => handleLevelClick(level.id)}
-                    aria-expanded={isActive}
-                    className={`group relative block h-full w-full rounded-3xl border-2 bg-white p-3 pb-5 text-center transition-all duration-300 ${
-                      isActive
-                        ? 'border-ink shadow-sticker-sun md:-translate-y-1.5'
-                        : 'border-ink/10 shadow-sm hover:-translate-y-1 hover:shadow-soft'
-                    }`}
-                  >
-                    <span className="img-zoom block overflow-hidden rounded-2xl">
-                      <span className="block aspect-[16/10]">
-                        <img
-                          src={level.mainImage || NO_IMAGE}
-                          alt={level.level}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                        />
-                      </span>
-                    </span>
-                    <span className="mt-4 block font-display text-xl font-bold text-brand">{level.level}</span>
-                    <span className="mt-1 block px-3 text-sm leading-snug text-ink/55">{level.description}</span>
-                    <span
-                      className={`absolute -bottom-3.5 left-1/2 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border-2 border-ink text-ink transition-all duration-300 ${
-                        isActive ? 'rotate-180 bg-sun opacity-100' : 'bg-white opacity-0 group-hover:opacity-100'
-                      }`}
-                    >
-                      <ChevronDown size={17} strokeWidth={3} />
-                    </span>
-                  </button>
-                </Reveal>
-
-                {/* Mobile: expand right under the tapped card */}
-                <div
-                  className={`md:hidden ${isActive ? 'mt-7 animate-fade-in-up' : 'hidden'}`}
-                >
-                  {isActive && <PathwayContent level={activeData} />}
-                </div>
-              </div>
-            );
-          })}
+        {/* Mobile: horizontal segmented selector */}
+        <div className="no-scrollbar -mx-5 mb-6 flex gap-2 overflow-x-auto px-5 md:hidden">
+          {academicLevels.map((level, i) => (
+            <button
+              key={level.id}
+              onClick={() => setActiveId(level.id)}
+              className={`shrink-0 rounded-full border px-4 py-2.5 font-label text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
+                level.id === active.id
+                  ? 'border-ink bg-ink text-bone'
+                  : 'border-ink/20 text-ink/60'
+              }`}
+            >
+              <span className={level.id === active.id ? 'text-sun' : 'text-ink/35'}>
+                {String(i + 1).padStart(2, '0')}
+              </span>{' '}
+              {level.level}
+            </button>
+          ))}
         </div>
 
-        {/* Desktop: expanded panel below the cards */}
-        <div className="hidden md:block">
-          <Reveal key={activeData.id} variant="fade">
-            <PathwayContent level={activeData} />
-          </Reveal>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[300px_1fr] md:gap-8">
+          {/* Desktop: sticky rail */}
+          <div className="hidden md:block">
+            <div className="sticky top-28 space-y-2">
+              {academicLevels.map((level, i) => {
+                const isActive = level.id === active.id;
+                return (
+                  <button
+                    key={level.id}
+                    onClick={() => setActiveId(level.id)}
+                    className={`group w-full rounded-2xl border p-5 text-left transition-all duration-300 ${
+                      isActive
+                        ? 'border-ink bg-ink text-bone'
+                        : 'border-ink/10 bg-white text-ink hover:border-ink/35'
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`font-label text-xs font-medium ${
+                          isActive ? 'text-sun' : 'text-ink/35'
+                        }`}
+                      >
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <ArrowRight
+                        size={15}
+                        className={`transition-all duration-300 ${
+                          isActive
+                            ? 'translate-x-0 text-sun opacity-100'
+                            : '-translate-x-1 text-ink/30 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'
+                        }`}
+                      />
+                    </div>
+                    <p className="mt-2 font-display text-lg font-bold">{level.level}</p>
+                    <p
+                      className={`mt-1 line-clamp-2 text-xs leading-relaxed ${
+                        isActive ? 'text-bone/55' : 'text-ink/45'
+                      }`}
+                    >
+                      {level.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Panel */}
+          <div key={active.id}>
+            <PathwayPanel level={active} />
+          </div>
         </div>
       </div>
     </section>
@@ -340,57 +373,70 @@ function FacilityGalleryModal({ facility, onClose }: { facility: Facility; onClo
   }, [onClose, allImages.length]);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-ink/95 p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[9999] flex animate-fade-in items-center justify-center bg-night/95 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <button
         onClick={onClose}
         aria-label="Close"
-        className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25"
+        className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-bone/80 transition-colors hover:border-sun hover:text-sun"
       >
-        <X size={22} />
+        <X size={20} />
       </button>
 
       <div className="w-full max-w-4xl" onClick={e => e.stopPropagation()}>
-        <div className="relative overflow-hidden rounded-3xl border-2 border-white/15">
-          <div className="aspect-video bg-ink">
-            <img src={allImages[currentIndex]} alt={facility.title} className="h-full w-full object-cover" />
+        <div className="relative overflow-hidden rounded-2xl">
+          <div className="aspect-video bg-night">
+            <img
+              key={currentIndex}
+              src={allImages[currentIndex]}
+              alt={facility.title}
+              className="h-full w-full animate-fade-in object-cover"
+            />
           </div>
           {allImages.length > 1 && (
-            <>
-              <button
-                onClick={() => setCurrentIndex(i => (i - 1 + allImages.length) % allImages.length)}
-                aria-label="Previous photo"
-                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink transition-colors hover:bg-sun"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                onClick={() => setCurrentIndex(i => (i + 1) % allImages.length)}
-                aria-label="Next photo"
-                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink transition-colors hover:bg-sun"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </>
+            <div className="absolute inset-x-4 bottom-4 flex items-center justify-between">
+              <span className="font-label text-xs font-medium tracking-[0.25em] text-bone/85">
+                {String(currentIndex + 1).padStart(2, '0')} /{' '}
+                {String(allImages.length).padStart(2, '0')}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentIndex(i => (i - 1 + allImages.length) % allImages.length)}
+                  aria-label="Previous photo"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 text-bone backdrop-blur-sm transition-colors hover:bg-bone hover:text-ink"
+                >
+                  <ArrowLeft size={16} />
+                </button>
+                <button
+                  onClick={() => setCurrentIndex(i => (i + 1) % allImages.length)}
+                  aria-label="Next photo"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 text-bone backdrop-blur-sm transition-colors hover:bg-bone hover:text-ink"
+                >
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
           )}
         </div>
 
-        <div className="mt-4 text-center">
-          <h3 className="font-display text-xl font-bold text-white">{facility.title}</h3>
-          <p className="mt-1 text-sm text-white/60">{facility.description}</p>
-          <p className="mt-1.5 text-xs text-white/40">
-            {currentIndex + 1} / {allImages.length}
-          </p>
+        <div className="mt-5 text-center">
+          <h3 className="font-display text-xl font-bold text-bone">{facility.title}</h3>
+          <p className="mt-1 text-sm text-bone/55">{facility.description}</p>
         </div>
 
         {allImages.length > 1 && (
-          <div className="mt-4 flex justify-center gap-2 overflow-x-auto pb-1">
+          <div className="no-scrollbar mt-4 flex justify-center gap-2 overflow-x-auto pb-1">
             {allImages.map((img, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
                 aria-label={`Photo ${idx + 1}`}
-                className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                  idx === currentIndex ? 'border-sun' : 'border-transparent opacity-50 hover:opacity-80'
+                className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg transition-all ${
+                  idx === currentIndex
+                    ? 'ring-2 ring-sun'
+                    : 'opacity-45 hover:opacity-80'
                 }`}
               >
                 <img src={img} alt="" className="h-full w-full object-cover" />
@@ -411,51 +457,59 @@ function FacilitiesSection() {
   if (!facilities || facilities.length === 0) return null;
 
   return (
-    <section className="bg-paper py-16 md:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-ink/10 bg-bone py-16 md:py-28">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
-          eyebrow="Campus infrastructure"
+          index="03"
+          eyebrow="Campus"
           title="World-Class Facilities"
-          subtitle="Tap any facility to flip through more photos."
-          accent="sun"
+          subtitle="Select any facility to flip through more photos."
           className="mb-10 md:mb-14"
         />
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
           {facilities.map((facility, index) => (
             <Reveal
               key={facility.id}
-              delay={(index % 3) * 100}
+              variant="fade"
+              delay={(index % 3) * 90}
               className={facility.colSpan === 2 ? 'sm:col-span-2' : ''}
             >
               <button
                 type="button"
                 onClick={() => setSelectedFacility(facility)}
-                className="card-hover group relative block w-full overflow-hidden rounded-3xl border-2 border-ink/10 text-left"
+                className="img-zoom group relative block w-full overflow-hidden rounded-2xl text-left md:rounded-3xl"
               >
                 <div className={facility.colSpan === 2 ? 'aspect-[2/1]' : 'aspect-[4/3] sm:aspect-square'}>
                   <img
                     src={facility.mainImage || NO_IMAGE}
                     alt={facility.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover"
                     loading="lazy"
+                    decoding="async"
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
-                  <div className="mb-1.5 flex items-center gap-2.5">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sun text-ink">
-                      <DynamicIcon name={facility.icon} size={18} />
-                    </span>
-                    <h3 className="font-display text-xl font-bold text-white">{facility.title}</h3>
-                  </div>
-                  <p className="text-sm leading-snug text-white/75">{facility.description}</p>
-                  {facility.gallery?.length > 0 && (
-                    <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-bold text-sun backdrop-blur-sm">
-                      <Camera size={12} />
-                      {facility.gallery.length + 1} photos
+                <div className="absolute inset-0 bg-gradient-to-t from-night/85 via-night/25 to-transparent transition-opacity duration-500" />
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 md:p-6">
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <DynamicIcon name={facility.icon} size={16} className="text-sun" />
+                      <h3 className="font-display text-lg font-bold text-bone md:text-xl">
+                        {facility.title}
+                      </h3>
+                    </div>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-bone/65 md:text-sm">
+                      {facility.description}
                     </p>
-                  )}
+                    {facility.gallery?.length > 0 && (
+                      <p className="mt-2 font-label text-[10px] font-medium uppercase tracking-[0.18em] text-sun">
+                        {facility.gallery.length + 1} photos
+                      </p>
+                    )}
+                  </div>
+                  <span className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/30 text-bone transition-all duration-300 group-hover:bg-sun group-hover:text-ink">
+                    <ArrowUpRight size={15} />
+                  </span>
                 </div>
               </button>
             </Reveal>
@@ -478,31 +532,35 @@ function ServicesSection() {
   if (!services || services.length === 0) return null;
 
   return (
-    <section className="relative overflow-hidden bg-cream py-16 md:py-24">
-      <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />
-      <DoodleStar className="absolute right-[8%] top-12 h-7 w-7 text-coral/60 animate-float" />
-
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="noise relative overflow-hidden bg-night py-16 text-bone md:py-28">
+      <div className="relative mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index="04"
           eyebrow="Student life"
           title="Beyond the Classroom"
           subtitle="Integrated technology and holistic support for a thriving student life."
-          accent="sky"
-          className="mb-10 md:mb-14"
+          dark
+          className="mb-12 md:mb-16"
         />
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-3xl bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (
-            <Reveal key={service.id} delay={(index % 3) * 100}>
-              <div className="card-hover h-full rounded-3xl border-2 border-ink/10 bg-white p-6">
-                <span
-                  className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink/10 text-brand"
-                  style={{ backgroundColor: service.iconColor || '#e0e7ff' }}
-                >
-                  <DynamicIcon name={service.icon} size={22} />
-                </span>
-                <h3 className="mb-1.5 font-display text-lg font-bold text-brand">{service.title}</h3>
-                <p className="text-sm leading-relaxed text-ink/60">{service.description}</p>
+            <Reveal key={service.id} variant="fade" delay={(index % 3) * 90} className="h-full">
+              <div className="group relative h-full bg-night p-7 transition-colors duration-500 hover:bg-[#161b3d] md:p-8">
+                <span className="absolute left-0 top-0 h-0.5 w-0 bg-sun transition-all duration-500 group-hover:w-full" />
+                <div className="flex items-center justify-between">
+                  <span
+                    className="flex h-11 w-11 items-center justify-center rounded-full"
+                    style={{ backgroundColor: service.iconColor || '#2d4289' }}
+                  >
+                    <DynamicIcon name={service.icon} size={18} className="text-ink" />
+                  </span>
+                  <span className="font-label text-xs font-medium text-bone/25">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <h3 className="mt-5 font-display text-lg font-bold">{service.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-bone/55">{service.description}</p>
               </div>
             </Reveal>
           ))}
@@ -513,6 +571,24 @@ function ServicesSection() {
 }
 
 // ── BRANCHES ─────────────────────────────────────────────────────────────────
+function BranchImage({ src, alt }: { src: string; alt: string }) {
+  const ref = useParallax<HTMLImageElement>(20);
+  return (
+    <div className="overflow-hidden rounded-3xl bg-ink/5">
+      <div className="aspect-video">
+        <img
+          ref={ref}
+          src={src}
+          alt={alt}
+          className="h-full w-full scale-[1.12] object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+  );
+}
+
 function BranchesSection() {
   const fetcher = useCallback(() => fetchBranches(), []);
   const { data: branches } = useSanityData(fetcher, branchesData);
@@ -520,53 +596,45 @@ function BranchesSection() {
   if (!branches || branches.length === 0) return null;
 
   return (
-    <section className="bg-paper py-16 md:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="bg-bone py-16 md:py-28">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index="05"
           eyebrow="Our network"
           title="Expanding Horizons"
-          subtitle="Bringing quality education to more communities."
-          accent="coral"
+          subtitle="Bringing quality education to more communities across Ethiopia."
           className="mb-12 md:mb-16"
         />
 
-        <div className="space-y-16 md:space-y-20">
+        <div className="space-y-16 md:space-y-24">
           {branches.map((branch, index) => {
             const flipped = index % 2 === 1;
             return (
-              <Reveal key={branch.id}>
+              <Reveal key={branch.id} variant="fade">
                 <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-14">
                   <div className={flipped ? 'lg:order-2' : ''}>
-                    <Polaroid
-                      src={branch.image || NO_IMAGE}
-                      alt={branch.name}
-                      imgClassName="aspect-video"
-                      caption={branch.location}
-                      tape
-                      tapeColor={flipped ? 'bg-coral/70' : 'bg-sun/80'}
-                      className={flipped ? 'rotate-[1.25deg]' : 'rotate-[-1.25deg]'}
-                    />
+                    <BranchImage src={branch.image || NO_IMAGE} alt={branch.name} />
                   </div>
                   <div className={flipped ? 'lg:order-1' : ''}>
-                    <p className="mb-2 inline-flex items-center gap-1.5 font-hand text-2xl text-coral-deep">
-                      <MapPin size={18} className="text-sun-deep" />
+                    <div className="flex items-center gap-2.5 font-label text-[11px] font-semibold uppercase tracking-[0.25em] text-ink/50">
+                      <MapPin size={13} className="text-brand" />
                       {branch.location}
-                    </p>
-                    <h3 className="font-display text-2xl font-bold text-brand md:text-3xl">{branch.name}</h3>
-                    <p className="mt-4 leading-relaxed text-ink/65">{branch.description}</p>
+                    </div>
+                    <h3 className="mt-3 font-display text-2xl font-bold tracking-tight text-ink md:text-4xl">
+                      {branch.name}
+                    </h3>
+                    <p className="mt-4 leading-relaxed text-ink/60">{branch.description}</p>
                     {branch.features?.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="mb-3 font-display font-bold text-ink">Campus Highlights</h4>
-                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                          {branch.features.map((feature, idx) => (
-                            <div key={idx} className="flex items-center gap-2.5">
-                              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-leaf/15 text-leaf">
-                                <Check size={12} strokeWidth={3.5} />
-                              </span>
-                              <span className="text-sm font-semibold text-ink/70">{feature}</span>
-                            </div>
-                          ))}
-                        </div>
+                      <div className="mt-7 grid grid-cols-1 gap-x-6 border-t border-ink/10 sm:grid-cols-2">
+                        {branch.features.map((feature, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-2.5 border-b border-ink/10 py-3"
+                          >
+                            <Check size={14} strokeWidth={3} className="shrink-0 text-leaf" />
+                            <span className="text-sm font-medium text-ink/70">{feature}</span>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -583,29 +651,35 @@ function BranchesSection() {
 // ── CTA ──────────────────────────────────────────────────────────────────────
 function CTASection() {
   return (
-    <section className="bg-paper px-4 pb-4 sm:px-6">
-      <Reveal variant="pop">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] border-2 border-ink bg-sun shadow-sticker">
-          <div className="absolute inset-0 bg-dots opacity-30" aria-hidden="true" />
-          <DoodleSun className="absolute -right-8 -top-8 h-28 w-28 text-white/50 animate-spin-slow" />
-          <DoodleStar className="absolute bottom-8 left-8 h-7 w-7 text-coral animate-float" />
-
-          <div className="relative mx-auto max-w-2xl px-6 py-14 text-center md:py-16">
-            <p className="mb-1 font-hand text-2xl text-coral-deep md:text-3xl">Ready to join us?</p>
-            <h2 className="font-display text-3xl font-bold text-ink md:text-4xl">Join Our Community</h2>
-            <p className="mx-auto mt-4 max-w-xl leading-relaxed text-ink/70">
-              Be part of a legacy that values integrity, innovation, and inclusivity. Discover what makes
-              Makko Billi School the perfect place for your child's future.
-            </p>
+    <section className="bg-bone px-5 pb-16 md:px-8 md:pb-24">
+      <Reveal variant="fade">
+        <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[2rem] bg-sun">
+          <div className="relative grid grid-cols-1 items-center gap-8 px-7 py-14 md:grid-cols-[1fr_auto] md:px-14 md:py-20">
+            <div>
+              <p className="font-label text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/55 md:text-xs">
+                Admissions open
+              </p>
+              <WordReveal
+                text="Join Our Community"
+                as="h2"
+                className="mt-4 font-display text-3xl font-bold leading-[1.02] tracking-tight text-ink md:text-6xl"
+              />
+              <p className="mt-5 max-w-xl leading-relaxed text-ink/65">
+                Be part of a legacy that values integrity, innovation, and inclusivity. Discover what
+                makes Makko Billi School the right place for your child's future.
+              </p>
+            </div>
             <Link
               to="/contact"
-              className="btn-press mt-8 inline-flex items-center gap-2 rounded-2xl border-2 border-ink bg-brand px-7 py-3.5 font-display font-bold text-white shadow-sticker"
+              className="group inline-flex w-fit items-center gap-2 rounded-full bg-ink px-8 py-4 font-label text-[13px] font-semibold uppercase tracking-[0.12em] text-bone transition-colors hover:bg-brand"
             >
               Apply for Admission
-              <ArrowRight size={18} />
+              <ArrowUpRight
+                size={16}
+                className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
             </Link>
           </div>
-          <Scallop className="relative h-4 text-paper md:h-5" />
         </div>
       </Reveal>
     </section>
@@ -620,10 +694,10 @@ export default function About() {
   return (
     <div className="min-h-screen">
       <PageHero
+        crumb="About"
         title={pageData?.hero?.title || 'About Us'}
         subtitle={pageData?.hero?.subtitle}
         images={pageData?.hero?.images}
-        accent="sun"
       />
       {pageData?.intro && <IntroSection intro={pageData.intro} />}
       <StatsSection />

@@ -1,84 +1,62 @@
 import Reveal from '@/components/Reveal';
-import { Squiggle } from '@/components/decor';
-
-const ACCENT_TEXT: Record<string, string> = {
-  sun: 'text-sun-deep',
-  coral: 'text-coral-deep',
-  sky: 'text-sky',
-  leaf: 'text-leaf',
-  brand: 'text-brand',
-  white: 'text-white/90',
-};
-
-const SQUIGGLE_TEXT: Record<string, string> = {
-  sun: 'text-sun',
-  coral: 'text-coral',
-  sky: 'text-sky',
-  leaf: 'text-leaf',
-  brand: 'text-brand',
-  white: 'text-sun',
-};
+import WordReveal from '@/components/WordReveal';
 
 /**
- * Standard section header: handwritten eyebrow, chunky display title with a
- * squiggle under the last word, optional subtitle.
+ * Editorial section header: indexed Space Grotesk eyebrow with rule,
+ * masked word-reveal display title, optional measure-width subtitle.
  */
 export default function SectionHeading({
+  index,
   eyebrow,
   title,
   subtitle,
-  accent = 'coral',
-  align = 'center',
+  align = 'left',
   dark = false,
   className = '',
 }: {
+  index?: string;
   eyebrow?: string;
   title: string;
   subtitle?: string;
-  accent?: 'sun' | 'coral' | 'sky' | 'leaf' | 'brand' | 'white';
   align?: 'center' | 'left';
   dark?: boolean;
   className?: string;
 }) {
-  const words = (title || '').trim().split(' ');
-  const last = words.length > 1 ? words.pop() : null;
+  const center = align === 'center';
 
   return (
-    <Reveal className={`${align === 'center' ? 'text-center' : 'text-left'} ${className}`}>
-      {eyebrow && (
-        <p className={`mb-1 font-hand text-2xl md:text-3xl ${ACCENT_TEXT[accent]}`}>
-          {eyebrow}
-        </p>
+    <div className={`${center ? 'text-center' : 'text-left'} ${className}`}>
+      {(eyebrow || index) && (
+        <Reveal variant="fade">
+          <div
+            className={`mb-5 flex items-center gap-3 font-label text-[11px] font-semibold uppercase tracking-[0.3em] md:text-xs ${
+              center ? 'justify-center' : ''
+            } ${dark ? 'text-bone/60' : 'text-ink/55'}`}
+          >
+            {index && <span className={dark ? 'text-sun' : 'text-brand'}>{index}</span>}
+            <span className={`h-px w-10 ${dark ? 'bg-bone/25' : 'bg-ink/25'}`} />
+            <span>{eyebrow}</span>
+          </div>
+        </Reveal>
       )}
-      <h2
-        className={`font-display text-3xl font-bold leading-tight md:text-4xl lg:text-[2.75rem] ${
-          dark ? 'text-white' : 'text-brand'
+      <WordReveal
+        text={title}
+        as="h2"
+        className={`font-display text-3xl font-bold leading-[1.06] tracking-tight md:text-5xl ${
+          dark ? 'text-bone' : 'text-ink'
         }`}
-      >
-        {last ? (
-          <>
-            {words.join(' ')}{' '}
-            <span className="relative inline-block whitespace-nowrap">
-              {last}
-              <Squiggle className={`absolute -bottom-2 left-0 h-2.5 w-full md:-bottom-3 md:h-3 ${SQUIGGLE_TEXT[accent]}`} />
-            </span>
-          </>
-        ) : (
-          <span className="relative inline-block">
-            {title}
-            <Squiggle className={`absolute -bottom-2 left-0 h-2.5 w-full md:-bottom-3 md:h-3 ${SQUIGGLE_TEXT[accent]}`} />
-          </span>
-        )}
-      </h2>
+      />
       {subtitle && (
-        <p
-          className={`mx-auto mt-5 max-w-2xl text-base leading-relaxed md:text-lg ${
-            dark ? 'text-white/70' : 'text-ink/60'
-          } ${align === 'left' ? 'mx-0' : ''}`}
-        >
-          {subtitle}
-        </p>
+        <Reveal variant="fade" delay={250}>
+          <p
+            className={`mt-5 max-w-2xl text-base leading-relaxed md:text-lg ${
+              dark ? 'text-bone/60' : 'text-ink/60'
+            } ${center ? 'mx-auto' : ''}`}
+          >
+            {subtitle}
+          </p>
+        </Reveal>
       )}
-    </Reveal>
+    </div>
   );
 }

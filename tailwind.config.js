@@ -48,30 +48,27 @@ module.exports = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // ── Makko Billi design system ──────────────────────────────
-        // Brand colors (kept from the logo / previous site)
+        // ── Makko Billi editorial design system ────────────────────
+        // legacy brand aliases (kept for compatibility)
         'school-brand': '#2d4289',
         'school-yellow': '#fed250',
         'school-pink': '#f179aa',
         'school-blue': '#3b82f6',
         'school-dark-blue': '#1a1b5e',
-        // New "paper & sticker" palette
-        ink: '#252b4a',
-        brand: '#2d4289',
-        navy: '#1a1b5e',
-        paper: '#fffcf5',
-        cream: '#fbf3e4',
-        sun: '#fed250',
-        'sun-deep': '#f5b91e',
-        coral: '#f179aa',
-        'coral-deep': '#e0497f',
-        leaf: '#37a876',
-        sky: '#6fa8ff',
+        // v2 palette
+        bone: '#f4f3ee',      // warm off-white page background
+        ink: '#15192e',       // near-black text / primary surface
+        night: '#10142b',     // deep navy section background
+        brand: '#2d4289',     // school blue
+        blue: '#5273d8',      // lifted blue for accents on dark
+        sun: '#ffd23f',       // signal yellow — used surgically
+        rose: '#ef6a9b',      // refined pink — tags & small accents
+        leaf: '#2e9e6b',
       },
       fontFamily: {
-        sans: ['Nunito', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['"Baloo 2"', 'ui-rounded', 'sans-serif'],
-        hand: ['Caveat', 'cursive'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['"Bricolage Grotesque"', 'ui-sans-serif', 'sans-serif'],
+        label: ['"Space Grotesk"', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",
@@ -79,18 +76,14 @@ module.exports = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
         xs: "calc(var(--radius) - 6px)",
-        blob: "62% 38% 46% 54% / 60% 47% 53% 40%",
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-        soft: "0 12px 32px -14px rgba(37, 43, 74, 0.28)",
-        sticker: "6px 6px 0 0 #252b4a",
-        'sticker-sm': "4px 4px 0 0 #252b4a",
-        'sticker-xs': "2.5px 2.5px 0 0 #252b4a",
-        'sticker-sun': "6px 6px 0 0 #fed250",
-        'sticker-coral': "6px 6px 0 0 #f179aa",
-        'sticker-brand': "6px 6px 0 0 #2d4289",
-        'sticker-white': "6px 6px 0 0 #ffffff",
+        lift: "0 18px 40px -18px rgba(21, 25, 46, 0.35)",
+        panel: "0 24px 60px -28px rgba(16, 20, 43, 0.45)",
+      },
+      transitionTimingFunction: {
+        out2: 'cubic-bezier(0.22, 1, 0.36, 1)',
       },
       keyframes: {
         "accordion-down": {
@@ -101,51 +94,40 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "caret-blink": {
-          "0%,70%,100%": { opacity: "1" },
-          "20%,50%": { opacity: "0" },
-        },
         marquee: {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
+        shimmer: {
+          from: { backgroundPosition: "200% 0" },
+          to: { backgroundPosition: "-200% 0" },
         },
-        "float-rotate": {
-          "0%, 100%": { transform: "translateY(0) rotate(-6deg)" },
-          "50%": { transform: "translateY(-12px) rotate(4deg)" },
-        },
-        wiggle: {
-          "0%, 100%": { transform: "rotate(-2.5deg)" },
-          "50%": { transform: "rotate(2.5deg)" },
-        },
-        "pop-in": {
-          "0%": { opacity: "0", transform: "scale(0.85)" },
-          "70%": { transform: "scale(1.04)" },
-          "100%": { opacity: "1", transform: "scale(1)" },
-        },
-        "spin-slow": {
-          from: { transform: "rotate(0deg)" },
-          to: { transform: "rotate(360deg)" },
-        },
-        "fade-in-up": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
+        "page-in": {
+          "0%": { opacity: "0", transform: "translateY(14px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "kenburns": {
+          "0%": { transform: "scale(1)" },
+          "100%": { transform: "scale(1.08)" },
+        },
+        "sheet-up": {
+          from: { transform: "translateY(100%)" },
+          to: { transform: "translateY(0)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "caret-blink": "caret-blink 1.25s ease-out infinite",
-        marquee: "marquee 28s linear infinite",
-        float: "float 6s ease-in-out infinite",
-        "float-rotate": "float-rotate 7s ease-in-out infinite",
-        wiggle: "wiggle 0.4s ease-in-out",
-        "pop-in": "pop-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards",
-        "spin-slow": "spin-slow 24s linear infinite",
-        "fade-in-up": "fade-in-up 0.6s ease-out forwards",
+        marquee: "marquee 30s linear infinite",
+        shimmer: "shimmer 1.8s linear infinite",
+        "page-in": "page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
+        "fade-in": "fade-in 0.4s ease-out both",
+        kenburns: "kenburns 7s ease-out both",
+        "sheet-up": "sheet-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both",
       },
     },
   },

@@ -1,39 +1,39 @@
-import { Phone, Mail } from 'lucide-react';
+import { useState } from 'react';
+import { Phone, Mail, Plus } from 'lucide-react';
 import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
-import { Tape, DoodleStar, DoodleSwirl } from '@/components/decor';
+import Shimmer from '@/components/Shimmer';
 import { staffPageData as mockStaffPageData, staffProfilesData, departmentsData } from '@/data/mockData';
 import { useSanityData, useSanityArrayData } from '@/hooks/useSanityData';
 import { fetchStaffPageData, fetchStaffProfiles, fetchDepartments } from '@/services/sanity';
 import type { StaffProfile, Department } from '@/types';
 
 const NO_PHOTO =
-  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"%3E%3Crect fill="%23fbf3e4" width="400" height="500"/%3E%3Ctext fill="%23b9b09c" font-family="sans-serif" font-size="20" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3EPhoto coming soon%3C/text%3E%3C/svg%3E';
+  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"%3E%3Crect fill="%23e8e6df" width="400" height="500"/%3E%3Ctext fill="%23a9a698" font-family="sans-serif" font-size="20" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3EPhoto coming soon%3C/text%3E%3C/svg%3E';
 
-// Contact chips — always visible, tappable on mobile (no hover required)
-function ContactChips({ profile, compact = false }: { profile: StaffProfile; compact?: boolean }) {
-  const hasContact = (profile.phones && profile.phones.length > 0) || profile.email;
-  if (!hasContact) return null;
+// Contact actions — always visible and tappable (no hover traps on touch)
+function ContactActions({ profile }: { profile: StaffProfile }) {
+  const phone = profile.phones?.[0];
+  if (!phone && !profile.email) return null;
 
   return (
-    <div className={`flex flex-wrap items-center gap-2 ${compact ? 'justify-center' : ''}`}>
-      {(profile.phones || []).map((phone, idx) => (
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+    {phone && (
         <a
-          key={idx}
           href={`tel:${phone}`}
-          className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink/10 bg-cream px-3 py-1.5 text-xs font-bold text-brand transition-colors hover:border-ink/30 hover:bg-sun"
+          className="inline-flex items-center gap-1.5 rounded-full border border-ink/15 px-3 py-1.5 font-label text-[11px] font-medium tracking-wide text-ink/70 transition-colors hover:border-ink hover:bg-ink hover:text-bone"
         >
-          <Phone size={12} />
+          <Phone size={11} />
           {phone}
         </a>
-      ))}
+      )}
       {profile.email && (
         <a
           href={`mailto:${profile.email}`}
-          className="inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-ink/10 bg-cream px-3 py-1.5 text-xs font-bold text-brand transition-colors hover:border-ink/30 hover:bg-sun"
+          className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-ink/15 px-3 py-1.5 font-label text-[11px] font-medium tracking-wide text-ink/70 transition-colors hover:border-ink hover:bg-ink hover:text-bone"
         >
-          <Mail size={12} className="shrink-0" />
+          <Mail size={11} className="shrink-0" />
           <span className="truncate">{profile.email}</span>
         </a>
       )}
@@ -41,111 +41,128 @@ function ContactChips({ profile, compact = false }: { profile: StaffProfile; com
   );
 }
 
-// ── FOUNDERS ─────────────────────────────────────────────────────────────────
-function FoundersSection({ founders, sectionTitle }: { founders: StaffProfile[]; sectionTitle: string }) {
-  if (founders.length === 0) return null;
-
-  const mainFounder = founders[0];
-  const coFounders = founders.slice(1);
-  const ordered = [coFounders[0], mainFounder, coFounders[1]].filter(Boolean) as StaffProfile[];
+// ── FOUNDERS — editorial feature row ─────────────────────────────────────────
+function FoundersSection({
+  founders,
+  sectionTitle,
+  loading,
+}: {
+  founders: StaffProfile[];
+  sectionTitle: string;
+  loading: boolean;
+}) {
+  if (!loading && founders.length === 0) return null;
 
   return (
-    <section className="relative bg-paper py-14 md:py-20">
-      <DoodleSwirl className="absolute left-6 top-8 hidden h-10 w-20 text-sun/60 md:block" />
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-ink/10 bg-bone py-16 md:py-24">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index="01"
           eyebrow="Where it all began"
           title={sectionTitle || 'Our Founders'}
-          accent="sun"
           className="mb-10 md:mb-14"
         />
 
-        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 md:items-end lg:grid-cols-3">
-          {ordered.map((profile, i) => {
-            const isMain = profile === mainFounder;
-            return (
-              <Reveal key={profile.id} delay={i * 130} variant="pop" className={isMain ? 'sm:col-span-2 lg:col-span-1' : ''}>
-                <div
-                  className={`relative h-full rounded-3xl border-2 bg-white p-3 pb-5 text-center transition-transform duration-300 hover:-translate-y-1.5 ${
-                    isMain
-                      ? 'border-ink shadow-sticker-sun lg:scale-[1.04]'
-                      : 'border-ink/10 shadow-soft'
-                  } ${i === 0 ? 'rotate-[-1deg]' : i === 2 ? 'rotate-[1deg]' : ''}`}
-                >
-                  <Tape color={isMain ? 'bg-sun/80' : 'bg-coral/60'} />
-                  <div className="img-zoom overflow-hidden rounded-2xl">
+        {loading && founders.length === 0 ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[0, 1, 2].map(i => (
+              <div key={i}>
+                <Shimmer className="aspect-[4/5] rounded-3xl" />
+                <Shimmer className="mt-4 h-5 w-2/3" />
+                <Shimmer className="mt-2 h-4 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            {founders.map((profile, i) => (
+              <Reveal key={profile.id} variant="fade" delay={i * 120}>
+                <article className={i === 0 ? 'lg:-mt-6' : ''}>
+                  <div className="img-zoom relative overflow-hidden rounded-3xl bg-ink/5">
                     <div className="aspect-[4/5]">
                       <img
                         src={profile.image || NO_PHOTO}
                         alt={profile.name}
                         className="h-full w-full object-cover"
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
+                    <span className="absolute left-4 top-4 rounded-full bg-night/65 px-3 py-1 font-label text-[10px] font-semibold uppercase tracking-[0.18em] text-sun backdrop-blur-sm">
+                      {String(i + 1).padStart(2, '0')} — Founder
+                    </span>
                   </div>
-                  <h3 className="mt-4 font-display text-xl font-bold text-brand">{profile.name}</h3>
-                  <p className="mb-3 mt-0.5 font-hand text-xl leading-none text-coral-deep">{profile.role}</p>
-                  <div className="px-2">
-                    <ContactChips profile={profile} compact />
+                  <div className="pt-5">
+                    <h3 className="font-display text-xl font-bold tracking-tight text-ink md:text-2xl">
+                      {profile.name}
+                    </h3>
+                    <p className="mt-1 font-label text-[11px] font-semibold uppercase tracking-[0.2em] text-brand">
+                      {profile.role}
+                    </p>
+                    <ContactActions profile={profile} />
                   </div>
-                </div>
+                </article>
               </Reveal>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-// ── DIRECTORS / VICE DIRECTORS ───────────────────────────────────────────────
+// ── DIRECTORS / VICE DIRECTORS — directory grid ──────────────────────────────
 function StaffGrid({
   profiles,
   title,
   subtitle,
+  index,
   eyebrow,
-  accent,
-  bgClass,
 }: {
   profiles: StaffProfile[];
   title: string;
   subtitle: string;
+  index: string;
   eyebrow: string;
-  accent: 'coral' | 'sky' | 'sun';
-  bgClass: string;
 }) {
   if (profiles.length === 0) return null;
 
   return (
-    <section className={`relative overflow-hidden py-14 md:py-20 ${bgClass}`}>
-      {bgClass.includes('cream') && <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />}
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-ink/10 bg-bone py-16 md:py-24">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
+          index={index}
           eyebrow={eyebrow}
           title={title}
           subtitle={subtitle}
-          accent={accent}
           className="mb-10 md:mb-14"
         />
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {profiles.map((profile, index) => (
-            <Reveal key={profile.id} delay={(index % 4) * 90}>
-              <div className="card-hover h-full rounded-3xl border-2 border-ink/10 bg-white p-3 pb-4 text-center">
-                <div className="img-zoom overflow-hidden rounded-2xl">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 md:gap-x-6 lg:grid-cols-4">
+          {profiles.map((profile, i) => (
+            <Reveal key={profile.id} variant="fade" delay={(i % 4) * 80}>
+              <article>
+                <div className="img-zoom overflow-hidden rounded-2xl bg-ink/5 md:rounded-3xl">
                   <div className="aspect-[4/5]">
                     <img
                       src={profile.image || NO_PHOTO}
                       alt={profile.name}
                       className="h-full w-full object-cover"
                       loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 </div>
-                <h3 className="mt-3.5 font-display text-lg font-bold leading-tight text-brand">{profile.name}</h3>
-                <p className="mb-3 mt-0.5 font-hand text-lg leading-tight text-coral-deep">{profile.role}</p>
-                <ContactChips profile={profile} compact />
-              </div>
+                <div className="pt-4">
+                  <h3 className="font-display text-base font-bold leading-tight tracking-tight text-ink md:text-lg">
+                    {profile.name}
+                  </h3>
+                  <p className="mt-1 font-label text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/50">
+                    {profile.role}
+                  </p>
+                  <ContactActions profile={profile} />
+                </div>
+              </article>
             </Reveal>
           ))}
         </div>
@@ -154,65 +171,88 @@ function StaffGrid({
   );
 }
 
-// ── DEPARTMENTS ──────────────────────────────────────────────────────────────
-function DepartmentsSection({ departments, departmentsTitle }: { departments: Department[]; departmentsTitle: string }) {
+// ── DEPARTMENTS — accordion index ────────────────────────────────────────────
+function DepartmentsSection({
+  departments,
+  departmentsTitle,
+}: {
+  departments: Department[];
+  departmentsTitle: string;
+}) {
+  const [openId, setOpenId] = useState<string | null>(departments[0]?.id ?? null);
+
   if (departments.length === 0) return null;
 
   return (
-    <section className="relative overflow-hidden bg-cream py-16 md:py-24">
-      <div className="absolute inset-0 bg-dots opacity-50" aria-hidden="true" />
-      <DoodleStar className="absolute right-[6%] top-14 h-7 w-7 text-sun-deep/70 animate-float" />
-
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="noise relative overflow-hidden bg-night py-16 text-bone md:py-28">
+      <div className="relative mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
-          eyebrow="The teams behind the magic"
+          index="04"
+          eyebrow="The teams behind the school"
           title={departmentsTitle || 'Our Departments'}
-          accent="coral"
-          className="mb-12 md:mb-16"
+          dark
+          className="mb-10 md:mb-14"
         />
 
-        <div className="space-y-16 md:space-y-20">
-          {departments.map((dept, index) => {
-            const flipped = index % 2 === 1;
+        <div className="border-t border-white/10">
+          {departments.map((dept, i) => {
+            const open = openId === dept.id;
             return (
-              <Reveal key={dept.id}>
-                <div className={`flex flex-col items-center gap-8 md:gap-12 ${flipped ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
-                  {/* Photo with rotated color backdrop */}
-                  <div className="group relative w-full md:w-1/2">
-                    <div
-                      className={`absolute inset-0 rounded-3xl border-2 border-ink/10 transition-transform duration-500 ${
-                        flipped
-                          ? 'rotate-[3deg] bg-coral/25 group-hover:rotate-[5deg]'
-                          : 'rotate-[-3deg] bg-sun/40 group-hover:rotate-[-5deg]'
-                      }`}
-                      aria-hidden="true"
-                    />
-                    <div className="relative rounded-3xl border-2 border-ink/10 bg-white p-2.5 transition-transform duration-500 group-hover:-translate-y-1.5">
-                      <Tape color={flipped ? 'bg-coral/60' : 'bg-sun/80'} />
-                      <div className="overflow-hidden rounded-2xl">
-                        <img
-                          src={dept.image || NO_PHOTO}
-                          alt={dept.name}
-                          className="h-64 w-full object-cover md:h-80"
-                          loading="lazy"
-                        />
-                      </div>
+              <div key={dept.id} className="border-b border-white/10">
+                <button
+                  onClick={() => setOpenId(open ? null : dept.id)}
+                  aria-expanded={open}
+                  className="group flex w-full items-center gap-5 py-5 text-left md:gap-8 md:py-7"
+                >
+                  <span
+                    className={`font-label text-sm font-medium transition-colors md:text-base ${
+                      open ? 'text-sun' : 'text-bone/30'
+                    }`}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span
+                    className={`flex-1 font-display text-xl font-bold tracking-tight transition-colors md:text-3xl ${
+                      open ? 'text-bone' : 'text-bone/60 group-hover:text-bone'
+                    }`}
+                    style={dept.headerFont ? { fontFamily: dept.headerFont } : undefined}
+                  >
+                    {dept.name}
+                  </span>
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-all duration-500 ${
+                      open
+                        ? 'rotate-45 border-sun text-sun'
+                        : 'border-white/20 text-bone/60 group-hover:border-bone group-hover:text-bone'
+                    }`}
+                  >
+                    <Plus size={17} />
+                  </span>
+                </button>
+
+                <div className="acc" data-open={open}>
+                  <div>
+                    <div className="grid grid-cols-1 gap-6 pb-8 md:grid-cols-[1fr_380px] md:gap-12 md:pb-10 md:pl-[3.4rem]">
+                      <p className="max-w-2xl leading-relaxed text-bone/65 md:text-lg">
+                        {dept.description}
+                      </p>
+                      {dept.image && (
+                        <div className="overflow-hidden rounded-2xl">
+                          <img
+                            src={dept.image}
+                            alt={dept.name}
+                            className={`h-52 w-full object-cover transition-all duration-700 md:h-56 ${
+                              open ? 'scale-100 opacity-100' : 'scale-105 opacity-0'
+                            }`}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Text */}
-                  <div className="w-full text-center md:w-1/2 md:text-left">
-                    <h3
-                      className="font-display text-2xl font-bold text-brand md:text-3xl"
-                      style={dept.headerFont ? { fontFamily: dept.headerFont } : undefined}
-                    >
-                      {dept.name}
-                    </h3>
-                    <DoodleSwirl className={`mx-auto mt-2 h-6 w-14 md:mx-0 ${flipped ? 'text-coral' : 'text-sun-deep'}`} />
-                    <p className="mt-4 leading-relaxed text-ink/65 md:text-lg">{dept.description}</p>
-                  </div>
                 </div>
-              </Reveal>
+              </div>
             );
           })}
         </div>
@@ -224,7 +264,7 @@ function DepartmentsSection({ departments, departmentsTitle }: { departments: De
 // ── PAGE ─────────────────────────────────────────────────────────────────────
 export default function Staff() {
   const { data: staffPage } = useSanityData(fetchStaffPageData, mockStaffPageData);
-  const { data: staffProfiles } = useSanityArrayData(fetchStaffProfiles, staffProfilesData);
+  const { data: staffProfiles, loading } = useSanityArrayData(fetchStaffProfiles, staffProfilesData);
   const { data: departments } = useSanityArrayData(fetchDepartments, departmentsData);
 
   const founders = staffProfiles.filter(p => p.category === 'founder');
@@ -234,30 +274,32 @@ export default function Staff() {
   return (
     <div className="min-h-screen">
       <PageHero
+        crumb="Staff"
         title={staffPage?.hero?.title || 'Our Staff'}
         subtitle={staffPage?.hero?.subtitle}
         images={staffPage?.hero?.images}
-        accent="coral"
       />
 
-      <FoundersSection founders={founders} sectionTitle={staffPage?.sectionTitles?.foundersTitle} />
+      <FoundersSection
+        founders={founders}
+        sectionTitle={staffPage?.sectionTitles?.foundersTitle}
+        loading={loading}
+      />
 
       <StaffGrid
         profiles={directors}
         title={staffPage?.sectionTitles?.directorsTitle || 'Our Directors'}
         subtitle={staffPage?.sectionTitles?.directorsSubtitle || ''}
+        index="02"
         eyebrow="Leadership"
-        accent="coral"
-        bgClass="bg-cream"
       />
 
       <StaffGrid
         profiles={viceDirectors}
         title={staffPage?.sectionTitles?.viceDirectorsTitle || 'Our Vice Directors'}
         subtitle={staffPage?.sectionTitles?.viceDirectorsSubtitle || ''}
-        eyebrow="Right-hand heroes"
-        accent="sky"
-        bgClass="bg-paper"
+        index="03"
+        eyebrow="Operations"
       />
 
       <DepartmentsSection
