@@ -193,7 +193,8 @@ export const fetchGalleryImages = async (): Promise<GalleryImage[]> => {
     const rows = await sanityClient.fetch(query);
     return Array.isArray(rows)
       ? rows.map((r) => {
-          applyPresetToPaths(r, ['image'], 'gallery');
+          // NOTE: gallery images intentionally served unoptimized.
+          // (Reverted 2026-06-11 per request — keep raw Sanity URLs here.)
           return r;
         })
       : rows;
