@@ -8,6 +8,8 @@ import {
   PlayCircle,
   Globe,
   CalendarDays,
+  GraduationCap,
+  Quote,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Reveal from '@/components/Reveal';
@@ -15,12 +17,14 @@ import WordReveal from '@/components/WordReveal';
 import SectionHeading from '@/components/SectionHeading';
 import FactStrip from '@/components/FactStrip';
 import Shimmer from '@/components/Shimmer';
+import Confetti from '@/components/Confetti';
 import DynamicIcon from '@/components/DynamicIcon';
 import LightboxGallery from '@/components/LightboxGallery';
 import { useParallax } from '@/hooks/useParallax';
-import { homePageData as mockHomePageData, socialPostsData, statsData } from '@/data/mockData';
+import { siteSettings as mockSiteSettings, homePageData as mockHomePageData, socialPostsData, statsData } from '@/data/mockData';
 import { useSanityData, useSanityArrayData } from '@/hooks/useSanityData';
 import {
+  fetchSiteSettings,
   fetchHomePageData,
   fetchStudentPortalApp,
   fetchSocialPosts,
@@ -35,6 +39,11 @@ function HomeHero({ hero }: { hero: HomePage['hero'] }) {
 
   const statsFetcher = useCallback(() => fetchStats(), []);
   const { data: stats } = useSanityArrayData(statsFetcher, statsData);
+  const { data: siteSettings } = useSanityData(fetchSiteSettings, mockSiteSettings);
+  const portalUrl =
+    siteSettings.studentPortalUrl && siteSettings.studentPortalUrl !== '#'
+      ? siteSettings.studentPortalUrl
+      : 'https://portal.makkobillischool.com';
 
   useEffect(() => {
     if (images.length <= 1) return;
@@ -85,12 +94,18 @@ function HomeHero({ hero }: { hero: HomePage['hero'] }) {
                     className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
                 </Link>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-2 rounded-full border border-ink/25 px-7 py-3.5 font-label text-[13px] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink hover:bg-ink hover:text-bone"
+                <a
+                  href={portalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 rounded-full border border-ink/25 px-7 py-3.5 font-label text-[13px] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink hover:bg-ink hover:text-bone"
                 >
-                  Visit Us
-                </Link>
+                  Student Portal
+                  <Globe
+                    size={16}
+                    className="transition-transform duration-300 group-hover:rotate-90"
+                  />
+                </a>
               </div>
             </Reveal>
 
@@ -288,6 +303,166 @@ function LatestUpdates({ latestUpdates }: { latestUpdates?: HomePage['latestUpda
       {lightboxImages.length > 0 && (
         <LightboxGallery images={lightboxImages} onClose={() => setLightboxImages([])} />
       )}
+    </section>
+  );
+}
+
+// ── CELEBRATION ──────────────────────────────────────────────────────────────
+// Temporary, hand-coded spotlight for the Class of 2026 graduation and the
+// Dembi Dollo campus opening. Not Sanity-driven on purpose — delete this
+// function and its <CelebrationSection /> call below once the moment has
+// passed; nothing else on the page depends on it.
+function CelebrationSection() {
+  const [lang, setLang] = useState<'om' | 'en'>('om');
+
+  return (
+    <section className="relative overflow-hidden bg-bone py-16 md:py-24">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
+        <SectionHeading
+          eyebrow="A special moment"
+          title="Congratulations, Graduates!"
+          subtitle="Celebrating our newest graduates and the opening of our Dembi Dollo campus."
+        />
+
+        {/* Principal's message — graduation feature card */}
+        <Reveal variant="fade" delay={150} className="mt-12 md:mt-16">
+          <div className="relative overflow-hidden rounded-[2rem] border-2 border-ink bg-white p-7 shadow-lift md:p-14">
+            <Confetti />
+            <div className="relative">
+              <div className="mb-6 flex flex-wrap items-center gap-3">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-sun text-ink">
+                  <GraduationCap size={22} />
+                </span>
+                <span className="rounded-full bg-ink px-4 py-1.5 font-label text-xs font-bold uppercase tracking-[0.16em] text-bone">
+                  Class of 2026
+                </span>
+              </div>
+              <Quote size={26} className="mb-4 text-sun" />
+              <div className="space-y-5 text-lg leading-relaxed text-ink/75 md:text-xl">
+                <p>
+                  To the Exceptional Class of 2026 — as the principal of Makko Billi School, it is
+                  my absolute honor to congratulate you on this monumental achievement. Today marks
+                  the culmination of your hard work, late nights, and unwavering determination. Your
+                  time at Makko Billi has not just been about acquiring academic knowledge — it has
+                  been about building character, resilience, and a vision for the future.
+                </p>
+                <p>
+                  As you step through these gates and into the next chapter of your lives, carry the
+                  values of our school with you. Dare to dream big, never stop asking questions, and
+                  use your education to build a brighter tomorrow for yourselves and your community.
+                </p>
+                <p>
+                  The world ahead of you is vast and full of opportunity. Be bold, stay curious, and
+                  always strive for excellence. To the Class of 2026 — this is your moment. Go out
+                  and make us proud. You will always be a part of the Makko Billi family.
+                  Congratulations!
+                </p>
+              </div>
+              <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-ink/10 pt-6">
+                <span className="font-display text-lg font-bold text-ink">Paulos Gemechu</span>
+                <span className="h-1 w-1 rotate-45 bg-sun" />
+                <span className="font-label text-xs font-semibold uppercase tracking-[0.16em] text-ink/50">
+                  Founder &amp; Managing Director
+                </span>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Founder's message on the Dembi Dollo opening — language toggle */}
+        <Reveal variant="fade" delay={280} className="mt-6 md:mt-8">
+          <div className="rounded-[2rem] bg-night p-7 text-bone md:p-12">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+              <p className="font-label text-[11px] font-semibold uppercase tracking-[0.3em] text-bone/50">
+                On the Dembi Dollo opening
+              </p>
+              <div className="flex items-center gap-1 rounded-full border border-white/15 p-1">
+                <button
+                  type="button"
+                  onClick={() => setLang('om')}
+                  className={`rounded-full px-3 py-1.5 font-label text-[11px] font-bold uppercase tracking-wider transition-colors ${
+                    lang === 'om' ? 'bg-sun text-ink' : 'text-bone/55 hover:text-bone'
+                  }`}
+                >
+                  Afaan Oromoo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLang('en')}
+                  className={`rounded-full px-3 py-1.5 font-label text-[11px] font-bold uppercase tracking-wider transition-colors ${
+                    lang === 'en' ? 'bg-sun text-ink' : 'text-bone/55 hover:text-bone'
+                  }`}
+                >
+                  English
+                </button>
+              </div>
+            </div>
+
+            {lang === 'om' ? (
+              <div className="space-y-5 leading-relaxed text-bone/80 md:text-lg">
+                <p>
+                  Kabajamtootaa baratoota fi ebbifamtoota mana barumsaa Makkoo Billii, barsiistota,
+                  koree GMB, fi maatii barattoota; duraan dursee baga gammaddan, baga guyyaa kabajaa
+                  hundeefama m/b keenyaa damee DD fi ebba baratoota keenya waliin geenye jechuun
+                  barbaadaa.
+                </p>
+                <p>
+                  Mana barumsaa keenya muxannoo, beekamtii fi fudhatama guddaa magaalaa Adaamaa
+                  kessati horatee as Dambi Dolloo baka dhaloota koo fidee ummataa naguddiseefi
+                  nabarsiise tajaajiluuf fedhii guddaan qaba turee. Kana ammo Waqayyo fi namootni
+                  heddun nagargaaranii mana barumsaa kana as bakka fi ganda ani baradheetti jalqabuu
+                  kootiif gammachuu guddaatu natti dhagahama. Hundeefamuun manni barumsaa Makkoo
+                  Billii Dambi Dolloo anaf dhunfaatti mallattoo barachuu, jiraachuu, milka'ufi
+                  ebbifamuu ti.
+                </p>
+                <p>
+                  Qamolee hundeefama damee M/B Makkoo Billii DD kanaaf gumaacha gotan hundaa
+                  galateefachuun barbaada. Barsiistotaa akkasumas maatii barattootaa, Waldaa Mana
+                  Amantaa Katolikii fi Koree GMB harka bantanii nusimatan, nudeggertan fi kadhaaf
+                  ebban nufaana jirtan hundaa galateefachuun barbaada. Gargaarsa keesaniin waggoota
+                  itti anan mana barumsaa kana guddisnee sadarkaa 2ffaa ti olguddisufi karoora
+                  bafannee hojjechaa jirraa. Kanaafuu deggersi fi kadhannaan keessan nu wajjiin
+                  hajiraatu jechaa yeroo gaarii isiniif hawwaa.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-5 leading-relaxed text-bone/80 md:text-lg">
+                <p>
+                  To the respected students and graduates of Makko Billi School, our teachers, the
+                  GMB committee, and the families of our students — first of all, congratulations,
+                  and congratulations on reaching the day celebrating the founding of our school's
+                  Dembi Dollo branch together with the graduation of our students.
+                </p>
+                <p>
+                  Our school, having gained experience, reputation, and wide acceptance in Adama,
+                  has long had a strong desire to bring that same service to Dembi Dollo — the place
+                  of my birth, where the community raised and educated me. With God's help and the
+                  support of many people, I feel great joy that this school is now beginning right
+                  here, in the area where I grew up and was educated. For me personally, the
+                  founding of Makko Billi School Dembi Dollo is a symbol of learning, living,
+                  succeeding, and graduating.
+                </p>
+                <p>
+                  I would like to thank everyone who contributed to the founding of the Makko Billi
+                  School Dembi Dollo branch — our teachers, the families of our students, the
+                  Catholic Church community, and the GMB committee, who welcomed us with open arms
+                  and have stood with us in support and prayer. With your help, in the coming years
+                  we are working with a plan to grow this school and raise it to secondary level. I
+                  wish you all a wonderful time, and thank you for your continued support and
+                  prayers.
+                </p>
+              </div>
+            )}
+
+            <div className="mt-7 border-t border-white/10 pt-5">
+              <p className="font-display text-base font-bold text-bone">Paulos Gemechu</p>
+              <p className="mt-0.5 text-sm text-bone/50">
+                Founder &amp; Senior Director, Dembi Dollo Branch
+              </p>
+            </div>
+          </div>
+        </Reveal>
+      </div>
     </section>
   );
 }
@@ -646,6 +821,7 @@ export default function Home() {
     <div className="min-h-screen">
       <HomeHero hero={homePageData?.hero} />
       <LatestUpdates latestUpdates={homePageData?.latestUpdates} />
+      <CelebrationSection />
       <StudentPortalAppSection />
       {homePageData?.grandOpening && <GrandOpening grandOpening={homePageData.grandOpening} />}
       {homePageData?.pillars && homePageData.pillars.length > 0 && (

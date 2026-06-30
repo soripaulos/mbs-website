@@ -110,6 +110,12 @@ module.exports = {
           "0%": { transform: "scale(1)" },
           "100%": { transform: "scale(1.08)" },
         },
+        "confetti-fall": {
+          "0%": { transform: "translateY(-10%) rotate(0deg)", opacity: "0" },
+          "8%": { opacity: "1" },
+          "90%": { opacity: "1" },
+          "100%": { transform: "translateY(420%) rotate(360deg)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -118,6 +124,7 @@ module.exports = {
         "page-in": "page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
         "fade-in": "fade-in 0.4s ease-out both",
         kenburns: "kenburns 7s ease-out both",
+        "confetti-fall": "confetti-fall 7s linear infinite",
       },
     },
   },

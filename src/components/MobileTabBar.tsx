@@ -11,17 +11,16 @@ const tabs = [
 ];
 
 /**
- * App-style bottom navigation. All six destinations sit in a single row —
- * no "More" overflow sheet. Visible through the `lg` breakpoint so there's
- * always a complete menu on screen, even at tablet widths where the
- * desktop top-bar links haven't appeared yet.
+ * App-style bottom navigation for mobile. All six destinations sit in a
+ * single row — no "More" overflow sheet. Hidden from `md` up, where the
+ * header's own nav links take over.
  */
 export default function MobileTabBar() {
   const location = useLocation();
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-[56] border-t border-white/10 bg-night/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-[56] border-t border-white/10 bg-night/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
       aria-label="Primary"
     >
       <div className="grid grid-cols-6">

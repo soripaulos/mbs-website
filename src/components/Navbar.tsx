@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowUpRight, Facebook, Send, Youtube, Music2 } from 'lucide-react';
+import { Facebook, Send, Youtube, Music2 } from 'lucide-react';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
 import { fetchSiteSettings } from '@/services/sanity';
@@ -15,22 +15,18 @@ const navLinks = [
 ];
 
 /**
- * Desktop: minimal editorial top bar with animated link underlines.
- * Mobile: slim top bar (logo + socials) — primary navigation lives in the
- * app-style bottom tab bar (MobileTabBar). The Portal CTA only appears on
- * the home page, alongside the social links; every other page just shows
- * the socials, keeping the bar quiet on inner pages.
+ * Header nav appears from `md` up — a real top-bar menu the moment the
+ * mobile bottom tab bar (also `md`-gated) disappears, so there's never a
+ * width with no navigation at all. Below `md`, MobileTabBar carries
+ * primary navigation instead.
+ *
+ * The Portal CTA lives in the home hero now, not the header — every page
+ * gets the same quiet header: logo, nav links, social links.
  */
 export default function Navbar() {
   const { data: siteSettings } = useSanityData(fetchSiteSettings, mockSiteSettings);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const isHome = location.pathname === '/';
-
-  const portalUrl =
-    siteSettings.studentPortalUrl && siteSettings.studentPortalUrl !== '#'
-      ? siteSettings.studentPortalUrl
-      : 'https://portal.makkobillischool.com';
 
   const socials = [
     { href: siteSettings.socialLinks?.facebook, icon: Facebook, label: 'Facebook' },
@@ -53,9 +49,9 @@ export default function Navbar() {
           : 'border-b border-transparent bg-transparent'
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5 md:h-[4.5rem] md:px-8">
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5 md:h-[4.5rem] md:px-6 lg:px-8">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5" aria-label="Makko Billi School — Home">
+        <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Makko Billi School — Home">
           {siteSettings.logo && (
             <img
               src={siteSettings.logoMobile || siteSettings.logo}
@@ -77,8 +73,8 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden items-center gap-7 lg:flex">
+        {/* Header nav links — md and up */}
+        <div className="hidden items-center gap-4 md:flex lg:gap-7">
           {navLinks.map(link => {
             const active = location.pathname === link.path;
             return (
@@ -86,7 +82,7 @@ export default function Navbar() {
                 key={link.path}
                 to={link.path}
                 data-active={active}
-                className={`link-line font-label text-[13px] font-medium uppercase tracking-[0.14em] transition-colors ${
+                className={`link-line whitespace-nowrap font-label text-[12px] font-medium uppercase tracking-[0.1em] transition-colors lg:text-[13px] lg:tracking-[0.14em] ${
                   active ? 'text-ink' : 'text-ink/55 hover:text-ink'
                 }`}
               >
@@ -96,39 +92,23 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Socials + (home-only) Portal CTA */}
-        <div className="flex items-center gap-2 md:gap-3">
-          {socials.length > 0 && (
-            <div className="flex items-center gap-1.5 md:gap-2">
-              {socials.map(({ href, icon: Icon, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-ink/55 transition-colors hover:bg-ink/5 hover:text-ink md:h-9 md:w-9"
-                >
-                  <Icon size={15} />
-                </a>
-              ))}
-            </div>
-          )}
-          {isHome && (
-            <a
-              href={portalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 font-label text-xs font-semibold uppercase tracking-[0.12em] text-bone transition-colors hover:bg-brand md:px-5 md:py-2.5"
-            >
-              Portal
-              <ArrowUpRight
-                size={14}
-                className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </a>
-          )}
-        </div>
+        {/* Socials — same on every page */}
+        {socials.length > 0 && (
+          <div className="flex shrink-0 items-center gap-1 md:gap-1.5">
+            {socials.map(({ href, icon: Icon, label }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-ink/55 transition-colors hover:bg-ink/5 hover:text-ink md:h-9 md:w-9"
+              >
+                <Icon size={15} />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </nav>
   );
