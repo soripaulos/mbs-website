@@ -15,13 +15,26 @@ import { useSanityData } from '@/hooks/useSanityData';
 import { fetchSiteSettings } from '@/services/sanity';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
 
-// Scroll to top on route change
+// Scroll to top on route change — or to a #anchor's target element if one is present
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    if (hash) {
+      // wait a tick for the destination route's content to mount
+      const timer = setTimeout(() => {
+        const el = document.getElementById(hash.slice(1));
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.pageYOffset - 88;
+          window.scrollTo({ top, behavior: 'smooth' });
+          return;
+        }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }, 80);
+      return () => clearTimeout(timer);
+    }
     window.scrollTo({ top: 0, behavior: 'auto' });
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return null;
 }

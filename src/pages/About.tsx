@@ -81,6 +81,81 @@ function IntroSection({ intro }: { intro: typeof aboutPageData.intro }) {
   );
 }
 
+// ── LEGACY — the history behind the school's name ────────────────────────────
+function LegacySection() {
+  return (
+    <section id="legacy" className="border-t border-ink/10 bg-bone py-16 md:py-24">
+      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 px-5 md:grid-cols-[260px_1fr] md:gap-16 md:px-8">
+        <div className="md:sticky md:top-28 md:self-start">
+          <Reveal variant="fade">
+            <div className="flex items-center gap-3 font-label text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/55 md:text-xs">
+              <span className="text-brand">02</span>
+              <span className="h-px w-10 bg-ink/25" />
+              <span>Our Namesake</span>
+            </div>
+          </Reveal>
+        </div>
+        <div>
+          <WordReveal
+            text="The Legacy Behind Our Name"
+            as="h2"
+            className="font-display text-2xl font-bold leading-snug tracking-tight text-ink md:text-4xl md:leading-[1.2]"
+          />
+          <div className="mt-8 space-y-6">
+            <Reveal variant="fade">
+              <p className="text-lg leading-relaxed text-ink/75 md:text-xl">
+                Makko Billi School carries the name of Makko Billi Dardara, one of the most revered
+                figures in Oromo history — remembered as an exceptional Abbaa Gadaa (Gadaa leader),
+                a masterful lawgiver, and a respected raajii (seer) among the Macca Oromo.
+              </p>
+            </Reveal>
+            <Reveal variant="fade" delay={100}>
+              <p className="leading-relaxed text-ink/60">
+                Living during the late 16th and early 17th centuries — a pivotal era of Oromo
+                population movement and settlement — Makko Billi played a central role in
+                establishing the great Chaffee, the assembly of the Macca Oromo, at Oda Bisil.
+                There he instituted and codified the Seera Gadaa, the laws of Gadaa, helping
+                transform it into a highly organized, democratic system of governance. His historic
+                declarations at Oda Bisil are still referenced today as a gold standard for
+                indigenous democracy, justice, and social ethics.
+              </p>
+            </Reveal>
+
+            <Reveal variant="fade" delay={150}>
+              <blockquote className="my-8 border-l-2 border-sun py-1 pl-6 md:pl-8">
+                <Quote size={20} className="mb-3 rotate-180 text-sun" />
+                <p className="font-display text-xl font-semibold italic leading-snug text-ink md:text-2xl">
+                  Saffu — a deep sense of moral order, mutual respect, and harmony between people,
+                  and between people and Waaqa.
+                </p>
+                <footer className="mt-3 font-label text-xs font-medium uppercase tracking-[0.18em] text-ink/40">
+                  Makko Billi's enduring philosophy
+                </footer>
+              </blockquote>
+            </Reveal>
+
+            <Reveal variant="fade" delay={200}>
+              <p className="leading-relaxed text-ink/60">
+                Perhaps his most enduring cultural contribution is the articulation of Saffu — a
+                philosophy of boundary-keeping, mutual respect, and cosmic harmony that remains
+                foundational to Oromo social and legal norms today.
+              </p>
+            </Reveal>
+            <Reveal variant="fade" delay={250}>
+              <p className="leading-relaxed text-ink/60">
+                Founded in Adama in 2009, Makko Billi School translates these ancestral values into
+                a modern educational setting through three pillars: Quality Education, Character
+                Building, and Skill Development — carrying his legacy of peace, integrity, and
+                social harmony into every classroom, on both our Adama and Dembi Dollo campuses.
+              </p>
+            </Reveal>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── STATS — dark count-up band ───────────────────────────────────────────────
 function StatsSection() {
   const fetcher = useCallback(() => fetchStats(), []);
@@ -268,7 +343,7 @@ function AcademicsSection() {
     <section className="bg-bone py-16 md:py-28">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
-          index="02"
+          index="03"
           eyebrow="Academics"
           title="Learning Pathways"
           subtitle="From kindergarten through grade 12 — explore each level's curriculum, meet its director, and see students in action."
@@ -460,7 +535,7 @@ function FacilitiesSection() {
     <section className="border-t border-ink/10 bg-bone py-16 md:py-28">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
-          index="03"
+          index="04"
           eyebrow="Campus"
           title="World-Class Facilities"
           subtitle="Select any facility to flip through more photos."
@@ -535,7 +610,7 @@ function ServicesSection() {
     <section className="noise relative overflow-hidden bg-night py-16 text-bone md:py-28">
       <div className="relative mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
-          index="04"
+          index="05"
           eyebrow="Student life"
           title="Beyond the Classroom"
           subtitle="Integrated technology and holistic support for a thriving student life."
@@ -599,7 +674,7 @@ function BranchesSection() {
     <section className="bg-bone py-16 md:py-28">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <SectionHeading
-          index="05"
+          index="06"
           eyebrow="Our network"
           title="Expanding Horizons"
           subtitle="Bringing quality education to more communities across Ethiopia."
@@ -700,6 +775,7 @@ export default function About() {
         images={pageData?.hero?.images}
       />
       {pageData?.intro && <IntroSection intro={pageData.intro} />}
+      <LegacySection />
       <StatsSection />
       <AcademicsSection />
       <FacilitiesSection />

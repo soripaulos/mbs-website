@@ -12,6 +12,7 @@ import {
   Users,
   ArrowUpRight,
   ArrowDown,
+  ChevronRight,
   Lightbulb,
 } from 'lucide-react';
 import Reveal from '@/components/Reveal';
@@ -178,6 +179,13 @@ function StorySection({ story }: { story: typeof dembiDolloPageData.story }) {
                 </h3>
               </div>
               <p className="leading-relaxed text-ink/65 md:text-lg">{story.ideaContent}</p>
+              <Link
+                to="/about#legacy"
+                className="group mt-4 inline-flex items-center gap-1.5 font-label text-xs font-semibold uppercase tracking-[0.14em] text-brand"
+              >
+                The full story of our name
+                <ChevronRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
+              </Link>
             </Reveal>
           </div>
           {story.ideaImage && (
