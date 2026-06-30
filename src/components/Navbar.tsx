@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Facebook, Send, Youtube, Music2 } from 'lucide-react';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
 import { fetchSiteSettings } from '@/services/sanity';
@@ -16,18 +16,28 @@ const navLinks = [
 
 /**
  * Desktop: minimal editorial top bar with animated link underlines.
- * Mobile: slim top bar (logo + portal) — primary navigation lives in the
- * app-style bottom tab bar (MobileTabBar).
+ * Mobile: slim top bar (logo + socials) — primary navigation lives in the
+ * app-style bottom tab bar (MobileTabBar). The Portal CTA only appears on
+ * the home page, alongside the social links; every other page just shows
+ * the socials, keeping the bar quiet on inner pages.
  */
 export default function Navbar() {
   const { data: siteSettings } = useSanityData(fetchSiteSettings, mockSiteSettings);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const isHome = location.pathname === '/';
 
   const portalUrl =
     siteSettings.studentPortalUrl && siteSettings.studentPortalUrl !== '#'
       ? siteSettings.studentPortalUrl
       : 'https://portal.makkobillischool.com';
+
+  const socials = [
+    { href: siteSettings.socialLinks?.facebook, icon: Facebook, label: 'Facebook' },
+    { href: siteSettings.socialLinks?.telegram, icon: Send, label: 'Telegram' },
+    { href: siteSettings.socialLinks?.youtube, icon: Youtube, label: 'YouTube' },
+    { href: siteSettings.socialLinks?.tiktok, icon: Music2, label: 'TikTok' },
+  ].filter(s => s.href);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 16);
@@ -86,19 +96,39 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Portal CTA */}
-        <a
-          href={portalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 font-label text-xs font-semibold uppercase tracking-[0.12em] text-bone transition-colors hover:bg-brand md:px-5 md:py-2.5"
-        >
-          Portal
-          <ArrowUpRight
-            size={14}
-            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
-        </a>
+        {/* Socials + (home-only) Portal CTA */}
+        <div className="flex items-center gap-2 md:gap-3">
+          {socials.length > 0 && (
+            <div className="flex items-center gap-1.5 md:gap-2">
+              {socials.map(({ href, icon: Icon, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-ink/55 transition-colors hover:bg-ink/5 hover:text-ink md:h-9 md:w-9"
+                >
+                  <Icon size={15} />
+                </a>
+              ))}
+            </div>
+          )}
+          {isHome && (
+            <a
+              href={portalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 font-label text-xs font-semibold uppercase tracking-[0.12em] text-bone transition-colors hover:bg-brand md:px-5 md:py-2.5"
+            >
+              Portal
+              <ArrowUpRight
+                size={14}
+                className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </a>
+          )}
+        </div>
       </div>
     </nav>
   );

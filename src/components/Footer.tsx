@@ -31,7 +31,7 @@ export default function Footer() {
 
   return (
     <footer className="noise relative overflow-hidden bg-night text-bone">
-      <div className="mx-auto max-w-[1200px] px-5 pb-32 pt-16 md:px-8 md:pb-12 md:pt-24">
+      <div className="mx-auto max-w-[1200px] px-5 pb-32 pt-16 md:px-8 md:pt-24 lg:pb-12">
         {/* Oversized wordmark */}
         <div className="border-b border-white/10 pb-10 md:pb-14">
           <WordReveal

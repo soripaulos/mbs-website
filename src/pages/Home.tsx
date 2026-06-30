@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import Reveal from '@/components/Reveal';
 import WordReveal from '@/components/WordReveal';
 import SectionHeading from '@/components/SectionHeading';
-import Marquee from '@/components/Marquee';
+import FactStrip from '@/components/FactStrip';
 import Shimmer from '@/components/Shimmer';
 import DynamicIcon from '@/components/DynamicIcon';
 import LightboxGallery from '@/components/LightboxGallery';
@@ -163,7 +163,7 @@ function HomeHero({ hero }: { hero: HomePage['hero'] }) {
       </div>
 
       <div className="mt-12 md:mt-20">
-        <Marquee
+        <FactStrip
           items={[
             'Nurturing Minds',
             'Building Character',

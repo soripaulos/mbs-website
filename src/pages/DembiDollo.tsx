@@ -18,7 +18,7 @@ import {
 import Reveal from '@/components/Reveal';
 import WordReveal from '@/components/WordReveal';
 import SectionHeading from '@/components/SectionHeading';
-import Marquee from '@/components/Marquee';
+import FactStrip from '@/components/FactStrip';
 import LightboxGallery from '@/components/LightboxGallery';
 import { useParallax } from '@/hooks/useParallax';
 import { useSanityData } from '@/hooks/useSanityData';
@@ -93,7 +93,7 @@ function Hero({ hero }: { hero: typeof dembiDolloPageData.hero }) {
       <div className="relative mx-auto w-full max-w-[1200px] px-5 pb-14 pt-40 md:px-8 md:pb-20">
         <Reveal variant="fade">
           <div className="mb-6 flex items-center gap-3 font-label text-[11px] font-semibold uppercase tracking-[0.3em] text-bone/70 md:text-xs">
-            <span className="text-sun">Campus 02</span>
+            <span className="text-sun">Campus 03</span>
             <span className="h-1 w-1 rotate-45 bg-sun" />
             <span>Kellem Wollega, Oromia</span>
           </div>
@@ -586,7 +586,7 @@ export default function DembiDollo() {
   return (
     <div className="min-h-screen">
       <Hero hero={data.hero} />
-      <Marquee
+      <FactStrip
         items={[
           'Dembi Dollo Campus',
           'Kellem Wollega',
