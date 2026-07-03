@@ -46,6 +46,30 @@ export async function getSingle<T = any>(doctype: string): Promise<T | null> {
   }
 }
 
+// Sort an array of records client-side by an "order_by" expression like
+// "order asc" or "date desc". Sorting is done here rather than via the REST
+// API's order_by param on purpose: several of our fields are named `order`,
+// which is a SQL reserved word Frappe does NOT backtick in its ORDER BY
+// clause, so a server-side sort throws a syntax error and the whole fetch
+// fails. Sorting in JS sidesteps that entirely and is safe for any field name.
+function sortRows<T = any>(rows: T[], orderBy?: string): T[] {
+  if (!orderBy) return rows;
+  const [field, dir] = orderBy.trim().split(/\s+/);
+  const desc = (dir || 'asc').toLowerCase() === 'desc';
+  return [...rows].sort((a: any, b: any) => {
+    const av = a?.[field];
+    const bv = b?.[field];
+    // Missing values always sort to the end regardless of direction.
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    let cmp: number;
+    if (typeof av === 'number' && typeof bv === 'number') cmp = av - bv;
+    else cmp = String(av).localeCompare(String(bv));
+    return desc ? -cmp : cmp;
+  });
+}
+
 // Fetch a list of documents for a regular (multi-record) doctype.
 // Set includeChildTables when the doctype has a Table field the caller needs
 // (e.g. a "gallery" of images) — see the getSingle comment for why a plain
@@ -56,15 +80,14 @@ export async function getList<T = any>(
   includeChildTables = false
 ): Promise<T[]> {
   try {
-    const params: Record<string, string> = {
+    const rows = await frappeGet(doctype, {
       fields: '["*"]',
       limit_page_length: '0',
-    };
-    if (orderBy) params.order_by = orderBy;
-    const rows = await frappeGet(doctype, params);
+    });
     if (!Array.isArray(rows)) return [];
-    if (!includeChildTables) return rows;
-    return await Promise.all(rows.map((row: any) => frappeGetByName(doctype, row.name)));
+    const sorted = sortRows(rows, orderBy);
+    if (!includeChildTables) return sorted;
+    return await Promise.all(sorted.map((row: any) => frappeGetByName(doctype, row.name)));
   } catch (error) {
     console.error(`[Frappe] Error fetching list "${doctype}":`, error);
     return [];
