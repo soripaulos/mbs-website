@@ -111,15 +111,22 @@ export default function LightboxGallery({
         </>
       )}
 
-      <figure className="px-4" onClick={e => e.stopPropagation()}>
+      <figure
+        className="flex max-h-[92vh] flex-col items-center px-4"
+        onClick={e => e.stopPropagation()}
+      >
         <img
           key={currentIndex}
           src={images[currentIndex]}
           alt={caption || ''}
-          className="max-h-[78vh] max-w-[92vw] animate-fade-in rounded-xl object-contain"
+          className={`w-auto max-w-[92vw] shrink animate-fade-in rounded-xl object-contain ${
+            caption ? 'max-h-[64vh]' : 'max-h-[82vh]'
+          }`}
         />
         {caption && (
-          <figcaption className="mt-4 text-center text-sm text-bone/70">{caption}</figcaption>
+          <figcaption className="mt-4 max-h-[24vh] max-w-2xl overflow-y-auto whitespace-pre-line text-center text-sm leading-relaxed text-bone/80">
+            {caption}
+          </figcaption>
         )}
       </figure>
 

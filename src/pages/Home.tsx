@@ -10,6 +10,7 @@ import {
   CalendarDays,
   GraduationCap,
   Quote,
+  Plus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Reveal from '@/components/Reveal';
@@ -182,12 +183,25 @@ function HomeHero({ hero }: { hero: HomePage['hero'] }) {
 // ── LATEST UPDATES — horizontal snap rail ────────────────────────────────────
 function LatestUpdates({ latestUpdates }: { latestUpdates?: HomePage['latestUpdates'] }) {
   const railRef = useRef<HTMLDivElement>(null);
-  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightbox, setLightbox] = useState<{ images: string[]; caption: string } | null>(null);
   const postsFetcher = useCallback(() => fetchSocialPosts(), []);
   const { data: posts, loading } = useSanityArrayData(postsFetcher, socialPostsData);
 
+  const pageSize = latestUpdates?.showCount || 3;
+  const [visibleCount, setVisibleCount] = useState(pageSize);
+  const visiblePosts = posts.slice(0, visibleCount);
+
   const scrollBy = (dir: 1 | -1) => {
     railRef.current?.scrollBy({ left: dir * (railRef.current.clientWidth * 0.85), behavior: 'smooth' });
+  };
+
+  const loadMore = () => {
+    setVisibleCount(c => c + pageSize);
+    // reveal the freshly-appended cards in the horizontal rail
+    setTimeout(
+      () => railRef.current?.scrollBy({ left: railRef.current.clientWidth * 0.85, behavior: 'smooth' }),
+      100
+    );
   };
 
   if (!loading && (!posts || posts.length === 0)) return null;
@@ -233,7 +247,7 @@ function LatestUpdates({ latestUpdates }: { latestUpdates?: HomePage['latestUpda
                 <Shimmer className="mt-2 h-4 w-5/6" />
               </div>
             ))
-          : posts.map((post, index) => (
+          : visiblePosts.map((post, index) => (
               <article
                 key={post.id || index}
                 className="group w-[80vw] max-w-[330px] shrink-0 snap-start sm:w-[340px] sm:max-w-none"
@@ -241,9 +255,9 @@ function LatestUpdates({ latestUpdates }: { latestUpdates?: HomePage['latestUpda
                 {post.images && post.images.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => setLightboxImages(post.images)}
+                    onClick={() => setLightbox({ images: post.images, caption: post.content })}
                     className="img-zoom relative block w-full overflow-hidden rounded-2xl bg-ink/5"
-                    aria-label="View photos"
+                    aria-label="View post"
                   >
                     <div className="aspect-[16/10]">
                       <img
@@ -286,8 +300,27 @@ function LatestUpdates({ latestUpdates }: { latestUpdates?: HomePage['latestUpda
         <div className="w-1 shrink-0" />
       </div>
 
-      {lightboxImages.length > 0 && (
-        <LightboxGallery images={lightboxImages} onClose={() => setLightboxImages([])} />
+      {visibleCount < posts.length && (
+        <div className="mx-auto mt-10 flex max-w-[1200px] flex-col items-center gap-3 px-5 md:px-8">
+          <button
+            onClick={loadMore}
+            className="group inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 font-label text-[13px] font-semibold uppercase tracking-[0.12em] text-bone transition-colors hover:bg-brand"
+          >
+            <Plus size={15} className="transition-transform duration-300 group-hover:rotate-90" />
+            {latestUpdates?.buttonText || 'Load More'}
+          </button>
+          <p className="font-label text-[11px] font-medium uppercase tracking-[0.2em] text-ink/40">
+            {visiblePosts.length} / {posts.length}
+          </p>
+        </div>
+      )}
+
+      {lightbox && (
+        <LightboxGallery
+          images={lightbox.images}
+          captions={lightbox.images.map(() => lightbox.caption)}
+          onClose={() => setLightbox(null)}
+        />
       )}
     </section>
   );
