@@ -32,7 +32,7 @@ import {
   fetchAcademicLevels,
   fetchServices,
   fetchBranches,
-} from '@/services/sanity';
+} from '@/services/frappe';
 import type { AcademicLevel, Facility } from '@/types';
 
 const NO_IMAGE =

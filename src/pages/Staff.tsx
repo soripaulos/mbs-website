@@ -6,7 +6,7 @@ import SectionHeading from '@/components/SectionHeading';
 import Shimmer from '@/components/Shimmer';
 import { staffPageData as mockStaffPageData, staffProfilesData, departmentsData } from '@/data/mockData';
 import { useSanityData, useSanityArrayData } from '@/hooks/useSanityData';
-import { fetchStaffPageData, fetchStaffProfiles, fetchDepartments } from '@/services/sanity';
+import { fetchStaffPageData, fetchStaffProfiles, fetchDepartments } from '@/services/frappe';
 import type { StaffProfile, Department } from '@/types';
 
 const NO_PHOTO =

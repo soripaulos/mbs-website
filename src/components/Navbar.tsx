@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Facebook, Send, Youtube, Music2 } from 'lucide-react';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
-import { fetchSiteSettings } from '@/services/sanity';
+import { fetchSiteSettings } from '@/services/frappe';
 
 const navLinks = [
   { path: '/', label: 'Home' },

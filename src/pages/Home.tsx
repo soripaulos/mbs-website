@@ -28,7 +28,7 @@ import {
   fetchStudentPortalApp,
   fetchSocialPosts,
   fetchStats,
-} from '@/services/sanity';
+} from '@/services/frappe';
 import type { HomePage } from '@/types';
 
 // ── HERO ─────────────────────────────────────────────────────────────────────

@@ -21,7 +21,7 @@ import SectionHeading from '@/components/SectionHeading';
 import LightboxGallery from '@/components/LightboxGallery';
 import { useParallax } from '@/hooks/useParallax';
 import { useSanityData } from '@/hooks/useSanityData';
-import { fetchDembiDolloPage } from '@/services/sanity';
+import { fetchDembiDolloPage } from '@/services/frappe';
 import { dembiDolloPageData } from '@/data/mockData';
 
 const ICON_MAP: Record<string, React.ElementType> = {

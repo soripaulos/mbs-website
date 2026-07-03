@@ -12,7 +12,7 @@ import Gallery from '@/pages/Gallery';
 import Contact from '@/pages/Contact';
 import DembiDollo from '@/pages/DembiDollo';
 import { useSanityData } from '@/hooks/useSanityData';
-import { fetchSiteSettings } from '@/services/sanity';
+import { fetchSiteSettings } from '@/services/frappe';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
 
 // Scroll to top on route change — or to a #anchor's target element if one is present

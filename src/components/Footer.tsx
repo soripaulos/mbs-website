@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Facebook, Send, Youtube, Music2, ArrowUpRight } from 'lucide-react';
 import { siteSettings as mockSiteSettings } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
-import { fetchSiteSettings } from '@/services/sanity';
+import { fetchSiteSettings } from '@/services/frappe';
 import WordReveal from '@/components/WordReveal';
 
 const quickLinks = [

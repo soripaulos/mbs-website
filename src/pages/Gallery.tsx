@@ -9,7 +9,7 @@ import {
   galleryImagesData as mockGalleryImages,
 } from '@/data/mockData';
 import { useSanityData, useSanityArrayData } from '@/hooks/useSanityData';
-import { fetchGalleryPageData, fetchGalleryImages } from '@/services/sanity';
+import { fetchGalleryPageData, fetchGalleryImages } from '@/services/frappe';
 
 const CATEGORIES = [
   { id: 'all', label: 'All' },

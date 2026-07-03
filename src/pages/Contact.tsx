@@ -5,7 +5,7 @@ import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
 import { contactPageData as mockContactData } from '@/data/mockData';
 import { useSanityData } from '@/hooks/useSanityData';
-import { fetchContactPageData } from '@/services/sanity';
+import { fetchContactPageData } from '@/services/frappe';
 import type { ContactInfo } from '@/types';
 
 const inputClass =
