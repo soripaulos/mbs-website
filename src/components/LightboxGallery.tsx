@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface LightboxGalleryProps {
@@ -57,7 +58,12 @@ export default function LightboxGallery({
 
   const caption = captions?.[currentIndex];
 
-  return (
+  // Rendered through a portal to <body> so the fixed overlay is positioned
+  // against the viewport. Page content lives inside a <main> that keeps a
+  // persistent transform (the page-in animation), which would otherwise
+  // become the containing block and trap this "fixed" element inside the
+  // full-height page rather than pinning it to the screen.
+  return createPortal(
     <div
       className="fixed inset-0 z-[9999] flex animate-fade-in items-center justify-center bg-night/95 backdrop-blur-sm"
       onClick={onClose}
@@ -134,6 +140,7 @@ export default function LightboxGallery({
           ))}
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 }

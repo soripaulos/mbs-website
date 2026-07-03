@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import {
   MapPin,
@@ -447,7 +448,7 @@ function FacilityGalleryModal({ facility, onClose }: { facility: Facility; onClo
     };
   }, [onClose, allImages.length]);
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[9999] flex animate-fade-in items-center justify-center bg-night/95 p-4 backdrop-blur-sm"
       onClick={onClose}
@@ -520,7 +521,8 @@ function FacilityGalleryModal({ facility, onClose }: { facility: Facility; onClo
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
