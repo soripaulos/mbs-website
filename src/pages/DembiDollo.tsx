@@ -94,7 +94,7 @@ function Hero({ hero }: { hero: typeof dembiDolloPageData.hero }) {
           <div className="mb-6 flex items-center gap-3 font-label text-[11px] font-semibold uppercase tracking-[0.3em] text-bone/70 md:text-xs">
             <span className="text-sun">Campus 03</span>
             <span className="h-1 w-1 rotate-45 bg-sun" />
-            <span>Kellem Wollega, Oromia</span>
+            <span>Dembi Dollo, Oromia</span>
           </div>
         </Reveal>
         <WordReveal
@@ -225,6 +225,60 @@ function StorySection({ story }: { story: typeof dembiDolloPageData.story }) {
 }
 
 // ── FOUNDER'S MESSAGE (Afaan Oromo) ──────────────────────────────────────────
+function FounderMessage() {
+  return (
+    <section className="noise relative overflow-hidden bg-night py-16 text-bone md:py-24">
+      <div className="relative mx-auto max-w-[1200px] px-5 md:px-8">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[280px_1fr] md:gap-16">
+          <div>
+            <Reveal variant="fade">
+              <div className="flex items-center gap-3 font-label text-[11px] font-semibold uppercase tracking-[0.3em] text-bone/55 md:text-xs">
+                <span className="text-sun">Hundeessaa</span>
+                <span className="h-px w-10 bg-bone/25" />
+                <span>Founder's Message</span>
+              </div>
+              <p className="mt-6 font-display text-xl font-bold tracking-tight md:text-2xl">
+                Phaawuloos Gammachuu
+              </p>
+              <p className="mt-1 text-sm text-bone/50">
+                Hundeessaa fi Direktora Ol'aanaa Mana Barumsaa Makkoo Billii
+              </p>
+            </Reveal>
+          </div>
+          <Reveal variant="fade" delay={120}>
+            <div className="space-y-5 text-lg leading-relaxed text-bone/80 md:text-xl">
+              <p>
+                Kabajamtootaa baratoota fi ebbifamtoota mana barumsaa Makkoo Billii, barsiistota,
+                koree GMB, fi maatii barattoota; duraan dursee baga gammaddan, baga guyyaa kabajaa
+                hundeefama m/b keenyaa damee DD fi ebba baratoota keenya waliin geenye jechuun
+                barbaadaa.
+              </p>
+              <p>
+                Mana barumsaa keenya muxannoo, beekamtii fi fudhatama guddaa magaalaa Adaamaa
+                kessati horatee as Dambi Dolloo baka dhaloota koo fidee ummataa naguddiseefi
+                nabarsiise tajaajiluuf fedhii guddaan qaba turee. Kana ammo Waqayyo fi namootni
+                heddun nagargaaranii mana barumsaa kana as bakka fi ganda ani baradheetti jalqabuu
+                kootiif gammachuu guddaatu natti dhagahama. Hundeefamuun manni barumsaa Makkoo
+                Billii Dambi Dolloo anaf dhunfaatti mallattoo barachuu, jiraachuu, milka'ufi
+                ebbifamuu ti.
+              </p>
+              <p>
+                Qamolee hundeefama damee M/B Makkoo Billii DD kanaaf gumaacha gotan hundaa
+                galateefachuun barbaada. Barsiistotaa akkasumas maatii barattootaa, Waldaa Mana
+                Amantaa Katolikii fi Koree GMB harka bantanii nusimatan, nudeggertan fi kadhaaf
+                ebban nufaana jirtan hundaa galateefachuun barbaada. Gargaarsa keesaniin waggoota
+                itti anan mana barumsaa kana guddisnee sadarkaa 2ffaa ti olguddisufi karoora
+                bafannee hojjechaa jirraa. Kanaafuu deggersi fi kadhannaan keessan nu wajjiin
+                hajiraatu jechaa yeroo gaarii isiniif hawwaa.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── CAMPUS TEASER ────────────────────────────────────────────────────────────
 function CampusTeaser({ gallery }: { gallery: typeof dembiDolloPageData.gallery }) {
   return (
@@ -532,6 +586,7 @@ export default function DembiDollo() {
     <div className="min-h-screen">
       <Hero hero={data.hero} />
       <StorySection story={data.story} />
+      <FounderMessage />
       <CampusTeaser gallery={data.gallery} />
 
       {data.compoundSection?.images?.length > 0 && (

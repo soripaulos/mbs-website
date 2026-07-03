@@ -9,9 +9,9 @@ const navLinks = [
   { path: '/', label: 'Home' },
   { path: '/about', label: 'About' },
   { path: '/staff', label: 'Staff' },
+  { path: '/dembi-dollo', label: 'Dembi Dollo' },
   { path: '/gallery', label: 'Gallery' },
   { path: '/contact', label: 'Contact' },
-  { path: '/dembi-dollo', label: 'Dembi Dollo' },
 ];
 
 /**

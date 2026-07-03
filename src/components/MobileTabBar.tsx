@@ -5,9 +5,9 @@ const tabs = [
   { path: '/', label: 'Home', icon: House },
   { path: '/about', label: 'About', icon: Compass },
   { path: '/staff', label: 'Staff', icon: Users },
+  { path: '/dembi-dollo', label: 'Dembi Dollo', icon: MapPin },
   { path: '/gallery', label: 'Gallery', icon: Images },
   { path: '/contact', label: 'Contact', icon: Phone },
-  { path: '/dembi-dollo', label: 'Dembi', icon: MapPin },
 ];
 
 /**
@@ -39,7 +39,7 @@ export default function MobileTabBar() {
                 className={`transition-colors ${active ? 'text-sun' : 'text-bone/55'}`}
               />
               <span
-                className={`font-label text-[9px] font-medium uppercase tracking-[0.1em] transition-colors ${
+                className={`px-0.5 text-center font-label text-[8.5px] font-medium uppercase leading-tight tracking-[0.04em] transition-colors ${
                   active ? 'text-sun' : 'text-bone/45'
                 }`}
               >
