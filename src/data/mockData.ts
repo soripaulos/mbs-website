@@ -37,6 +37,17 @@ export const homePageData: HomePage = {
       playStore: "#",
       webPortal: "#"
     }
+  },
+  grandOpening: {
+    badge: "New Campus",
+    title: "Grand Opening",
+    subtitle: "Makko Billi School Dembi Dollo — KG and Elementary (KG-Grade 8)",
+    description: "Location: Located in the heart of Dhanqaa near Dembi Dollo, bringing world-class education closer to the West Welega community.",
+    images: [],
+    features: [
+      { icon: "Building2", title: "Modern Infrastructure", description: "State-of-the-art laboratories, smart classrooms, and extensive sports facilities designed for holistic development." },
+      { icon: "BookOpen", title: "Comprehensive Curriculum", description: "Offering KG to Grade 8 education with a focus on academic excellence, character building, and digital literacy." }
+    ]
   }
 } as HomePage;
 
