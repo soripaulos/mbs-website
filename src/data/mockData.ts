@@ -68,6 +68,17 @@ export const homePageData: HomePage = {
     showCount: 3,
     buttonText: 'Load More',
   },
+  grandOpening: {
+    badge: 'New Campus',
+    title: 'Grand Opening',
+    subtitle: 'Makko Billi School Dembi Dollo — KG and Elementary (KG-Grade 8)',
+    description: 'Location: Located in the heart of Dhanqaa near Dembi Dollo, bringing world-class education closer to the West Welega community.',
+    images: [],
+    features: [
+      { icon: 'Building2', title: 'Modern Infrastructure', description: 'State-of-the-art laboratories, smart classrooms, and extensive sports facilities designed for holistic development.' },
+      { icon: 'BookOpen', title: 'Comprehensive Curriculum', description: 'Offering KG to Grade 8 education with a focus on academic excellence, character building, and digital literacy.' }
+    ]
+  }
 } as unknown as HomePage;
 
 export const aboutPageData: AboutPage = {
@@ -161,7 +172,7 @@ export const dembiDolloPageData: DembiDolloPage = {
     ideaImageCaption: '',
     locationTitle: 'The Location',
     locationContent:
-      'Nestled in the heart of Dembi Dollo, a historic town in the Kellem Wollega Zone of the Oromia Region, our campus is strategically located to serve the local community. Dembi Dollo, rich in cultural heritage and natural beauty, provides an inspiring backdrop for learning and growth.',
+      'Nestled in the heart of Dhanqaa near Dembi Dollo, a historic town in the Kellem Wollega Zone of the Oromia Region, our campus is strategically located to serve the local community. Dembi Dollo, rich in cultural heritage and natural beauty, provides an inspiring backdrop for learning and growth.',
     locationImage: '',
     locationImageCaption: '',
   },
