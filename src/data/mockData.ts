@@ -77,7 +77,7 @@ export const dembiDolloPageData: DembiDolloPage = {
     ideaImage: '',
     ideaImageCaption: '',
     locationTitle: 'The Location',
-    locationContent: 'Nestled in the heart of Dembi Dollo, a historic town in the Kellem Wollega Zone of the Oromia Region, our campus is strategically located to serve the local community. Dembi Dollo, rich in cultural heritage and natural beauty, provides an inspiring backdrop for learning and growth.',
+    locationContent: 'Nestled in the heart of Dhanqaa near Dembi Dollo, a historic town in the Kellem Wollega Zone of the Oromia Region, our campus is strategically located to serve the local community. Dembi Dollo, rich in cultural heritage and natural beauty, provides an inspiring backdrop for learning and growth.',
     locationImage: '',
     locationImageCaption: '',
   },
