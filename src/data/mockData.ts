@@ -17,7 +17,7 @@ import type {
   DembiDolloPage,
 } from '@/types';
 
-export const siteSettings: SiteSettings = {} as SiteSettings;
+export const siteSettings: SiteSettings = {} as unknown as SiteSettings;
 
 export const homePageData: HomePage = {
   studentPortalApp: {
@@ -49,9 +49,9 @@ export const homePageData: HomePage = {
       { icon: "BookOpen", title: "Comprehensive Curriculum", description: "Offering KG to Grade 8 education with a focus on academic excellence, character building, and digital literacy." }
     ]
   }
-} as HomePage;
+} as unknown as HomePage;
 
-export const aboutPageData: AboutPage = {} as AboutPage;
+export const aboutPageData: AboutPage = {} as unknown as AboutPage;
 
 export const statsData: Stat[] = [];
 export const facilitiesData: Facility[] = [];
@@ -59,14 +59,14 @@ export const academicLevelsData: AcademicLevel[] = [];
 export const servicesData: Service[] = [];
 export const branchesData: Branch[] = [];
 
-export const staffPageData: StaffPage = {} as StaffPage;
+export const staffPageData: StaffPage = {} as unknown as StaffPage;
 export const staffProfilesData: StaffProfile[] = [];
 export const departmentsData: Department[] = [];
 
-export const galleryPageData: GalleryPage = {} as GalleryPage;
+export const galleryPageData: GalleryPage = {} as unknown as GalleryPage;
 export const galleryImagesData: GalleryImage[] = [];
 
-export const contactPageData: ContactInfo = {} as ContactInfo;
+export const contactPageData: ContactInfo = {} as unknown as ContactInfo;
 
 export const socialPostsData: SocialPost[] = [];
 
@@ -137,4 +137,4 @@ export const dembiDolloPageData: DembiDolloPage = {
     ctaButtonText: 'Get Involved',
     ctaButtonLink: 'mailto:saratesfaye5@gmail.com',
   },
-} as DembiDolloPage;
+} as unknown as DembiDolloPage;
